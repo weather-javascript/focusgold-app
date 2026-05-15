@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusGold 数2BC 復習アプリ</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --bg2: #16161d;
+      --bg3: #1e1e28;
+      --bg4: #252533;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --text: #e8e8f0;
+      --text2: #9090a8;
+      --text3: #5a5a72;
+      --accent: #6c63ff;
+      --accent2: #8b84ff;
+      --accent-bg: rgba(108,99,255,0.12);
+      --green: #4ade80;
+      --green-bg: rgba(74,222,128,0.1);
+      --amber: #fbbf24;
+      --amber-bg: rgba(251,191,36,0.1);
+      --red: #f87171;
+      --red-bg: rgba(248,113,113,0.1);
+      --blue: #60a5fa;
+      --blue-bg: rgba(96,165,250,0.1);
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,15,19,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0;
+      padding: 0 16px;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 700;
+      color: var(--accent2);
+      margin-right: auto;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--text2); font-weight: 400; font-size: 12px; margin-left: 6px; }
+    .nav-tabs { display: flex; gap: 2px; }
+    .nav-tab {
+      padding: 6px 14px; border-radius: 8px;
+      border: none; background: transparent;
+      color: var(--text2); font-size: 13px; cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .nav-tab:hover { background: var(--bg3); color: var(--text); }
+    .nav-tab.active { background: var(--accent-bg); color: var(--accent2); }
+
+    /* LAYOUT */
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+
+    /* TODAY PANEL */
+    .today-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .today-title { font-size: 22px; font-weight: 700; color: var(--text); }
+    .today-date { font-size: 12px; color: var(--text3); margin-top: 4px; }
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+    }
+    .stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-value.accent { color: var(--accent2); }
+    .stat-value.green { color: var(--green); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.red { color: var(--red); }
+
+    /* TASK LIST */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+    .task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
+    .task-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .task-card:hover { border-color: var(--border2); background: var(--bg3); }
+    .task-card.done { opacity: 0.45; }
+    .task-checkbox {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid var(--border2); background: transparent;
+      cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .task-card.done .task-checkbox { background: var(--green); border-color: var(--green); }
+    .task-checkbox-check { color: #0f0f13; font-size: 12px; display: none; }
+    .task-card.done .task-checkbox-check { display: block; }
+    .task-info { flex: 1; }
+    .task-num { font-size: 13px; font-weight: 600; color: var(--text); }
+    .task-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .task-badge {
+      font-size: 10px; font-weight: 600; padding: 3px 8px;
+      border-radius: 20px; letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .badge-r1 { background: var(--amber-bg); color: var(--amber); }
+    .badge-r2 { background: var(--blue-bg); color: var(--blue); }
+    .badge-r3 { background: var(--red-bg); color: var(--red); }
+    .badge-new { background: var(--green-bg); color: var(--green); }
+    .empty-state {
+      text-align: center; padding: 48px 24px;
+      color: var(--text3); font-size: 14px;
+    }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+
+    /* RESULT INDICATOR on task cards */
+    .result-chip {
+      font-size: 11px; font-weight: 700; padding: 3px 8px;
+      border-radius: 20px; flex-shrink: 0; letter-spacing: 0.5px;
+    }
+    .result-chip.maru { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+    .result-chip.sanka { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+    .result-chip.batu { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+
+    /* RESULT SELECTOR in modal */
+    .result-selector { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 12px 0 16px; }
+    .result-opt {
+      padding: 14px 8px; border-radius: var(--radius); border: 1px solid var(--border2);
+      background: var(--bg3); cursor: pointer; text-align: center;
+      transition: all 0.15s; font-family: inherit;
+    }
+    .result-opt:hover { background: var(--bg4); }
+    .result-opt.selected-maru { background: var(--green-bg); border-color: rgba(74,222,128,0.5); }
+    .result-opt.selected-sanka { background: var(--amber-bg); border-color: rgba(251,191,36,0.5); }
+    .result-opt.selected-batu { background: var(--red-bg); border-color: rgba(248,113,113,0.5); }
+    .result-opt-sym { font-size: 22px; display: block; margin-bottom: 4px; }
+    .result-opt-label { font-size: 10px; color: var(--text2); display: block; line-height: 1.3; }
+
+    /* PROGRESS PANEL */
+    .chapters-grid { display: flex; flex-direction: column; gap: 10px; }
+    .chapter-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 16px 20px;
+    }
+    .chapter-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; cursor: pointer;
+    }
+    .chapter-name { font-size: 14px; font-weight: 600; }
+    .chapter-range { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .chapter-pct { font-size: 13px; font-weight: 700; color: var(--accent2); }
+    .progress-bar {
+      height: 4px; background: var(--bg4); border-radius: 4px; overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+      transition: width 0.4s ease;
+    }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 4px;
+      max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+    }
+    .chapter-card.expanded .problem-grid { max-height: 600px; }
+    .prob-btn {
+      aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text3); font-size: 10px;
+      cursor: pointer; transition: all 0.1s; display: flex;
+      align-items: center; justify-content: center;
+      font-family: inherit;
+    }
+    .prob-btn:hover { border-color: var(--accent); color: var(--accent2); }
+    .prob-btn.learned { background: var(--green-bg); border-color: rgba(74,222,128,0.3); color: var(--green); }
+    .prob-btn.learned-sanka { background: var(--amber-bg); border-color: rgba(251,191,36,0.35); color: var(--amber); }
+    .prob-btn.learned-batu { background: var(--red-bg); border-color: rgba(248,113,113,0.35); color: var(--red); }
+    .prob-btn.r1 { background: var(--amber-bg); border-color: rgba(251,191,36,0.3); color: var(--amber); }
+    .prob-btn.r2 { background: var(--blue-bg); border-color: rgba(96,165,250,0.3); color: var(--blue); }
+    .prob-btn.r3 { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.3); color: var(--red); }
+    .prob-btn.mastered { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.3); color: var(--accent2); }
+    .prob-btn.mastered-sanka { background: rgba(108,99,255,0.1); border-color: rgba(251,191,36,0.4); color: var(--accent2); }
+    .prob-btn.mastered-batu { background: rgba(108,99,255,0.08); border-color: rgba(248,113,113,0.4); color: var(--red); }
+
+    /* LEGEND */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      margin-bottom: 20px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); padding: 28px;
+      width: 360px; max-width: calc(100vw - 32px);
+      transform: translateY(12px); transition: transform 0.2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+    .modal-actions { display: flex; flex-direction: column; gap: 8px; }
+    .modal-btn {
+      padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--border2);
+      background: var(--bg3); color: var(--text); font-size: 13px; font-weight: 600;
+      cursor: pointer; text-align: left; transition: all 0.15s; font-family: inherit;
+    }
+    .modal-btn:hover { background: var(--bg4); border-color: var(--border2); }
+    .modal-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .modal-btn.primary:hover { background: var(--accent2); }
+    .modal-btn-sub { font-size: 11px; color: var(--text3); font-weight: 400; margin-top: 2px; }
+    .modal-close { float: right; background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; line-height: 1; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: 24px; padding: 10px 20px;
+      font-size: 13px; color: var(--text);
+      transition: transform 0.3s; z-index: 300; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* SETTINGS */
+    .settings-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
+    }
+    .settings-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 13px; color: var(--text); }
+    .settings-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .danger-btn {
+      padding: 8px 16px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,0.3);
+      background: var(--red-bg); color: var(--red); font-size: 12px;
+      cursor: pointer; font-family: inherit; font-weight: 600;
+      transition: all 0.15s;
+    }
+    .danger-btn:hover { background: rgba(248,113,113,0.2); }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">FocusGold <span>数2BC</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('today')">今日のタスク</button>
+    <button class="nav-tab" onclick="showTab('progress')">進捗</button>
+    <button class="nav-tab" onclick="showTab('settings')">設定</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- TODAY TAB -->
+  <div id="tab-today">
+    <div class="today-header">
+      <div>
+        <div class="today-title">今日のタスク</div>
+        <div class="today-date" id="today-date"></div>
+      </div>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="task-list" id="task-list">
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        読み込み中...
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRESS TAB -->
+  <div id="tab-progress" style="display:none">
+    <div class="today-header">
+      <div>
+        <div class="today-title">学習進捗</div>
+        <div class="today-date">問題をクリックして学習状態を記録</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bg4);border:1px solid var(--border2)"></div>未学習</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green-bg);border:1px solid rgba(74,222,128,0.3)"></div>学習済 ○</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.35)"></div>学習済 △</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.35)"></div>学習済 ×</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue-bg);border:1px solid rgba(96,165,250,0.3)"></div>復習待ち</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-bg);border:1px solid rgba(108,99,255,0.3)"></div>完了</div>
+    </div>
+    <div class="chapters-grid" id="chapters-grid"></div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div id="tab-settings" style="display:none">
+    <div class="today-header">
+      <div><div class="today-title">設定</div></div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-title">復習スケジュール</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">1回目復習</div>
+          <div class="settings-sub">学習から3日後</div>
+        </div>
+        <div style="color:var(--amber);font-weight:700;font-size:14px">3日後</div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">2回目復習</div>
+          <div class="settings-sub">学習から1週間後</div>
+        </div>
+        <div style="color:var(--blue);font-weight:700;font-size:14px">7日後</div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">3回目復習（最終）</div>
+          <div class="settings-sub">学習から1ヶ月後</div>
+        </div>
+        <div style="color:var(--red);font-weight:700;font-size:14px">30日後</div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-title">データ</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">学習データをリセット</div>
+          <div class="settings-sub">すべての記録が削除されます</div>
+        </div>
+        <button class="danger-btn" onclick="resetData()">リセット</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">データをエクスポート</div>
+          <div class="settings-sub">JSON形式で保存</div>
+        </div>
+        <button class="modal-btn" style="padding:8px 16px;font-size:12px" onclick="exportData()">エクスポート</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModalDirect()">×</button>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const CHAPTERS = [
+  { name: '第一章　式と計算', start: 1, end: 35 },
+  { name: '第二章　高次方程式', start: 36, end: 67 },
+  { name: '第三章　図形と方程式', start: 68, end: 120 },
+  { name: '第四章　三角関数', start: 121, end: 152 },
+  { name: '第五章　指数関数と対数関数', start: 153, end: 178 },
+  { name: '第六章　微分法', start: 179, end: 217 },
+  { name: '第七章　積分法', start: 218, end: 245 },
+  { name: '第八章　数列', start: 'B1.1', end: 'B1.66', count: 66, prefix: 'B1.' },
+  { name: '第九章　確率分布と統計的な推測', start: 'B2.1', end: 'B2.19', count: 19, prefix: 'B2.' },
+  { name: '第十章　平面上のベクトル', start: 'C1.1', end: 'C1.41', count: 41, prefix: 'C1.' },
+  { name: '第十一章　空間のベクトル', start: 'C1.42', end: 'C1.81', count: 40, prefix: 'C1.', startNum: 42 },
+];
+
+// Review intervals: day offsets
+const REVIEW_DAYS = [3, 7, 30];
+
+// state: { [problemId]: { learnedAt: timestamp, reviews: [ts1, ts2, ts3] } }
+let state = {};
+
+function loadState() {
+  try { state = JSON.parse(localStorage.getItem('fg_state') || '{}'); } catch(e) { state = {}; }
+}
+function saveState() {
+  localStorage.setItem('fg_state', JSON.stringify(state));
+}
+
+// Build problem IDs for a chapter
+function getProblems(ch) {
+  if (ch.prefix) {
+    const start = ch.startNum || 1;
+    return Array.from({ length: ch.count }, (_, i) => ch.prefix + (start + i));
+  }
+  return Array.from({ length: ch.end - ch.start + 1 }, (_, i) => String(ch.start + i));
+}
+
+function today() {
+  const d = new Date(); d.setHours(0,0,0,0); return d.getTime();
+}
+
+function daysSince(ts) {
+  return Math.floor((today() - ts) / 86400000);
+}
+
+// Get review stage for a problem (used for dot color)
+function getStage(pid) {
+  const s = state[pid];
+  if (!s) return 'unlearned';
+  const reviews = s.reviews || [];
+  const result = s.result || 'maru'; // maru / sanka / batu
+  if (reviews.length >= 3) {
+    if (result === 'maru') return 'mastered';
+    if (result === 'sanka') return 'mastered-sanka';
+    return 'mastered-batu';
+  }
+  const nextReviewDays = REVIEW_DAYS[reviews.length];
+  const daysPassed = daysSince(s.learnedAt);
+  if (daysPassed < nextReviewDays) {
+    if (result === 'maru') return 'learned';
+    if (result === 'sanka') return 'learned-sanka';
+    return 'learned-batu';
+  }
+  return ['r1','r2','r3'][reviews.length];
+}
+
+function isDueToday(pid) {
+  const s = state[pid];
+  if (!s) return false;
+  const reviews = s.reviews || [];
+  if (reviews.length >= 3) return false;
+  const nextReviewDays = REVIEW_DAYS[reviews.length];
+  return daysSince(s.learnedAt) >= nextReviewDays;
+}
+
+// ===== TODAY TAB =====
+function renderToday() {
+  // Date
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+  // Collect tasks
+  let tasks = [];
+  CHAPTERS.forEach(ch => {
+    getProblems(ch).forEach(pid => {
+      if (isDueToday(pid)) {
+        const s = state[pid];
+        const rev = (s.reviews||[]).length;
+        tasks.push({ pid, ch: ch.name, stage: rev });
+      }
+    });
+  });
+
+  // Sort: r1 > r2 > r3
+  tasks.sort((a,b) => a.stage - b.stage);
+
+  // Stats
+  let totalLearned = 0, totalMastered = 0, totalDue = tasks.length;
+  let totalProblems = CHAPTERS.reduce((a,ch) => a + (ch.prefix ? ch.count : ch.end - ch.start + 1), 0);
+  Object.keys(state).forEach(pid => {
+    const s = state[pid];
+    if (s) {
+      totalLearned++;
+      if ((s.reviews||[]).length >= 3) totalMastered++;
+    }
+  });
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-label">今日のタスク</div><div class="stat-value amber">${totalDue}</div></div>
+    <div class="stat-card"><div class="stat-label">学習済問題</div><div class="stat-value accent">${totalLearned}</div></div>
+    <div class="stat-card"><div class="stat-label">完全習得</div><div class="stat-value green">${totalMastered}</div></div>
+    <div class="stat-card"><div class="stat-label">全問題数</div><div class="stat-value" style="color:var(--text2)">${totalProblems}</div></div>
+  `;
+
+  if (tasks.length === 0) {
+    document.getElementById('task-list').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        今日の復習タスクはありません！<br>
+        <span style="font-size:12px;margin-top:8px;display:block">「進捗」タブから新しい問題を学習しましょう</span>
+      </div>
+    `;
+    return;
+  }
+
+  const badgeLabels = ['1回目復習', '2回目復習', '最終復習'];
+  const badgeClasses = ['badge-r1', 'badge-r2', 'badge-r3'];
+  const resultChipMap = {
+    maru:  { cls: 'maru',  label: '○' },
+    sanka: { cls: 'sanka', label: '△' },
+    batu:  { cls: 'batu',  label: '×' },
+  };
+  
+  document.getElementById('task-list').innerHTML = tasks.map(t => {
+    const doneKey = 'done_' + t.pid;
+    const isDone = sessionStorage.getItem(doneKey);
+    const lastResult = state[t.pid]?.result || 'maru';
+    const chip = resultChipMap[lastResult];
+    return `
+    <div class="task-card ${isDone ? 'done' : ''}" id="tc-${t.pid}" onclick="openTaskModal('${t.pid}', ${t.stage})">
+      <div class="task-checkbox">
+        <span class="task-checkbox-check">✓</span>
+      </div>
+      <div class="task-info">
+        <div class="task-num">問題 ${t.pid}</div>
+        <div class="task-meta">${t.ch}　<span style="color:var(--text3)">前回: <span class="result-chip ${chip.cls}" style="font-size:10px;padding:1px 5px">${chip.label}</span></span></div>
+      </div>
+      <span class="task-badge ${badgeClasses[t.stage]}">${badgeLabels[t.stage]}</span>
+    </div>
+    `;
+  }).join('');
+}
+
+function openTaskModal(pid, stage) {
+  openModal(pid, CHAPTERS.find(ch => getProblems(ch).includes(pid))?.name || '', stage);
+}
+
+function toggleTask(pid, stage) {
+  // kept for legacy, redirect to modal
+  openTaskModal(pid, stage);
+}
+
+// ===== PROGRESS TAB =====
+function renderProgress() {
+  const grid = document.getElementById('chapters-grid');
+  grid.innerHTML = CHAPTERS.map((ch, ci) => {
+    const problems = getProblems(ch);
+    const total = problems.length;
+    const done = problems.filter(p => state[p]).length;
+    const mastered = problems.filter(p => (state[p]?.reviews||[]).length >= 3).length;
+    const pct = Math.round(done / total * 100);
+    
+    return `
+    <div class="chapter-card" id="ch-card-${ci}">
+      <div class="chapter-header" onclick="toggleChapter(${ci})">
+        <div>
+          <div class="chapter-name">${ch.name}</div>
+          <div class="chapter-range">${total}問　習得${mastered}問</div>
+        </div>
+        <div class="chapter-pct">${pct}%</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="problem-grid" id="pg-${ci}">
+        ${problems.map(pid => {
+          const stage = getStage(pid);
+          return `<button class="prob-btn ${stage === 'unlearned' ? '' : stage}" onclick="openModal('${pid}', '${ch.name}')">${pid}</button>`;
+        }).join('')}
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+function toggleChapter(ci) {
+  const card = document.getElementById(`ch-card-${ci}`);
+  card.classList.toggle('expanded');
+}
+
+// ===== MODAL =====
+let modalPid = '', modalCh = '', modalStage = null;
+
+function resultSelectorHTML(currentResult) {
+  const opts = [
+    { key: 'maru',  sym: '○', label: 'できた' },
+    { key: 'sanka', sym: '△', label: '答えを見たら\nわかった' },
+    { key: 'batu',  sym: '×', label: '答えを見ても\nわからなかった' },
+  ];
+  return `
+  <div style="font-size:11px;color:var(--text3);margin-bottom:6px">この問題の結果</div>
+  <div class="result-selector" id="result-sel">
+    ${opts.map(o => `
+      <button class="result-opt ${currentResult === o.key ? 'selected-'+o.key : ''}"
+        onclick="selectResult('${o.key}')"
+        id="ropt-${o.key}">
+        <span class="result-opt-sym">${o.sym}</span>
+        <span class="result-opt-label">${o.label.replace('\n','<br>')}</span>
+      </button>
+    `).join('')}
+  </div>`;
+}
+
+let pendingResult = 'maru';
+
+function selectResult(key) {
+  pendingResult = key;
+  ['maru','sanka','batu'].forEach(k => {
+    const el = document.getElementById('ropt-' + k);
+    if (!el) return;
+    el.className = 'result-opt' + (k === key ? ' selected-' + k : '');
+  });
+}
+
+function openModal(pid, chName, stageOverride) {
+  modalPid = pid; modalCh = chName;
+  const s = state[pid];
+  const stage = getStage(pid);
+  modalStage = stageOverride !== undefined ? stageOverride : null;
+  pendingResult = s?.result || 'maru';
+
+  document.getElementById('modal-title').textContent = `問題 ${pid}`;
+  document.getElementById('modal-sub').textContent = chName;
+
+  const isDueReview = ['r1','r2','r3'].includes(stage);
+  const revIdx = s ? (s.reviews||[]).length : 0;
+
+  const stageLabels = {
+    unlearned: '未学習',
+    learned: `学習済（${daysSince(s?.learnedAt)}日経過）`,
+    r1: '1回目復習の日！',
+    r2: '2回目復習の日！',
+    r3: '最終復習の日！',
+    mastered: '完全習得済！',
+    'mastered-sanka': '完全習得済！',
+    'mastered-batu': '完全習得済！',
+    'learned-sanka': `学習済（${daysSince(s?.learnedAt)}日経過）`,
+    'learned-batu': `学習済（${daysSince(s?.learnedAt)}日経過）`,
+  };
+
+  let actions = '';
+  if (stage === 'unlearned') {
+    actions = `
+      ${resultSelectorHTML('maru')}
+      <button class="modal-btn primary" onclick="learnProblem()">今日学習した<div class="modal-btn-sub">1回目の学習として記録</div></button>
+    `;
+  } else if (stage === 'learned' || stage === 'learned-sanka' || stage === 'learned-batu') {
+    actions = `
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px">次回復習: ${nextReviewDate(pid)}</div>
+      ${resultSelectorHTML(pendingResult)}
+      <button class="modal-btn primary" onclick="updateResult()">評価を更新<div class="modal-btn-sub">復習スケジュールはそのまま</div></button>
+      <button class="modal-btn" style="border-color:rgba(248,113,113,0.3);color:var(--red)" onclick="unlearn()">学習記録を削除</button>
+    `;
+  } else if (stage === 'mastered' || stage === 'mastered-sanka' || stage === 'mastered-batu') {
+    actions = `
+      <div style="font-size:12px;color:var(--accent2);margin-bottom:12px;font-weight:600">🎉 すべての復習完了！</div>
+      ${resultSelectorHTML(pendingResult)}
+      <button class="modal-btn primary" onclick="updateResult()">評価を更新</button>
+      <button class="modal-btn" onclick="closeModalDirect()">閉じる</button>
+    `;
+  } else {
+    // due for review r1/r2/r3
+    const taskEl = document.getElementById('tc-' + pid);
+    const alreadyDone = taskEl?.classList.contains('done');
+    actions = `
+      ${resultSelectorHTML(pendingResult)}
+      <button class="modal-btn primary" onclick="reviewProblem()">復習完了！<div class="modal-btn-sub">${stageLabels[stage]}</div></button>
+      <button class="modal-btn" onclick="closeModalDirect()">後で</button>
+    `;
+  }
+
+  document.getElementById('modal-actions').innerHTML = `
+    <div style="font-size:12px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:12px">${stageLabels[stage] || stage}</div>
+    ${actions}
+  `;
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function nextReviewDate(pid) {
+  const s = state[pid];
+  if (!s) return '-';
+  const rev = (s.reviews||[]).length;
+  if (rev >= 3) return '完了';
+  const dueTs = s.learnedAt + REVIEW_DAYS[rev] * 86400000;
+  return new Date(dueTs).toLocaleDateString('ja-JP', { month:'long', day:'numeric' });
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function learnProblem() {
+  state[modalPid] = { learnedAt: today(), reviews: [], result: pendingResult };
+  saveState();
+  closeModalDirect();
+  const labels = { maru: '○ できた', sanka: '△ 答えを見たらわかった', batu: '× わからなかった' };
+  showToast(`問題${modalPid} 学習記録（${labels[pendingResult]}）`);
+  renderProgress();
+  renderToday();
+}
+
+function reviewProblem() {
+  if (!state[modalPid]) state[modalPid] = { learnedAt: today(), reviews: [] };
+  const reviews = state[modalPid].reviews || [];
+  state[modalPid].reviews = [...reviews, today()];
+  state[modalPid].result = pendingResult;
+  saveState();
+  // mark task card done
+  const taskEl = document.getElementById('tc-' + modalPid);
+  if (taskEl) { taskEl.classList.add('done'); sessionStorage.setItem('done_' + modalPid, '1'); }
+  closeModalDirect();
+  const labels = { maru: '○', sanka: '△', batu: '×' };
+  showToast(`問題${modalPid} 復習完了 ${labels[pendingResult]}`);
+  renderProgress();
+  renderToday();
+}
+
+function updateResult() {
+  if (!state[modalPid]) return;
+  state[modalPid].result = pendingResult;
+  saveState();
+  closeModalDirect();
+  const labels = { maru: '○', sanka: '△', batu: '×' };
+  showToast(`問題${modalPid} 評価を${labels[pendingResult]}に更新`);
+  renderProgress();
+  renderToday();
+}
+
+function unlearn() {
+  delete state[modalPid];
+  saveState();
+  closeModalDirect();
+  showToast(`問題${modalPid} の記録を削除しました`);
+  renderProgress();
+  renderToday();
+}
+
+// ===== TAB =====
+function showTab(t) {
+  ['today','progress','settings'].forEach(id => {
+    document.getElementById(`tab-${id}`).style.display = id === t ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((el, i) => {
+    el.classList.toggle('active', ['today','progress','settings'][i] === t);
+  });
+  if (t === 'progress') renderProgress();
+  if (t === 'today') renderToday();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===== SETTINGS =====
+function resetData() {
+  if (confirm('すべての学習データをリセットしますか？')) {
+    state = {};
+    saveState();
+    showToast('データをリセットしました');
+    renderToday();
+  }
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'focusgold_data.json';
+  a.click();
+}
+
+// ===== INIT =====
+loadState();
+renderToday();
+</script>
+</body>
+</html>
