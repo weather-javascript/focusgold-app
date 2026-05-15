@@ -1,0 +1,8 @@
+{
+  "appId": "com.focusgold.app",
+  "appName": "FocusGold",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  }
+}
