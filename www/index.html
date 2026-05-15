@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FocusGold 数2BC 復習アプリ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>FocusGold 数2BC</title>
 <style>
 :root {
   --bg: #0f0f13;
@@ -28,166 +28,108 @@
   --blue-bg: rgba(96,165,250,0.1);
   --radius: 10px;
   --radius-lg: 16px;
+  --bottom-h: 64px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.6;
+.light {
+  --bg: #f4f4f8;
+  --bg2: #ffffff;
+  --bg3: #f0f0f5;
+  --bg4: #e4e4ec;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a2e;
+  --text2: #5a5a72;
+  --text3: #9090a8;
 }
-nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(15,15,19,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 0;
-  padding: 0 16px;
-  height: 56px;
-}
-.nav-logo {
-  font-size: 16px; font-weight: 700;
-  color: var(--accent2);
-  margin-right: auto;
-  letter-spacing: -0.5px;
-}
-.nav-logo span { color: var(--text2); font-weight: 400; font-size: 12px; margin-left: 6px; }
-.nav-status {
-  font-size: 11px; color: var(--text3); margin-right: 12px;
-  display: flex; align-items: center; gap: 4px;
-}
-.status-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--text3);
-}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; padding-bottom: var(--bottom-h); }
+
+/* NAV */
+nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; height: 52px; gap: 8px; }
+.light nav.top-nav { background: rgba(244,244,248,0.94); }
+.nav-logo { font-size: 16px; font-weight: 700; color: var(--accent2); margin-right: auto; }
+.nav-logo span { color: var(--text2); font-weight: 400; font-size: 11px; margin-left: 5px; }
+.nav-streak { font-size: 13px; font-weight: 700; color: var(--amber); }
+.nav-icon-btn { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 6px; border-radius: 8px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
 .status-dot.online { background: var(--green); }
-.status-dot.syncing { background: var(--amber); }
-.nav-tabs { display: flex; gap: 2px; }
-.nav-tab {
-  padding: 6px 14px; border-radius: 8px;
-  border: none; background: transparent;
-  color: var(--text2); font-size: 13px; cursor: pointer;
-  transition: all 0.15s; font-family: inherit;
-}
-.nav-tab:hover { background: var(--bg3); color: var(--text); }
-.nav-tab.active { background: var(--accent-bg); color: var(--accent2); }
-.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-.today-header {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  margin-bottom: 20px;
-}
-.today-title { font-size: 22px; font-weight: 700; color: var(--text); }
-.today-date { font-size: 12px; color: var(--text3); margin-top: 4px; }
-.stats-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px 16px;
-}
-.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.stat-value { font-size: 24px; font-weight: 700; }
+
+/* BOTTOM NAV */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: var(--bg2); border-top: 1px solid var(--border); display: flex; height: var(--bottom-h); padding-bottom: env(safe-area-inset-bottom, 0); }
+.bn-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: none; background: none; color: var(--text3); font-size: 10px; cursor: pointer; font-family: inherit; transition: color 0.15s; }
+.bn-icon { font-size: 20px; transition: transform 0.15s; }
+.bn-tab.active { color: var(--accent2); }
+.bn-tab.active .bn-icon { transform: translateY(-2px); }
+
+/* CONTAINER */
+.container { max-width: 960px; margin: 0 auto; padding: 18px 15px; }
+
+/* AUTH */
+#auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+.auth-logo { font-size: 30px; font-weight: 700; color: var(--accent2); margin-bottom: 4px; }
+.auth-sub { font-size: 12px; color: var(--text3); margin-bottom: 28px; }
+.auth-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; width: 100%; max-width: 360px; }
+.auth-tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--bg3); border-radius: var(--radius); padding: 3px; }
+.auth-tab { flex: 1; padding: 8px; border: none; background: none; color: var(--text2); font-size: 13px; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.auth-tab.active { background: var(--bg2); color: var(--text); }
+.auth-input { width: 100%; padding: 11px 13px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-size: 14px; font-family: inherit; margin-bottom: 9px; outline: none; }
+.auth-input:focus { border-color: var(--accent); }
+.auth-btn { width: 100%; padding: 12px; border-radius: var(--radius); border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; margin-bottom: 8px; transition: all 0.15s; }
+.auth-btn.primary { background: var(--accent); color: #fff; }
+.auth-btn.google { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; gap: 8px; }
+.auth-divider { text-align: center; color: var(--text3); font-size: 12px; margin: 8px 0; }
+.auth-err { color: var(--red); font-size: 12px; margin-bottom: 8px; text-align: center; min-height: 16px; }
+.auth-skip { color: var(--text3); font-size: 12px; text-align: center; cursor: pointer; text-decoration: underline; margin-top: 10px; }
+
+/* LOADING */
+#loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 14px; }
+.loading-logo { font-size: 22px; font-weight: 700; color: var(--accent2); }
+.loading-spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--bg4); border-top-color: var(--accent); animation: spin 0.8s linear infinite; }
+.loading-text { font-size: 12px; color: var(--text3); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 18px; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; }
+.stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+.stat-value { font-size: 20px; font-weight: 700; }
 .stat-value.accent { color: var(--accent2); }
 .stat-value.green { color: var(--green); }
 .stat-value.amber { color: var(--amber); }
-.stat-value.red { color: var(--red); }
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
-}
-.section-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-.task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px; }
-.task-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 12px 16px;
-  display: flex; align-items: center; gap: 12px;
-  transition: border-color 0.15s, background 0.15s;
-  cursor: pointer;
-}
-.task-card:hover { border-color: var(--border2); background: var(--bg3); }
-.task-card.done { opacity: 0.45; }
-.task-checkbox {
-  width: 20px; height: 20px; border-radius: 50%;
-  border: 2px solid var(--border2); background: transparent;
-  cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
-}
-.task-card.done .task-checkbox { background: var(--green); border-color: var(--green); }
-.task-checkbox-check { color: #0f0f13; font-size: 12px; display: none; }
-.task-card.done .task-checkbox-check { display: block; }
-.task-info { flex: 1; }
-.task-num { font-size: 13px; font-weight: 600; color: var(--text); }
-.task-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.task-badge {
-  font-size: 10px; font-weight: 600; padding: 3px 8px;
-  border-radius: 20px; letter-spacing: 0.3px;
-  flex-shrink: 0;
-}
+
+/* TASKS */
+.section-title { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 9px; }
+.task-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+.task-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: border-color 0.15s; }
+.task-card:hover, .task-card:active { border-color: var(--border2); background: var(--bg3); }
+.task-card.done { opacity: 0.38; }
+.task-checkbox { width: 19px; height: 19px; border-radius: 50%; border: 2px solid var(--border2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: transparent; transition: all 0.15s; }
+.task-card.done .task-checkbox { background: var(--green); border-color: var(--green); color: #0a0a0e; }
+.task-info { flex: 1; min-width: 0; }
+.task-num { font-size: 13px; font-weight: 600; }
+.task-meta { font-size: 11px; color: var(--text3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.task-badge { font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 20px; flex-shrink: 0; }
 .badge-r1 { background: var(--amber-bg); color: var(--amber); }
 .badge-r2 { background: var(--blue-bg); color: var(--blue); }
 .badge-r3 { background: var(--red-bg); color: var(--red); }
-.badge-new { background: var(--green-bg); color: var(--green); }
-.empty-state {
-  text-align: center; padding: 48px 24px;
-  color: var(--text3); font-size: 14px;
-}
-.empty-icon { font-size: 36px; margin-bottom: 12px; }
-.result-chip {
-  font-size: 11px; font-weight: 700; padding: 3px 8px;
-  border-radius: 20px; flex-shrink: 0; letter-spacing: 0.5px;
-}
-.result-chip.maru { background: var(--green-bg); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
-.result-chip.sanka { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
-.result-chip.batu { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
-.result-selector { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 12px 0 16px; }
-.result-opt {
-  padding: 14px 8px; border-radius: var(--radius); border: 1px solid var(--border2);
-  background: var(--bg3); cursor: pointer; text-align: center;
-  transition: all 0.15s; font-family: inherit;
-}
-.result-opt:hover { background: var(--bg4); }
-.result-opt.selected-maru { background: var(--green-bg); border-color: rgba(74,222,128,0.5); }
-.result-opt.selected-sanka { background: var(--amber-bg); border-color: rgba(251,191,36,0.5); }
-.result-opt.selected-batu { background: var(--red-bg); border-color: rgba(248,113,113,0.5); }
-.result-opt-sym { font-size: 22px; display: block; margin-bottom: 4px; }
-.result-opt-label { font-size: 10px; color: var(--text2); display: block; line-height: 1.3; }
+
+/* WEAK */
+.weak-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+.weak-card { background: var(--bg2); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--radius); padding: 11px 13px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.weak-card:hover { border-color: rgba(248,113,113,0.4); }
+
+/* PROGRESS */
 .chapters-grid { display: flex; flex-direction: column; gap: 10px; }
-.chapter-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 16px 20px;
-}
-.chapter-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; cursor: pointer;
-}
-.chapter-name { font-size: 14px; font-weight: 600; }
+.chapter-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 17px; }
+.chapter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; cursor: pointer; user-select: none; }
+.chapter-name { font-size: 13px; font-weight: 600; }
 .chapter-range { font-size: 11px; color: var(--text3); margin-top: 2px; }
 .chapter-pct { font-size: 13px; font-weight: 700; color: var(--accent2); }
-.progress-bar {
-  height: 4px; background: var(--bg4); border-radius: 4px; overflow: hidden;
-  margin-bottom: 14px;
-}
-.progress-fill {
-  height: 100%; border-radius: 4px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
-  transition: width 0.4s ease;
-}
-.problem-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 4px;
-  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
-}
-.chapter-card.expanded .problem-grid { max-height: 600px; }
-.prob-btn {
-  aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border);
-  background: var(--bg3); color: var(--text3); font-size: 10px;
-  cursor: pointer; transition: all 0.1s; display: flex;
-  align-items: center; justify-content: center;
-  font-family: inherit;
-}
+.progress-bar { height: 4px; background: var(--bg4); border-radius: 4px; overflow: hidden; margin-bottom: 11px; }
+.progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width 0.4s; }
+.problem-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(34px,1fr)); gap: 4px; max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+.chapter-card.expanded .problem-grid { max-height: 800px; }
+.prob-btn { aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border); background: var(--bg3); color: var(--text3); font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; position: relative; transition: all 0.1s; }
 .prob-btn:hover { border-color: var(--accent); color: var(--accent2); }
 .prob-btn.learned { background: var(--green-bg); border-color: rgba(74,222,128,0.3); color: var(--green); }
 .prob-btn.learned-sanka { background: var(--amber-bg); border-color: rgba(251,191,36,0.35); color: var(--amber); }
@@ -198,192 +140,245 @@ nav {
 .prob-btn.mastered { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.3); color: var(--accent2); }
 .prob-btn.mastered-sanka { background: rgba(108,99,255,0.1); border-color: rgba(251,191,36,0.4); color: var(--accent2); }
 .prob-btn.mastered-batu { background: rgba(108,99,255,0.08); border-color: rgba(248,113,113,0.4); color: var(--red); }
-.legend {
-  display: flex; flex-wrap: wrap; gap: 8px 16px;
-  margin-bottom: 20px;
-}
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
-.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 200; opacity: 0; pointer-events: none;
-  transition: opacity 0.2s;
-}
+.prob-btn.has-memo::after { content:''; position:absolute; top:2px; right:2px; width:5px; height:5px; border-radius:50%; background:var(--accent2); }
+.legend { display: flex; flex-wrap: wrap; gap: 5px 10px; margin-bottom: 14px; }
+.legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text2); }
+.legend-dot { width: 8px; height: 8px; border-radius: 3px; }
+
+/* CALENDAR */
+.cal-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-nav-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); padding: 5px 12px; cursor: pointer; font-size: 14px; }
+.cal-month-label { font-size: 15px; font-weight: 600; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-dow { text-align: center; font-size: 10px; color: var(--text3); padding: 3px 0; font-weight: 600; }
+.cal-day { aspect-ratio: 1; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: var(--text2); }
+.cal-day.has-activity { background: var(--accent-bg); color: var(--accent2); font-weight: 600; }
+.cal-day.today { border: 1.5px solid var(--accent); }
+.cal-day-count { font-size: 8px; color: var(--text3); line-height: 1; }
+.cal-day.has-activity .cal-day-count { color: var(--accent2); opacity: 0.7; }
+.chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; margin-bottom: 12px; }
+.chart-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 12px; }
+.bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 72px; }
+.bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; }
+.bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--accent-bg); min-height: 2px; }
+.bar.active { background: var(--accent); }
+.bar-label { font-size: 8px; color: var(--text3); }
+.bar-val { font-size: 8px; color: var(--text3); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: flex; align-items: flex-end; justify-content: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal {
-  background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: var(--radius-lg); padding: 28px;
-  width: 360px; max-width: calc(100vw - 32px);
-  transform: translateY(12px); transition: transform 0.2s;
-}
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 14px 18px 32px; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.22s; max-height: 92vh; overflow-y: auto; }
 .modal-overlay.open .modal { transform: translateY(0); }
-.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-.modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 14px; }
+.modal-close-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+.modal-x { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; line-height: 1; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+.modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
 .modal-actions { display: flex; flex-direction: column; gap: 8px; }
-.modal-btn {
-  padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--border2);
-  background: var(--bg3); color: var(--text); font-size: 13px; font-weight: 600;
-  cursor: pointer; text-align: left; transition: all 0.15s; font-family: inherit;
-}
-.modal-btn:hover { background: var(--bg4); border-color: var(--border2); }
+.modal-btn { padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; font-family: inherit; width: 100%; transition: all 0.15s; }
 .modal-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.modal-btn.primary:hover { background: var(--accent2); }
-.modal-btn-sub { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 400; margin-top: 2px; }
-.modal-close { float: right; background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; line-height: 1; }
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-radius: 24px; padding: 10px 20px;
-  font-size: 13px; color: var(--text);
-  transition: transform 0.3s; z-index: 300; white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.settings-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
-}
-.settings-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
-.settings-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-}
+.modal-btn-sub { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 400; margin-top: 2px; }
+.result-selector { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin: 9px 0 13px; }
+.result-opt { padding: 11px 5px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg3); cursor: pointer; text-align: center; font-family: inherit; transition: all 0.15s; }
+.result-opt.selected-maru { background: var(--green-bg); border-color: rgba(74,222,128,0.5); }
+.result-opt.selected-sanka { background: var(--amber-bg); border-color: rgba(251,191,36,0.5); }
+.result-opt.selected-batu { background: var(--red-bg); border-color: rgba(248,113,113,0.5); }
+.result-opt-sym { font-size: 19px; display: block; margin-bottom: 3px; }
+.result-opt-label { font-size: 10px; color: var(--text2); display: block; line-height: 1.3; }
+.memo-label { font-size: 11px; color: var(--text3); margin-top: 10px; margin-bottom: 4px; }
+.memo-input { width: 100%; padding: 9px 11px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-size: 13px; font-family: inherit; resize: vertical; min-height: 64px; outline: none; margin-bottom: 4px; }
+.memo-input:focus { border-color: var(--accent); }
+
+/* SETTINGS */
+.settings-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 10px; }
+.settings-title { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: var(--text2); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .settings-row:last-child { border-bottom: none; }
-.settings-label { font-size: 13px; color: var(--text); }
-.settings-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
-.danger-btn {
-  padding: 8px 16px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,0.3);
-  background: var(--red-bg); color: var(--red); font-size: 12px;
-  cursor: pointer; font-family: inherit; font-weight: 600;
-  transition: all 0.15s;
-}
-.danger-btn:hover { background: rgba(248,113,113,0.2); }
-#loading-screen {
-  position: fixed; inset: 0; background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  z-index: 999;
-  gap: 16px;
-}
-.loading-logo { font-size: 24px; font-weight: 700; color: var(--accent2); }
-.loading-spinner {
-  width: 32px; height: 32px; border-radius: 50%;
-  border: 3px solid var(--bg4);
-  border-top-color: var(--accent);
-  animation: spin 0.8s linear infinite;
-}
-.loading-text { font-size: 13px; color: var(--text3); }
-@keyframes spin { to { transform: rotate(360deg); } }
-@media (max-width: 600px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
+.settings-label { font-size: 13px; }
+.settings-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.toggle { width: 40px; height: 22px; background: var(--bg4); border-radius: 11px; position: relative; cursor: pointer; border: none; transition: background 0.2s; flex-shrink: 0; }
+.toggle.on { background: var(--accent); }
+.toggle::after { content:''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left 0.2s; }
+.toggle.on::after { left: 21px; }
+.danger-btn { padding: 6px 13px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,0.3); background: var(--red-bg); color: var(--red); font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 600; }
+.small-btn { padding: 6px 13px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 12px; cursor: pointer; font-family: inherit; }
+.signout-btn { width: 100%; padding: 11px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,0.3); background: var(--red-bg); color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+/* TOAST */
+.toast { position: fixed; bottom: calc(var(--bottom-h) + 10px); left: 50%; transform: translateX(-50%) translateY(60px); background: var(--bg3); border: 1px solid var(--border2); border-radius: 24px; padding: 8px 18px; font-size: 13px; color: var(--text); transition: transform 0.3s; z-index: 400; white-space: nowrap; pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* CONFETTI */
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 500; overflow: hidden; }
+.cp { position: absolute; width: 8px; height: 8px; animation: cf 2s ease-in forwards; opacity: 0; }
+@keyframes cf { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+
+/* EMPTY */
+.empty-state { text-align: center; padding: 36px 16px; color: var(--text3); font-size: 13px; }
+.empty-icon { font-size: 30px; margin-bottom: 8px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 14px; }
+.page-title { font-size: 19px; font-weight: 700; }
+.page-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: repeat(2,1fr); }
 }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loading-screen">
   <div class="loading-logo">FocusGold</div>
   <div class="loading-spinner"></div>
-  <div class="loading-text" id="loading-text">Firebase に接続中...</div>
+  <div class="loading-text" id="loading-text">接続中...</div>
 </div>
 
-<nav>
+<!-- AUTH -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-logo">FocusGold</div>
+  <div class="auth-sub">数2BC 復習アプリ</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">ログイン</button>
+      <button class="auth-tab" id="atab-signup" onclick="switchAuthTab('signup')">新規登録</button>
+    </div>
+    <div id="auth-err" class="auth-err"></div>
+    <input class="auth-input" type="email" id="auth-email" placeholder="メールアドレス" autocomplete="email" />
+    <input class="auth-input" type="password" id="auth-pass" placeholder="パスワード（6文字以上）" autocomplete="current-password" />
+    <div id="auth-pass2-wrap" style="display:none">
+      <input class="auth-input" type="password" id="auth-pass2" placeholder="パスワード（確認）" autocomplete="new-password" />
+    </div>
+    <button class="auth-btn primary" id="auth-submit-btn" onclick="authSubmit()">ログイン</button>
+    <div class="auth-divider">または</div>
+    <button class="auth-btn google" onclick="authGoogle()">
+      <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Googleでログイン
+    </button>
+    <div class="auth-skip" onclick="authAnonymous()">ログインせずに使う</div>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<nav class="top-nav" id="main-nav" style="display:none">
   <div class="nav-logo">FocusGold <span>数2BC</span></div>
-  <div class="nav-status">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text">接続中</span>
-  </div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showTab('today')">今日のタスク</button>
-    <button class="nav-tab" onclick="showTab('progress')">進捗</button>
-    <button class="nav-tab" onclick="showTab('settings')">設定</button>
-  </div>
+  <span class="nav-streak" id="nav-streak">🔥 0</span>
+  <div class="status-dot" id="status-dot" style="margin:0 2px"></div>
+  <button class="nav-icon-btn" onclick="toggleTheme()" title="テーマ">☀</button>
 </nav>
 
-<div class="container">
-  <div id="tab-today">
-    <div class="today-header">
-      <div>
-        <div class="today-title">今日のタスク</div>
-        <div class="today-date" id="today-date"></div>
-      </div>
+<!-- MAIN -->
+<div id="main-content" style="display:none">
+
+  <!-- TODAY -->
+  <div id="tab-today" class="container">
+    <div class="page-header">
+      <div class="page-title">今日のタスク</div>
+      <div class="page-sub" id="today-date"></div>
     </div>
     <div class="stats-row" id="stats-row"></div>
-    <div class="task-list" id="task-list">
-      <div class="empty-state"><div class="empty-icon">📚</div>読み込み中...</div>
+    <div class="section-title">復習タスク</div>
+    <div class="task-list" id="task-list"></div>
+    <div class="section-title" id="weak-title" style="display:none">苦手問題（×）</div>
+    <div class="weak-list" id="weak-list"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="tab-calendar" class="container" style="display:none">
+    <div class="page-header"><div class="page-title">学習カレンダー</div></div>
+    <div class="cal-wrap">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button class="cal-nav-btn" onclick="calNext()">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">週別学習数（過去8週）</div>
+      <div class="bar-chart" id="weekly-chart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">正答率の推移（○の割合）</div>
+      <div class="bar-chart" id="rate-chart"></div>
     </div>
   </div>
 
-  <div id="tab-progress" style="display:none">
-    <div class="today-header">
-      <div>
-        <div class="today-title">学習進捗</div>
-        <div class="today-date">問題をクリックして学習状態を記録</div>
-      </div>
-    </div>
+  <!-- PROGRESS -->
+  <div id="tab-progress" class="container" style="display:none">
+    <div class="page-header"><div class="page-title">学習進捗</div><div class="page-sub">問題をタップして記録</div></div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--bg4);border:1px solid var(--border2)"></div>未学習</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--green-bg);border:1px solid rgba(74,222,128,0.3)"></div>学習済 ○</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.35)"></div>学習済 △</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.35)"></div>学習済 ×</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green-bg);border:1px solid rgba(74,222,128,0.3)"></div>学習済○</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3)"></div>学習済△</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.3)"></div>学習済×</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--blue-bg);border:1px solid rgba(96,165,250,0.3)"></div>復習待ち</div>
       <div class="legend-item"><div class="legend-dot" style="background:var(--accent-bg);border:1px solid rgba(108,99,255,0.3)"></div>完了</div>
     </div>
     <div class="chapters-grid" id="chapters-grid"></div>
   </div>
 
-  <div id="tab-settings" style="display:none">
-    <div class="today-header">
-      <div><div class="today-title">設定</div></div>
-    </div>
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="container" style="display:none">
+    <div class="page-header"><div class="page-title">設定</div></div>
     <div class="settings-card">
       <div class="settings-title">アカウント</div>
       <div class="settings-row">
-        <div>
-          <div class="settings-label">ユーザーID</div>
-          <div class="settings-sub" id="uid-display">取得中...</div>
-        </div>
+        <div><div class="settings-label">ユーザー</div><div class="settings-sub" id="uid-display">読み込み中...</div></div>
       </div>
       <div class="settings-row">
-        <div>
-          <div class="settings-label">同期状態</div>
-          <div class="settings-sub" id="sync-status">Firebase と同期中</div>
-        </div>
-        <div class="status-dot online" id="sync-dot" style="width:10px;height:10px"></div>
+        <div><div class="settings-label">同期状態</div><div class="settings-sub" id="sync-status">Firebase と同期中</div></div>
+        <div class="status-dot online" style="width:9px;height:9px"></div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-title">表示</div>
+      <div class="settings-row">
+        <div><div class="settings-label">ライトモード</div></div>
+        <button class="toggle" id="theme-toggle" onclick="toggleTheme()"></button>
       </div>
     </div>
     <div class="settings-card">
       <div class="settings-title">復習スケジュール</div>
-      <div class="settings-row">
-        <div><div class="settings-label">1回目復習</div><div class="settings-sub">学習から3日後</div></div>
-        <div style="color:var(--amber);font-weight:700;font-size:14px">3日後</div>
-      </div>
-      <div class="settings-row">
-        <div><div class="settings-label">2回目復習</div><div class="settings-sub">学習から1週間後</div></div>
-        <div style="color:var(--blue);font-weight:700;font-size:14px">7日後</div>
-      </div>
-      <div class="settings-row">
-        <div><div class="settings-label">3回目復習（最終）</div><div class="settings-sub">学習から1ヶ月後</div></div>
-        <div style="color:var(--red);font-weight:700;font-size:14px">30日後</div>
-      </div>
+      <div class="settings-row"><div><div class="settings-label">1回目</div></div><div style="color:var(--amber);font-weight:700;font-size:13px">3日後</div></div>
+      <div class="settings-row"><div><div class="settings-label">2回目</div></div><div style="color:var(--blue);font-weight:700;font-size:13px">7日後</div></div>
+      <div class="settings-row"><div><div class="settings-label">最終</div></div><div style="color:var(--red);font-weight:700;font-size:13px">30日後</div></div>
     </div>
     <div class="settings-card">
       <div class="settings-title">データ</div>
       <div class="settings-row">
-        <div><div class="settings-label">学習データをリセット</div><div class="settings-sub">すべての記録が削除されます</div></div>
+        <div><div class="settings-label">データをリセット</div><div class="settings-sub">すべての記録を削除</div></div>
         <button class="danger-btn" onclick="resetData()">リセット</button>
       </div>
       <div class="settings-row">
-        <div><div class="settings-label">データをエクスポート</div><div class="settings-sub">JSON形式で保存</div></div>
-        <button class="modal-btn" style="padding:8px 16px;font-size:12px" onclick="exportData()">エクスポート</button>
+        <div><div class="settings-label">JSONエクスポート</div></div>
+        <button class="small-btn" onclick="exportData()">書き出し</button>
       </div>
     </div>
+    <div class="settings-card">
+      <button class="signout-btn" onclick="doSignOut()">ログアウト</button>
+    </div>
   </div>
+
 </div>
 
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav" style="display:none">
+  <button class="bn-tab active" id="bn-today" onclick="showTab('today')"><span class="bn-icon">📋</span><span>今日</span></button>
+  <button class="bn-tab" id="bn-calendar" onclick="showTab('calendar')"><span class="bn-icon">📅</span><span>カレンダー</span></button>
+  <button class="bn-tab" id="bn-progress" onclick="showTab('progress')"><span class="bn-icon">📊</span><span>進捗</span></button>
+  <button class="bn-tab" id="bn-settings" onclick="showTab('settings')"><span class="bn-icon">⚙️</span><span>設定</span></button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalBg(event)">
   <div class="modal">
-    <button class="modal-close" onclick="closeModalDirect()">×</button>
+    <div class="modal-handle"></div>
+    <div class="modal-close-row"><button class="modal-x" onclick="closeModalDirect()">×</button></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-sub" id="modal-sub"></div>
     <div class="modal-actions" id="modal-actions"></div>
@@ -391,13 +386,14 @@ nav {
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="confetti-container" id="confetti-container"></div>
 
-<!-- Firebase Compat SDK (Android WebView対応) -->
+<!-- Firebase Compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyCrZL-70u3uYUApW5vfSmktSDHHIDBcl7k",
   authDomain: "focusgold-app.firebaseapp.com",
   projectId: "focusgold-app",
@@ -405,13 +401,11 @@ const firebaseConfig = {
   messagingSenderId: "688930596421",
   appId: "1:688930596421:web:52124f27955d330169e52c"
 };
-
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+var auth = firebase.auth();
+var db = firebase.firestore();
 
-// ===== データ定義 =====
-const CHAPTERS = [
+var CHAPTERS = [
   { name: '第一章 式と計算', start: 1, end: 35 },
   { name: '第二章 高次方程式', start: 36, end: 67 },
   { name: '第三章 図形と方程式', start: 68, end: 120 },
@@ -419,57 +413,132 @@ const CHAPTERS = [
   { name: '第五章 指数関数と対数関数', start: 153, end: 178 },
   { name: '第六章 微分法', start: 179, end: 217 },
   { name: '第七章 積分法', start: 218, end: 245 },
-  { name: '第八章 数列', start: 'B1.1', end: 'B1.66', count: 66, prefix: 'B1.' },
-  { name: '第九章 確率分布と統計的な推測', start: 'B2.1', end: 'B2.19', count: 19, prefix: 'B2.' },
-  { name: '第十章 平面上のベクトル', start: 'C1.1', end: 'C1.41', count: 41, prefix: 'C1.' },
-  { name: '第十一章 空間のベクトル', start: 'C1.42', end: 'C1.81', count: 40, prefix: 'C1.', startNum: 42 },
+  { name: '第八章 数列', count: 66, prefix: 'B1.', startNum: 1 },
+  { name: '第九章 確率分布と統計的な推測', count: 19, prefix: 'B2.', startNum: 1 },
+  { name: '第十章 平面上のベクトル', count: 41, prefix: 'C1.', startNum: 1 },
+  { name: '第十一章 空間のベクトル', count: 40, prefix: 'C1.', startNum: 42 },
 ];
+var REVIEW_DAYS = [3, 7, 30];
+var state = {};
+var currentUid = null;
+var saveTimeout = null;
+var authMode = 'login';
+var calYear, calMonth;
 
-const REVIEW_DAYS = [3, 7, 30];
-let state = {};
-let currentUid = null;
-let saveTimeout = null;
+// ===== AUTH UI =====
+window.switchAuthTab = function(mode) {
+  authMode = mode;
+  document.getElementById('atab-login').classList.toggle('active', mode === 'login');
+  document.getElementById('atab-signup').classList.toggle('active', mode === 'signup');
+  document.getElementById('auth-submit-btn').textContent = mode === 'login' ? 'ログイン' : '新規登録';
+  document.getElementById('auth-pass2-wrap').style.display = mode === 'signup' ? '' : 'none';
+  document.getElementById('auth-err').textContent = '';
+};
 
-// ===== Firestore =====
+window.authSubmit = function() {
+  var email = document.getElementById('auth-email').value.trim();
+  var pass = document.getElementById('auth-pass').value;
+  var err = document.getElementById('auth-err');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'メールとパスワードを入力してください'; return; }
+  if (authMode === 'signup') {
+    var pass2 = document.getElementById('auth-pass2').value;
+    if (pass !== pass2) { err.textContent = 'パスワードが一致しません'; return; }
+    auth.createUserWithEmailAndPassword(email, pass).catch(function(e) { err.textContent = authErrMsg(e.code); });
+  } else {
+    auth.signInWithEmailAndPassword(email, pass).catch(function(e) { err.textContent = authErrMsg(e.code); });
+  }
+};
+
+window.authGoogle = function() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(e) {
+    document.getElementById('auth-err').textContent = authErrMsg(e.code);
+  });
+};
+
+window.authAnonymous = function() {
+  auth.signInAnonymously().catch(function(e) {
+    document.getElementById('auth-err').textContent = authErrMsg(e.code);
+  });
+};
+
+function authErrMsg(code) {
+  var m = {
+    'auth/email-already-in-use': 'このメールは既に登録済みです',
+    'auth/invalid-email': 'メールアドレスの形式が正しくありません',
+    'auth/wrong-password': 'パスワードが間違っています',
+    'auth/user-not-found': 'ユーザーが見つかりません',
+    'auth/weak-password': 'パスワードは6文字以上にしてください',
+    'auth/network-request-failed': 'ネットワークエラーです',
+    'auth/popup-closed-by-user': 'ログインがキャンセルされました',
+    'auth/invalid-credential': 'メールまたはパスワードが間違っています',
+  };
+  return m[code] || 'エラー: ' + code;
+}
+
+window.doSignOut = function() {
+  if (confirm('ログアウトしますか？')) auth.signOut();
+};
+
+// ===== AUTH STATE =====
+auth.onAuthStateChanged(function(user) {
+  document.getElementById('loading-screen').style.display = 'none';
+  if (user) {
+    currentUid = user.uid;
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = '';
+    document.getElementById('main-content').style.display = '';
+    document.getElementById('bottom-nav').style.display = '';
+    var uidEl = document.getElementById('uid-display');
+    if (uidEl) uidEl.textContent = user.isAnonymous ? '匿名ユーザー' : (user.email || user.displayName || user.uid.slice(0,16) + '...');
+    loadFromFirestore(user.uid).then(function() {
+      setStatus('online');
+      renderToday();
+      updateStreak();
+    });
+  } else {
+    currentUid = null;
+    document.getElementById('auth-screen').style.display = '';
+    document.getElementById('main-nav').style.display = 'none';
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('bottom-nav').style.display = 'none';
+  }
+});
+
+// ===== FIRESTORE =====
 async function loadFromFirestore(uid) {
   try {
-    const snap = await db.collection('users').doc(uid).get();
+    var snap = await db.collection('users').doc(uid).get();
     if (snap.exists) {
       state = snap.data().state || {};
     } else {
-      const local = localStorage.getItem('fg_state');
-      if (local) {
-        state = JSON.parse(local);
-        await saveToFirestore(uid);
-        showToast('ローカルデータをクラウドに移行しました');
-      } else {
-        state = {};
-      }
+      var local = localStorage.getItem('fg_state');
+      state = local ? JSON.parse(local) : {};
+      if (local) await saveToFirestore(uid);
     }
   } catch(e) {
-    console.error('Firestore読込エラー:', e);
-    const local = localStorage.getItem('fg_state');
+    console.warn('Firestore load error:', e);
+    var local = localStorage.getItem('fg_state');
     state = local ? JSON.parse(local) : {};
     setStatus('offline');
   }
 }
 
 async function saveToFirestore(uid) {
-  const targetUid = uid || currentUid;
+  var targetUid = uid || currentUid;
   if (!targetUid) return;
   try {
     setStatus('syncing');
     await db.collection('users').doc(targetUid).set({ state: state, updatedAt: Date.now() });
     localStorage.setItem('fg_state', JSON.stringify(state));
     setStatus('online');
-    const el = document.getElementById('sync-status');
+    var el = document.getElementById('sync-status');
     if (el) el.textContent = '同期済み ' + new Date().toLocaleTimeString('ja-JP');
   } catch(e) {
-    console.error('Firestore保存エラー:', e);
+    console.warn('Firestore save error:', e);
     localStorage.setItem('fg_state', JSON.stringify(state));
     setStatus('offline');
-    const el = document.getElementById('sync-status');
-    if (el) el.textContent = 'オフライン（ローカル保存）';
   }
 }
 
@@ -479,190 +548,321 @@ function saveState() {
   saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
 }
 
-// ===== ステータス =====
+// ===== STATUS =====
 function setStatus(s) {
-  const dot = document.getElementById('status-dot');
-  const txt = document.getElementById('status-text');
-  const syncDot = document.getElementById('sync-dot');
-  if (s === 'online') {
-    dot.className = 'status-dot online';
-    txt.textContent = '同期済み';
-    if (syncDot) syncDot.className = 'status-dot online';
-  } else if (s === 'syncing') {
-    dot.className = 'status-dot';
-    dot.style.background = 'var(--amber)';
-    txt.textContent = '同期中...';
-  } else {
-    dot.className = 'status-dot';
-    txt.textContent = 'オフライン';
-    if (syncDot) syncDot.style.background = 'var(--red)';
-  }
+  var dot = document.getElementById('status-dot');
+  if (!dot) return;
+  if (s === 'online') { dot.className = 'status-dot online'; }
+  else if (s === 'syncing') { dot.className = 'status-dot'; dot.style.background = 'var(--amber)'; }
+  else { dot.className = 'status-dot'; dot.style.background = 'var(--red)'; }
 }
 
-// ===== 認証 =====
-auth.onAuthStateChanged(function(user) {
-  if (user) {
-    currentUid = user.uid;
-    document.getElementById('loading-text').textContent = 'データを読み込み中...';
-    var uidEl = document.getElementById('uid-display');
-    if (uidEl) uidEl.textContent = user.uid.slice(0, 16) + '...';
-
-    loadFromFirestore(user.uid).then(function() {
-      setStatus('online');
-      document.getElementById('loading-screen').style.display = 'none';
-      renderToday();
-    });
-  }
-});
-
-auth.signInAnonymously().catch(function(e) {
-  console.error('認証エラー:', e);
-  document.getElementById('loading-text').textContent = '接続失敗。ページを再読み込みしてください。';
-});
-
-// ===== ユーティリティ =====
+// ===== UTILS =====
 function getProblems(ch) {
   if (ch.prefix) {
-    var start = ch.startNum || 1;
-    return Array.from({ length: ch.count }, function(_, i) { return ch.prefix + (start + i); });
+    var s = ch.startNum || 1;
+    return Array.from({length: ch.count}, function(_, i) { return ch.prefix + (s + i); });
   }
-  return Array.from({ length: ch.end - ch.start + 1 }, function(_, i) { return String(ch.start + i); });
+  return Array.from({length: ch.end - ch.start + 1}, function(_, i) { return String(ch.start + i); });
 }
 
-function today() {
+function todayTs() {
   var d = new Date(); d.setHours(0,0,0,0); return d.getTime();
 }
 
 function daysSince(ts) {
-  return Math.floor((today() - ts) / 86400000);
+  return Math.floor((todayTs() - ts) / 86400000);
 }
 
 function getStage(pid) {
   var s = state[pid];
   if (!s) return 'unlearned';
-  var reviews = s.reviews || [];
+  var rev = s.reviews || [];
   var result = s.result || 'maru';
-  if (reviews.length >= 3) {
-    if (result === 'maru') return 'mastered';
-    if (result === 'sanka') return 'mastered-sanka';
-    return 'mastered-batu';
-  }
-  var nextReviewDays = REVIEW_DAYS[reviews.length];
-  var daysPassed = daysSince(s.learnedAt);
-  if (daysPassed < nextReviewDays) {
-    if (result === 'maru') return 'learned';
-    if (result === 'sanka') return 'learned-sanka';
-    return 'learned-batu';
-  }
-  return ['r1','r2','r3'][reviews.length];
+  if (rev.length >= 3) return result === 'maru' ? 'mastered' : result === 'sanka' ? 'mastered-sanka' : 'mastered-batu';
+  if (daysSince(s.learnedAt) < REVIEW_DAYS[rev.length]) return result === 'maru' ? 'learned' : result === 'sanka' ? 'learned-sanka' : 'learned-batu';
+  return ['r1','r2','r3'][rev.length];
 }
 
 function isDueToday(pid) {
   var s = state[pid];
   if (!s) return false;
-  var reviews = s.reviews || [];
-  if (reviews.length >= 3) return false;
-  var nextReviewDays = REVIEW_DAYS[reviews.length];
-  return daysSince(s.learnedAt) >= nextReviewDays;
+  var rev = s.reviews || [];
+  if (rev.length >= 3) return false;
+  return daysSince(s.learnedAt) >= REVIEW_DAYS[rev.length];
 }
 
-// ===== 今日のタスク =====
+// ===== STREAK =====
+function updateStreak() {
+  var days = {};
+  Object.keys(state).forEach(function(pid) {
+    var s = state[pid];
+    if (!s) return;
+    function addDay(ts) {
+      var d = new Date(ts); d.setHours(0,0,0,0); days[d.getTime()] = true;
+    }
+    addDay(s.learnedAt);
+    (s.reviews||[]).forEach(addDay);
+  });
+  var streak = 0;
+  var cur = new Date(); cur.setHours(0,0,0,0);
+  while (days[cur.getTime()]) { streak++; cur.setDate(cur.getDate() - 1); }
+  var el = document.getElementById('nav-streak');
+  if (el) el.textContent = '🔥 ' + streak;
+}
+
+// ===== THEME =====
+window.toggleTheme = function() {
+  document.body.classList.toggle('light');
+  var isLight = document.body.classList.contains('light');
+  var toggle = document.getElementById('theme-toggle');
+  if (toggle) toggle.classList.toggle('on', isLight);
+  localStorage.setItem('fg_theme', isLight ? 'light' : 'dark');
+};
+(function() {
+  if (localStorage.getItem('fg_theme') === 'light') {
+    document.body.classList.add('light');
+    window.addEventListener('DOMContentLoaded', function() {
+      var t = document.getElementById('theme-toggle');
+      if (t) t.classList.add('on');
+    });
+  }
+})();
+
+// ===== TODAY =====
 function renderToday() {
-  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ja-JP', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+  var d = new Date();
+  var dateEl = document.getElementById('today-date');
+  if (dateEl) dateEl.textContent = d.toLocaleDateString('ja-JP', {year:'numeric',month:'long',day:'numeric',weekday:'short'});
 
   var tasks = [];
   CHAPTERS.forEach(function(ch) {
     getProblems(ch).forEach(function(pid) {
-      if (isDueToday(pid)) {
-        var s = state[pid];
-        var rev = (s.reviews||[]).length;
-        tasks.push({ pid: pid, ch: ch.name, stage: rev });
-      }
+      if (isDueToday(pid)) tasks.push({ pid: pid, ch: ch.name, stage: (state[pid].reviews||[]).length });
     });
   });
   tasks.sort(function(a,b) { return a.stage - b.stage; });
 
-  var totalLearned = 0, totalMastered = 0, totalDue = tasks.length;
+  var totalLearned = 0, totalMastered = 0;
   var totalProblems = CHAPTERS.reduce(function(a,ch) { return a + (ch.prefix ? ch.count : ch.end - ch.start + 1); }, 0);
   Object.keys(state).forEach(function(pid) {
-    var s = state[pid];
-    if (s) { totalLearned++; if ((s.reviews||[]).length >= 3) totalMastered++; }
+    if (state[pid]) { totalLearned++; if ((state[pid].reviews||[]).length >= 3) totalMastered++; }
   });
 
-  document.getElementById('stats-row').innerHTML =
-    '<div class="stat-card"><div class="stat-label">今日のタスク</div><div class="stat-value amber">' + totalDue + '</div></div>' +
-    '<div class="stat-card"><div class="stat-label">学習済問題</div><div class="stat-value accent">' + totalLearned + '</div></div>' +
+  var sr = document.getElementById('stats-row');
+  if (sr) sr.innerHTML =
+    '<div class="stat-card"><div class="stat-label">今日のタスク</div><div class="stat-value amber">' + tasks.length + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">学習済</div><div class="stat-value accent">' + totalLearned + '</div></div>' +
     '<div class="stat-card"><div class="stat-label">完全習得</div><div class="stat-value green">' + totalMastered + '</div></div>' +
-    '<div class="stat-card"><div class="stat-label">全問題数</div><div class="stat-value" style="color:var(--text2)">' + totalProblems + '</div></div>';
+    '<div class="stat-card"><div class="stat-label">全問題</div><div class="stat-value" style="color:var(--text2)">' + totalProblems + '</div></div>';
 
+  var bCls = ['badge-r1','badge-r2','badge-r3'];
+  var bLbl = ['1回目復習','2回目復習','最終復習'];
+  var chipCols = {maru:'var(--green)',sanka:'var(--amber)',batu:'var(--red)'};
+  var chipLbls = {maru:'○',sanka:'△',batu:'×'};
+
+  var listEl = document.getElementById('task-list');
+  if (!listEl) return;
   if (tasks.length === 0) {
-    document.getElementById('task-list').innerHTML =
-      '<div class="empty-state"><div class="empty-icon">🎉</div>今日の復習タスクはありません！<br><span style="font-size:12px;margin-top:8px;display:block">「進捗」タブから新しい問題を学習しましょう</span></div>';
-    return;
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div>今日の復習タスクはありません！<br><span style="font-size:12px">「進捗」から新しい問題を学習しましょう</span></div>';
+  } else {
+    listEl.innerHTML = tasks.map(function(t) {
+      var done = sessionStorage.getItem('done_' + t.pid);
+      var lr = (state[t.pid] && state[t.pid].result) || 'maru';
+      return '<div class="task-card ' + (done ? 'done' : '') + '" id="tc-' + t.pid + '" onclick="openTaskModal(\'' + t.pid + '\')">' +
+        '<div class="task-checkbox">✓</div>' +
+        '<div class="task-info"><div class="task-num">問題 ' + t.pid + '</div>' +
+        '<div class="task-meta">' + t.ch + '&nbsp;前回: <span style="color:' + chipCols[lr] + ';font-weight:700">' + chipLbls[lr] + '</span></div></div>' +
+        '<span class="task-badge ' + bCls[t.stage] + '">' + bLbl[t.stage] + '</span></div>';
+    }).join('');
   }
 
-  var badgeLabels = ['1回目復習', '2回目復習', '最終復習'];
-  var badgeClasses = ['badge-r1', 'badge-r2', 'badge-r3'];
-  var resultChipMap = { maru: { cls: 'maru', label: '○' }, sanka: { cls: 'sanka', label: '△' }, batu: { cls: 'batu', label: '×' } };
+  // Weak problems
+  var weakProbs = Object.keys(state).filter(function(pid) {
+    var s = state[pid];
+    return s && s.result === 'batu' && (s.reviews||[]).length < 3 && !isDueToday(pid);
+  });
+  var wt = document.getElementById('weak-title');
+  var wl = document.getElementById('weak-list');
+  if (weakProbs.length > 0) {
+    if (wt) wt.style.display = '';
+    if (wl) wl.innerHTML = weakProbs.slice(0, 8).map(function(pid) {
+      var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(pid) !== -1; });
+      return '<div class="weak-card" onclick="openTaskModal(\'' + pid + '\')">' +
+        '<span style="color:var(--red);font-weight:700;font-size:15px">×</span>' +
+        '<div class="task-info"><div class="task-num">問題 ' + pid + '</div>' +
+        '<div class="task-meta">' + (ch ? ch.name : '') + '</div></div>' +
+        '<span style="font-size:11px;color:var(--text3)">次の復習: ' + nextReviewDate(pid) + '</span></div>';
+    }).join('');
+  } else {
+    if (wt) wt.style.display = 'none';
+    if (wl) wl.innerHTML = '';
+  }
+}
 
-  document.getElementById('task-list').innerHTML = tasks.map(function(t) {
-    var doneKey = 'done_' + t.pid;
-    var isDone = sessionStorage.getItem(doneKey);
-    var lastResult = (state[t.pid] && state[t.pid].result) || 'maru';
-    var chip = resultChipMap[lastResult];
-    return '<div class="task-card ' + (isDone ? 'done' : '') + '" id="tc-' + t.pid + '" onclick="openTaskModal(\'' + t.pid + '\', ' + t.stage + ')">' +
-      '<div class="task-checkbox"><span class="task-checkbox-check">✓</span></div>' +
-      '<div class="task-info"><div class="task-num">問題 ' + t.pid + '</div>' +
-      '<div class="task-meta">' + t.ch + ' <span style="color:var(--text3)">前回: <span class="result-chip ' + chip.cls + '" style="font-size:10px;padding:1px 5px">' + chip.label + '</span></span></div></div>' +
-      '<span class="task-badge ' + badgeClasses[t.stage] + '">' + badgeLabels[t.stage] + '</span></div>';
+// ===== CALENDAR =====
+function initCal() {
+  var now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+}
+
+function buildActMap() {
+  var actMap = {};
+  Object.keys(state).forEach(function(pid) {
+    var s = state[pid];
+    if (!s) return;
+    function addAct(ts) {
+      var d = new Date(ts); d.setHours(0,0,0,0);
+      var k = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+      actMap[k] = (actMap[k] || 0) + 1;
+    }
+    addAct(s.learnedAt);
+    (s.reviews||[]).forEach(addAct);
+  });
+  return actMap;
+}
+
+function renderCalendar() {
+  var now = new Date();
+  var label = document.getElementById('cal-month-label');
+  if (label) label.textContent = calYear + '年 ' + (calMonth + 1) + '月';
+  var actMap = buildActMap();
+  var grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  var dows = ['日','月','火','水','木','金','土'];
+  var html = dows.map(function(d) { return '<div class="cal-dow">' + d + '</div>'; }).join('');
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  for (var i = 0; i < firstDay; i++) html += '<div></div>';
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var todayKey = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+  for (var day = 1; day <= daysInMonth; day++) {
+    var k = calYear + '-' + calMonth + '-' + day;
+    var isToday = (k === todayKey);
+    var cnt = actMap[k] || 0;
+    var cls = 'cal-day' + (cnt > 0 ? ' has-activity' : '') + (isToday ? ' today' : '');
+    html += '<div class="' + cls + '"><span>' + day + '</span>' + (cnt > 0 ? '<span class="cal-day-count">' + cnt + '</span>' : '') + '</div>';
+  }
+  grid.innerHTML = html;
+  renderWeeklyChart();
+  renderRateChart();
+}
+
+function getWeekData(offsetWeeks) {
+  var now = new Date(); now.setHours(0,0,0,0);
+  var weekStart = new Date(now);
+  weekStart.setDate(weekStart.getDate() - now.getDay() - offsetWeeks * 7);
+  var total = 0, maru = 0;
+  for (var d = 0; d < 7; d++) {
+    var day = new Date(weekStart); day.setDate(day.getDate() + d);
+    var dayTs = day.getTime();
+    Object.keys(state).forEach(function(pid) {
+      var s = state[pid];
+      if (!s) return;
+      function checkDay(ts) {
+        var rd = new Date(ts); rd.setHours(0,0,0,0);
+        if (rd.getTime() === dayTs) { total++; if (s.result === 'maru') maru++; }
+      }
+      checkDay(s.learnedAt);
+      (s.reviews||[]).forEach(checkDay);
+    });
+  }
+  return { total: total, maru: maru };
+}
+
+function renderWeeklyChart() {
+  var el = document.getElementById('weekly-chart');
+  if (!el) return;
+  var weeks = [];
+  for (var w = 7; w >= 0; w--) {
+    var data = getWeekData(w);
+    weeks.push({ cnt: data.total, current: w === 0 });
+  }
+  var max = Math.max.apply(null, weeks.map(function(w) { return w.cnt; })) || 1;
+  el.innerHTML = weeks.map(function(w) {
+    var pct = Math.round(w.cnt / max * 100);
+    return '<div class="bar-wrap">' +
+      '<div class="bar' + (w.current ? ' active' : '') + '" style="height:' + pct + '%;min-height:' + (w.cnt > 0 ? 3 : 2) + 'px"></div>' +
+      '<div class="bar-label">' + (w.current ? '今' : '') + '</div>' +
+      '<div class="bar-val">' + (w.cnt || '') + '</div></div>';
   }).join('');
 }
 
-// ===== 進捗タブ =====
+function renderRateChart() {
+  var el = document.getElementById('rate-chart');
+  if (!el) return;
+  var weeks = [];
+  for (var w = 7; w >= 0; w--) {
+    var data = getWeekData(w);
+    var rate = data.total > 0 ? Math.round(data.maru / data.total * 100) : 0;
+    weeks.push({ rate: rate, hasData: data.total > 0, current: w === 0 });
+  }
+  el.innerHTML = weeks.map(function(w) {
+    return '<div class="bar-wrap">' +
+      '<div class="bar' + (w.current ? ' active' : '') + '" style="height:' + w.rate + '%;min-height:' + (w.hasData ? 3 : 2) + 'px;' + (w.hasData ? 'background:var(--green)' : '') + '"></div>' +
+      '<div class="bar-label">' + (w.current ? '今' : '') + '</div>' +
+      '<div class="bar-val">' + (w.hasData ? w.rate + '%' : '') + '</div></div>';
+  }).join('');
+}
+
+window.calPrev = function() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); };
+window.calNext = function() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); };
+
+// ===== PROGRESS =====
 function renderProgress() {
   var grid = document.getElementById('chapters-grid');
+  if (!grid) return;
   grid.innerHTML = CHAPTERS.map(function(ch, ci) {
-    var problems = getProblems(ch);
-    var total = problems.length;
-    var done = problems.filter(function(p) { return state[p]; }).length;
-    var mastered = problems.filter(function(p) { return state[p] && (state[p].reviews||[]).length >= 3; }).length;
+    var probs = getProblems(ch);
+    var total = probs.length;
+    var done = probs.filter(function(p) { return state[p]; }).length;
+    var mastered = probs.filter(function(p) { return state[p] && (state[p].reviews||[]).length >= 3; }).length;
     var pct = Math.round(done / total * 100);
     return '<div class="chapter-card" id="ch-card-' + ci + '">' +
       '<div class="chapter-header" onclick="toggleChapter(' + ci + ')">' +
-      '<div><div class="chapter-name">' + ch.name + '</div>' +
-      '<div class="chapter-range">' + total + '問 習得' + mastered + '問</div></div>' +
+      '<div><div class="chapter-name">' + ch.name + '</div><div class="chapter-range">' + total + '問 習得' + mastered + '問</div></div>' +
       '<div class="chapter-pct">' + pct + '%</div></div>' +
       '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
       '<div class="problem-grid" id="pg-' + ci + '">' +
-      problems.map(function(pid) {
+      probs.map(function(pid) {
         var stage = getStage(pid);
-        return '<button class="prob-btn ' + (stage === 'unlearned' ? '' : stage) + '" onclick="openModal(\'' + pid + '\', \'' + ch.name + '\')">' + pid + '</button>';
-      }).join('') +
-      '</div></div>';
+        var hasMemo = state[pid] && state[pid].memo;
+        return '<button class="prob-btn ' + (stage === 'unlearned' ? '' : stage) + (hasMemo ? ' has-memo' : '') + '" onclick="openModal(\'' + pid + '\',\'' + ch.name.replace(/'/g,'') + '\')">' + pid + '</button>';
+      }).join('') + '</div></div>';
   }).join('');
 }
 
-function toggleChapter(ci) {
+window.toggleChapter = function(ci) {
   document.getElementById('ch-card-' + ci).classList.toggle('expanded');
-}
+};
 
-// ===== モーダル =====
+// ===== MODAL =====
 var modalPid = '', modalCh = '';
 var pendingResult = 'maru';
 
-function resultSelectorHTML(currentResult) {
-  var opts = [
-    { key: 'maru', sym: '○', label: 'できた' },
-    { key: 'sanka', sym: '△', label: '答えを見たら<br>わかった' },
-    { key: 'batu', sym: '×', label: '答えを見ても<br>わからなかった' },
-  ];
+function resultSelectorHTML(cur) {
+  var opts = [{k:'maru',s:'○',l:'できた'},{k:'sanka',s:'△',l:'答えを見たら<br>わかった'},{k:'batu',s:'×',l:'答えを見ても<br>わからなかった'}];
   return '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">この問題の結果</div>' +
-    '<div class="result-selector" id="result-sel">' +
+    '<div class="result-selector">' +
     opts.map(function(o) {
-      return '<button class="result-opt ' + (currentResult === o.key ? 'selected-'+o.key : '') + '" onclick="selectResult(\'' + o.key + '\')" id="ropt-' + o.key + '">' +
-        '<span class="result-opt-sym">' + o.sym + '</span>' +
-        '<span class="result-opt-label">' + o.label + '</span></button>';
+      return '<button class="result-opt ' + (cur === o.k ? 'selected-' + o.k : '') + '" onclick="selectResult(\'' + o.k + '\')" id="ropt-' + o.k + '">' +
+        '<span class="result-opt-sym">' + o.s + '</span><span class="result-opt-label">' + o.l + '</span></button>';
     }).join('') + '</div>';
+}
+
+function memoHTML(pid) {
+  var memo = (state[pid] && state[pid].memo) || '';
+  return '<div class="memo-label">📝 メモ（解法のポイントなど）</div>' +
+    '<textarea class="memo-input" id="prob-memo" placeholder="ここにメモを入力...">' + memo + '</textarea>';
+}
+
+function nextReviewDate(pid) {
+  var s = state[pid];
+  if (!s) return '-';
+  var rev = (s.reviews||[]).length;
+  if (rev >= 3) return '完了';
+  var dueTs = s.learnedAt + REVIEW_DAYS[rev] * 86400000;
+  return new Date(dueTs).toLocaleDateString('ja-JP', {month:'long',day:'numeric'});
 }
 
 window.selectResult = function(key) {
@@ -673,151 +873,145 @@ window.selectResult = function(key) {
   });
 };
 
-window.openTaskModal = function(pid, stageOverride) {
-  var ch = CHAPTERS.find(function(ch) { return getProblems(ch).indexOf(pid) !== -1; });
-  openModal(pid, ch ? ch.name : '', stageOverride);
+window.openTaskModal = function(pid) {
+  var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(pid) !== -1; });
+  openModal(pid, ch ? ch.name : '');
 };
 
-window.openModal = function(pid, chName, stageOverride) {
+window.openModal = function(pid, chName) {
   modalPid = pid; modalCh = chName;
   var s = state[pid];
   var stage = getStage(pid);
   pendingResult = (s && s.result) || 'maru';
-
   document.getElementById('modal-title').textContent = '問題 ' + pid;
   document.getElementById('modal-sub').textContent = chName;
 
-  var stageLabels = {
-    unlearned: '未学習',
-    learned: '学習済（' + daysSince(s && s.learnedAt) + '日経過）',
-    r1: '1回目復習の日！', r2: '2回目復習の日！', r3: '最終復習の日！',
-    mastered: '完全習得済！', 'mastered-sanka': '完全習得済！', 'mastered-batu': '完全習得済！',
-    'learned-sanka': '学習済（' + daysSince(s && s.learnedAt) + '日経過）',
-    'learned-batu': '学習済（' + daysSince(s && s.learnedAt) + '日経過）',
-  };
+  var ds = daysSince(s && s.learnedAt);
+  var stageLabel = { unlearned:'未学習', learned:'学習済（'+ds+'日経過）', 'learned-sanka':'学習済（'+ds+'日経過）', 'learned-batu':'学習済（'+ds+'日経過）', r1:'1回目復習の日！', r2:'2回目復習の日！', r3:'最終復習の日！', mastered:'完全習得済！', 'mastered-sanka':'完全習得済！', 'mastered-batu':'完全習得済！' }[stage] || stage;
 
-  var actions = '';
+  var actions = '<div style="font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border);margin-bottom:11px">' + stageLabel + '</div>';
+
   if (stage === 'unlearned') {
-    actions = resultSelectorHTML('maru') +
+    actions += resultSelectorHTML('maru') + memoHTML(pid) +
       '<button class="modal-btn primary" onclick="learnProblem()">今日学習した<div class="modal-btn-sub">1回目の学習として記録</div></button>';
-  } else if (stage === 'learned' || stage === 'learned-sanka' || stage === 'learned-batu') {
-    actions = '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">次回復習: ' + nextReviewDate(pid) + '</div>' +
-      resultSelectorHTML(pendingResult) +
-      '<button class="modal-btn primary" onclick="updateResult()">評価を更新<div class="modal-btn-sub">復習スケジュールはそのまま</div></button>' +
-      '<button class="modal-btn" style="border-color:rgba(248,113,113,0.3);color:var(--red)" onclick="unlearn()">学習記録を削除</button>';
-  } else if (stage === 'mastered' || stage === 'mastered-sanka' || stage === 'mastered-batu') {
-    actions = '<div style="font-size:12px;color:var(--accent2);margin-bottom:12px;font-weight:600">🎉 すべての復習完了！</div>' +
-      resultSelectorHTML(pendingResult) +
-      '<button class="modal-btn primary" onclick="updateResult()">評価を更新</button>' +
+  } else if (['learned','learned-sanka','learned-batu'].indexOf(stage) !== -1) {
+    actions += '<div style="font-size:11px;color:var(--text3);margin-bottom:10px">次回復習: ' + nextReviewDate(pid) + '</div>' +
+      resultSelectorHTML(pendingResult) + memoHTML(pid) +
+      '<button class="modal-btn primary" onclick="updateResult()">評価・メモを更新</button>' +
+      '<button class="modal-btn" style="color:var(--red);border-color:rgba(248,113,113,0.3)" onclick="unlearn()">学習記録を削除</button>';
+  } else if (['mastered','mastered-sanka','mastered-batu'].indexOf(stage) !== -1) {
+    actions += '<div style="font-size:13px;color:var(--accent2);margin-bottom:10px;font-weight:600">🎉 すべての復習完了！</div>' +
+      resultSelectorHTML(pendingResult) + memoHTML(pid) +
+      '<button class="modal-btn primary" onclick="updateResult()">評価・メモを更新</button>' +
       '<button class="modal-btn" onclick="closeModalDirect()">閉じる</button>';
   } else {
-    actions = resultSelectorHTML(pendingResult) +
-      '<button class="modal-btn primary" onclick="reviewProblem()">復習完了！<div class="modal-btn-sub">' + (stageLabels[stage] || stage) + '</div></button>' +
+    actions += resultSelectorHTML(pendingResult) + memoHTML(pid) +
+      '<button class="modal-btn primary" onclick="reviewProblem()">復習完了！</button>' +
       '<button class="modal-btn" onclick="closeModalDirect()">後で</button>';
   }
 
-  document.getElementById('modal-actions').innerHTML =
-    '<div style="font-size:12px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:12px">' + (stageLabels[stage] || stage) + '</div>' +
-    actions;
+  document.getElementById('modal-actions').innerHTML = actions;
   document.getElementById('modal').classList.add('open');
 };
 
-function nextReviewDate(pid) {
-  var s = state[pid];
-  if (!s) return '-';
-  var rev = (s.reviews||[]).length;
-  if (rev >= 3) return '完了';
-  var dueTs = s.learnedAt + REVIEW_DAYS[rev] * 86400000;
-  return new Date(dueTs).toLocaleDateString('ja-JP', { month:'long', day:'numeric' });
-}
+window.closeModalBg = function(e) { if (e.target === document.getElementById('modal')) closeModalDirect(); };
+window.closeModalDirect = function() { document.getElementById('modal').classList.remove('open'); };
 
-window.closeModal = function(e) {
-  if (e.target === document.getElementById('modal')) closeModalDirect();
-};
-window.closeModalDirect = function() {
-  document.getElementById('modal').classList.remove('open');
-};
+function getMemo() { var el = document.getElementById('prob-memo'); return el ? el.value.trim() : ''; }
 
 window.learnProblem = function() {
-  state[modalPid] = { learnedAt: today(), reviews: [], result: pendingResult };
-  saveState();
-  closeModalDirect();
-  var labels = { maru: '○ できた', sanka: '△ 答えを見たらわかった', batu: '× わからなかった' };
-  showToast('問題' + modalPid + ' 学習記録（' + labels[pendingResult] + '）');
-  renderProgress(); renderToday();
+  state[modalPid] = { learnedAt: todayTs(), reviews: [], result: pendingResult, memo: getMemo() };
+  saveState(); closeModalDirect();
+  showToast('問題' + modalPid + ' 学習記録しました');
+  renderToday(); renderProgress(); updateStreak();
 };
 
 window.reviewProblem = function() {
-  if (!state[modalPid]) state[modalPid] = { learnedAt: today(), reviews: [] };
-  var reviews = state[modalPid].reviews || [];
-  state[modalPid].reviews = reviews.concat([today()]);
+  if (!state[modalPid]) state[modalPid] = { learnedAt: todayTs(), reviews: [] };
+  state[modalPid].reviews = (state[modalPid].reviews || []).concat([todayTs()]);
   state[modalPid].result = pendingResult;
+  state[modalPid].memo = getMemo();
   saveState();
   var taskEl = document.getElementById('tc-' + modalPid);
   if (taskEl) { taskEl.classList.add('done'); sessionStorage.setItem('done_' + modalPid, '1'); }
   closeModalDirect();
-  var labels = { maru: '○', sanka: '△', batu: '×' };
-  showToast('問題' + modalPid + ' 復習完了 ' + labels[pendingResult]);
-  renderProgress(); renderToday();
+  var lbls = {maru:'○',sanka:'△',batu:'×'};
+  showToast('問題' + modalPid + ' 復習完了 ' + lbls[pendingResult]);
+  if ((state[modalPid].reviews||[]).length >= 3) launchConfetti();
+  renderToday(); renderProgress(); updateStreak();
 };
 
 window.updateResult = function() {
   if (!state[modalPid]) return;
   state[modalPid].result = pendingResult;
-  saveState();
-  closeModalDirect();
-  var labels = { maru: '○', sanka: '△', batu: '×' };
-  showToast('問題' + modalPid + ' 評価を' + labels[pendingResult] + 'に更新');
-  renderProgress(); renderToday();
+  state[modalPid].memo = getMemo();
+  saveState(); closeModalDirect();
+  showToast('問題' + modalPid + ' 更新しました');
+  renderToday(); renderProgress();
 };
 
 window.unlearn = function() {
   delete state[modalPid];
-  saveState();
-  closeModalDirect();
+  saveState(); closeModalDirect();
   showToast('問題' + modalPid + ' の記録を削除しました');
-  renderProgress(); renderToday();
+  renderToday(); renderProgress();
 };
 
-// ===== タブ =====
+// ===== CONFETTI =====
+function launchConfetti() {
+  var container = document.getElementById('confetti-container');
+  if (!container) return;
+  var colors = ['#6c63ff','#4ade80','#fbbf24','#f87171','#60a5fa','#f472b6','#a78bfa'];
+  for (var i = 0; i < 60; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var p = document.createElement('div');
+        p.className = 'cp';
+        p.style.cssText = 'left:' + (Math.random()*100) + 'vw;top:-10px;background:' + colors[Math.floor(Math.random()*colors.length)] + ';border-radius:' + (Math.random() > 0.5 ? '50%' : '2px') + ';animation-duration:' + (1.2 + Math.random()*1.5) + 's;animation-delay:' + (Math.random()*0.4) + 's;';
+        container.appendChild(p);
+        setTimeout(function() { if (p.parentNode) p.parentNode.removeChild(p); }, 3000);
+      }, idx * 18);
+    })(i);
+  }
+}
+
+// ===== TABS =====
 window.showTab = function(t) {
-  ['today','progress','settings'].forEach(function(id) {
-    document.getElementById('tab-' + id).style.display = id === t ? '' : 'none';
+  ['today','calendar','progress','settings'].forEach(function(id) {
+    var el = document.getElementById('tab-' + id);
+    if (el) el.style.display = id === t ? '' : 'none';
+    var bn = document.getElementById('bn-' + id);
+    if (bn) bn.classList.toggle('active', id === t);
   });
-  document.querySelectorAll('.nav-tab').forEach(function(el, i) {
-    el.classList.toggle('active', ['today','progress','settings'][i] === t);
-  });
-  if (t === 'progress') renderProgress();
   if (t === 'today') renderToday();
+  if (t === 'calendar') { initCal(); renderCalendar(); }
+  if (t === 'progress') renderProgress();
 };
 
-// ===== トースト =====
+// ===== TOAST =====
 window.showToast = function(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
   setTimeout(function() { t.classList.remove('show'); }, 2200);
 };
 
-// ===== 設定 =====
+// ===== SETTINGS =====
 window.resetData = function() {
   if (confirm('すべての学習データをリセットしますか？')) {
-    state = {};
-    saveState();
-    showToast('データをリセットしました');
-    renderToday();
+    state = {}; saveState(); showToast('データをリセットしました'); renderToday();
   }
 };
 
 window.exportData = function() {
-  var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  var blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'focusgold_data.json';
   a.click();
 };
 
-window.toggleChapter = toggleChapter;
+initCal();
 </script>
 </body>
 </html>
