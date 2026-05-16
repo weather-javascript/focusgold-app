@@ -32,10 +32,6 @@ jobs:
 
       - name: Copy icons directly to Android
         run: |
-          for size in 36 48 72 96 144 192; do
-            dir="android/app/src/main/res/mipmap-${size}dpi"
-            mkdir -p "$dir"
-          done
           cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
           cp icon.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
           cp icon.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
