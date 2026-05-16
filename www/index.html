@@ -598,6 +598,8 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+  
 <script>
 var firebaseConfig = {
   apiKey: "AIzaSyCrZL-70u3uYUApW5vfSmktSDHHIDBcl7k",
@@ -611,6 +613,33 @@ firebase.initializeApp(firebaseConfig);
 var auth = firebase.auth();
 var db = firebase.firestore();
 
+// ===== FCM MESSAGING =====
+var messaging = firebase.messaging();
+var VAPID_KEY = 'BGjFWmMpnIAXcbOVcSgdZdYi5-ohatDwCasQJqjXTKvuJDdIYyfGeVToHow4tF9S5_njLsHmQ92RTLzNSSgR7Hg';
+// 例: 'BDxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+async function initFCM(uid) {
+  try {
+    var token = await messaging.getToken({ vapidKey: VAPID_KEY });
+    if (token) {
+      // FirestoreにFCMトークンを保存
+      await db.collection('users').doc(uid).set(
+        { fcmToken: token },
+        { merge: true }
+      );
+      console.log('FCMトークン保存済み');
+    }
+  } catch(e) {
+    console.warn('FCM初期化失敗（通知が拒否されているか未許可）:', e);
+  }
+}
+
+// フォアグラウンド（アプリが開いてる間）の通知受信
+messaging.onMessage(function(payload) {
+  var n = payload.notification;
+  if (n) showToast('🔔 ' + n.body);
+});
+  
 var CHAPTERS = [
   { name: '第一章 式と計算', start: 1, end: 35 },
   { name: '第二章 高次方程式', start: 36, end: 67 },
