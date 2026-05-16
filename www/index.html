@@ -1522,18 +1522,28 @@ window.askAIMemo = function() {
     : 'FocusGold数2BCの問題' + pid + 'について、学習のポイントを日本語で150字以内で教えてください。';
   var resultEl = document.getElementById('ai-memo-result');
   if (!resultEl) return;
+  // =====================================================
+  // ▼▼▼ Gemini APIキーをここに貼り付けてください ▼▼▼
+  var GEMINI_API_KEY = 'AIzaSyCZB0mWGOVbbON6E8RjuIXhTaKMd_1qJZk';
+  // ▲▲▲ https://aistudio.google.com/app/apikey でキー取得（無料）▲▲▲
+  // =====================================================
+  if (!GEMINI_API_KEY || GEMINI_API_KEY.includes('ここに')) {
+    resultEl.style.display = '';
+    resultEl.textContent = '⚠ APIキーが未設定です。HTMLの GEMINI_API_KEY を書き換えてください。';
+    return;
+  }
   resultEl.style.display = '';
   resultEl.textContent = '🤖 AIが考えています...';
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_API_KEY, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 300,
-      messages: [{ role: 'user', content: prompt }]
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 300, temperature: 0.7 }
     })
   }).then(function(r) { return r.json(); }).then(function(data) {
-    var text = (data.content || []).map(function(b) { return b.text || ''; }).join('');
+    var text = '';
+    try { text = data.candidates[0].content.parts[0].text; } catch(e) {}
     resultEl.textContent = text || 'AIから応答がありませんでした';
   }).catch(function(e) {
     resultEl.textContent = 'AI接続エラー: ' + e.message;
