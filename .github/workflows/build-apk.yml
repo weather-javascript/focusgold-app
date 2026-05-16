@@ -21,6 +21,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install Capacitor assets tool
+        run: npm install -g @capacitor/assets
+
+      - name: Copy icon
+        run: |
+          mkdir -p resources
+          cp icon.png resources/icon.png
+          cp icon.png resources/icon-foreground.png
+          npx @capacitor/assets generate --android
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
