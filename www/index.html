@@ -244,13 +244,14 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 .signout-btn { width: 100%; padding: 11px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,0.3); background: var(--red-bg); color: var(--red); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
 
 /* TOAST */
-.toast { position: fixed; bottom: calc(var(--bottom-h) + 10px); left: 50%; transform: translateX(-50%) translateY(60px); background: var(--bg3); border: 1px solid var(--border2); border-radius: 24px; padding: 8px 18px; font-size: 13px; color: var(--text); transition: transform 0.3s; z-index: 400; white-space: nowrap; pointer-events: none; }
-.toast.show { transform: translateX(-50%) translateY(0); }
+.toast { position: fixed; top: 64px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--bg3); border: 1px solid var(--border2); border-radius: 24px; padding: 8px 18px; font-size: 13px; color: var(--text); transition: transform 0.3s, opacity 0.3s; z-index: 400; white-space: nowrap; pointer-events: none; opacity: 0; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
 /* CONFETTI */
 .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 500; overflow: hidden; }
 .cp { position: absolute; width: 8px; height: 8px; animation: cf 2s ease-in forwards; opacity: 0; }
 @keyframes cf { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+@keyframes slideUp { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 
 /* EMPTY */
 .empty-state { text-align: center; padding: 36px 16px; color: var(--text3); font-size: 13px; }
@@ -769,6 +770,10 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
         <div><div class="settings-label">OLEDモード（純黒）</div><div class="settings-sub">バッテリー節約</div></div>
         <button class="toggle" id="oled-toggle" onclick="toggleOled()"></button>
       </div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <div><div class="settings-label">🎨 カラーテーマ</div><div class="settings-sub">40種類から選択</div></div>
+        <div id="theme-palette" style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px;width:100%;margin-top:4px"></div>
+      </div>
     </div>
     <div class="settings-card">
       <div class="settings-title">通知</div>
@@ -790,87 +795,63 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
     </div>
     <div class="settings-card">
       <div class="settings-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>復習スケジュール（SM-2適応型）</span>
+        <span>📅 復習スケジュール設定</span>
         <span style="font-size:10px;color:var(--accent2);font-weight:700;background:var(--accent-bg);padding:2px 8px;border-radius:10px">SM-2</span>
       </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6">問題を解いた後、<b>どのくらいで次の復習をするか</b>を直感的に設定できます。正解するほど間隔が延びる仕組みです。</div>
 
-      <!-- × バツ設定 -->
-      <div class="settings-row">
-        <div>
-          <div class="settings-label" style="color:var(--red)">× 不正解の場合</div>
-          <div class="settings-sub">次回復習まで何日？</div>
+      <!-- × バツ設定 スライダー -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:700;color:var(--red)">× 間違えたとき</div>
+          <div style="font-size:14px;font-weight:800;color:var(--red)" id="sm2-batu-lbl">1日後</div>
         </div>
-        <div style="display:flex;align-items:center;gap:5px">
-          <input type="number" id="sm2-batu-days" min="1" max="30" value="1"
-            style="width:52px;background:var(--bg3);border:1px solid rgba(248,113,113,0.4);border-radius:6px;color:var(--red);font-size:14px;font-weight:700;padding:4px 7px;font-family:inherit;outline:none;text-align:center"
-            onchange="saveSM2Settings()" />
-          <span style="font-size:12px;color:var(--text3)">日後</span>
-        </div>
+        <input type="range" id="sm2-batu-days" min="1" max="14" value="1"
+          style="width:100%;accent-color:var(--red)" oninput="onSM2Slide()" onchange="saveSM2Settings()" />
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>1日</span><span>7日</span><span>14日</span></div>
       </div>
 
-      <!-- △ 三角設定 -->
-      <div class="settings-row">
-        <div>
-          <div class="settings-label" style="color:var(--amber)">△ 要確認の場合</div>
-          <div class="settings-sub">EFへのペナルティ係数（0〜1）</div>
+      <!-- △ 三角設定 スライダー -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:700;color:var(--amber)">△ なんとなく解けたとき</div>
+          <div style="font-size:13px;font-weight:700;color:var(--amber)" id="sm2-sanka-lbl">普通の間隔</div>
         </div>
-        <div style="display:flex;align-items:center;gap:5px">
-          <input type="number" id="sm2-sanka-q" min="1" max="4" value="3" step="1"
-            style="width:52px;background:var(--bg3);border:1px solid rgba(251,191,36,0.4);border-radius:6px;color:var(--amber);font-size:14px;font-weight:700;padding:4px 7px;font-family:inherit;outline:none;text-align:center"
-            onchange="saveSM2Settings()" />
-          <span style="font-size:12px;color:var(--text3)">/ 5</span>
-        </div>
+        <input type="range" id="sm2-sanka-q" min="1" max="4" value="3" step="1"
+          style="width:100%;accent-color:var(--amber)" oninput="onSM2Slide()" onchange="saveSM2Settings()" />
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>短め</span><span>普通</span><span>長め</span></div>
       </div>
 
-      <!-- ○ マル設定 -->
-      <div class="settings-row">
-        <div>
-          <div class="settings-label" style="color:var(--green)">○ 正解の場合</div>
-          <div class="settings-sub">スコア（高いほど間隔が延びる）</div>
+      <!-- ○ マル設定 スライダー -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:700;color:var(--green)">○ しっかり解けたとき</div>
+          <div style="font-size:13px;font-weight:700;color:var(--green)" id="sm2-maru-lbl">大きく延ばす</div>
         </div>
-        <div style="display:flex;align-items:center;gap:5px">
-          <input type="number" id="sm2-maru-q" min="4" max="5" value="5" step="1"
-            style="width:52px;background:var(--bg3);border:1px solid rgba(74,222,128,0.4);border-radius:6px;color:var(--green);font-size:14px;font-weight:700;padding:4px 7px;font-family:inherit;outline:none;text-align:center"
-            onchange="saveSM2Settings()" />
-          <span style="font-size:12px;color:var(--text3)">/ 5</span>
-        </div>
+        <input type="range" id="sm2-maru-q" min="4" max="5" value="5" step="1"
+          style="width:100%;accent-color:var(--green)" oninput="onSM2Slide()" onchange="saveSM2Settings()" />
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>少し延ばす</span><span>大きく延ばす</span></div>
       </div>
 
-      <!-- 初期EF -->
-      <div class="settings-row">
-        <div>
-          <div class="settings-label">初期EF（Ease Factor）</div>
-          <div class="settings-sub">高いほど間隔が早く延びる（推奨: 2.5）</div>
+      <!-- 最大間隔 スライダー -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:12px;font-weight:700">最大復習間隔</div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent2)" id="sm2-max-lbl">180日</div>
         </div>
-        <div style="display:flex;align-items:center;gap:5px">
-          <input type="number" id="sm2-ef" min="1.3" max="4.0" value="2.5" step="0.1"
-            style="width:60px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--accent2);font-size:14px;font-weight:700;padding:4px 7px;font-family:inherit;outline:none;text-align:center"
-            onchange="saveSM2Settings()" />
-        </div>
-      </div>
-
-      <!-- 最大間隔 -->
-      <div class="settings-row">
-        <div>
-          <div class="settings-label">最大復習間隔</div>
-          <div class="settings-sub">これ以上は間隔を延ばさない</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:5px">
-          <input type="number" id="sm2-max-interval" min="30" max="365" value="180"
-            style="width:60px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:14px;font-weight:700;padding:4px 7px;font-family:inherit;outline:none;text-align:center"
-            onchange="saveSM2Settings()" />
-          <span style="font-size:12px;color:var(--text3)">日</span>
-        </div>
+        <input type="range" id="sm2-max-interval" min="30" max="365" value="180" step="30"
+          style="width:100%;accent-color:var(--accent)" oninput="onSM2Slide()" onchange="saveSM2Settings()" />
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>30日</span><span>6ヶ月</span><span>1年</span></div>
       </div>
 
       <!-- プレビュー -->
-      <div style="margin-top:10px;background:var(--bg3);border-radius:var(--radius);padding:10px 12px">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px">次回復習タイミング プレビュー</div>
+      <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.5px">✅ 全正解した場合の復習スケジュール</div>
         <div id="sm2-preview" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       </div>
 
       <!-- リセット -->
-      <div style="margin-top:10px;text-align:right">
+      <div style="text-align:right">
         <button class="small-btn" onclick="resetSM2Settings()">デフォルトに戻す</button>
       </div>
     </div>
@@ -899,14 +880,57 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
         <button class="small-btn" onclick="stopSession()">終了</button>
       </div>
     </div>
-    <div class="settings-card">
-      <div class="settings-title">⏱ ポモドーロタイマー（25分）</div>
-      <div class="settings-row">
-        <div><div class="settings-label" id="pomo-display">25:00</div><div class="settings-sub">集中タイマー</div></div>
-        <div style="display:flex;gap:6px">
-          <button class="small-btn" id="pomo-btn" onclick="togglePomodoro()">▶ 開始</button>
-          <button class="small-btn" onclick="resetPomodoro()">↺</button>
+    <div class="settings-card" id="pomo-card">
+      <div class="settings-title">🍅 ポモドーロタイマー</div>
+      <!-- SVG ring timer -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:16px 0 8px">
+        <div style="position:relative;width:140px;height:140px">
+          <svg width="140" height="140" style="transform:rotate(-90deg)">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--bg4)" stroke-width="8"/>
+            <circle id="pomo-ring" cx="70" cy="70" r="60" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-linecap="round" stroke-dasharray="376.99" stroke-dashoffset="0"
+              style="transition:stroke-dashoffset 1s linear,stroke 0.5s"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div id="pomo-display" style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent2)">25:00</div>
+            <div id="pomo-phase-label" style="font-size:10px;color:var(--text3);margin-top:2px">集中</div>
+          </div>
         </div>
+        <!-- Session dots -->
+        <div style="display:flex;gap:6px;margin:10px 0 4px" id="pomo-dots"></div>
+        <!-- Cycle config -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:3px">集中</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button onclick="adjustPomo('work',-5)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">−</button>
+              <span id="pomo-work-val" style="font-size:13px;font-weight:700;min-width:28px;text-align:center">25分</span>
+              <button onclick="adjustPomo('work',5)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">＋</button>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:3px">短休憩</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button onclick="adjustPomo('short',-1)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">−</button>
+              <span id="pomo-short-val" style="font-size:13px;font-weight:700;min-width:28px;text-align:center">5分</span>
+              <button onclick="adjustPomo('short',1)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">＋</button>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:3px">長休憩</div>
+            <div style="display:flex;align-items:center;gap:4px">
+              <button onclick="adjustPomo('long',-5)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">−</button>
+              <span id="pomo-long-val" style="font-size:13px;font-weight:700;min-width:28px;text-align:center">15分</span>
+              <button onclick="adjustPomo('long',5)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);width:24px;height:24px;cursor:pointer;font-size:14px;font-family:inherit">＋</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="pomo-btn" onclick="togglePomodoro()" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:14px;font-weight:700;padding:10px 28px;cursor:pointer;font-family:inherit">▶ 開始</button>
+          <button onclick="resetPomodoro()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit">↺</button>
+          <button onclick="skipPomoPhase()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit">⏭</button>
+        </div>
+        <div id="pomo-session-count" style="font-size:11px;color:var(--text3);margin-top:8px">完了セッション: 0</div>
       </div>
     </div>
     <div class="settings-card">
@@ -1204,6 +1228,19 @@ function resetSM2Settings() {
 }
 window.resetSM2Settings = resetSM2Settings;
 
+function onSM2Slide() {
+  var batu = parseInt((document.getElementById('sm2-batu-days')||{}).value)||1;
+  var sanka = parseInt((document.getElementById('sm2-sanka-q')||{}).value)||3;
+  var maru = parseInt((document.getElementById('sm2-maru-q')||{}).value)||5;
+  var maxI = parseInt((document.getElementById('sm2-max-interval')||{}).value)||180;
+  var bl = document.getElementById('sm2-batu-lbl'); if (bl) bl.textContent = batu + '日後';
+  var sl = document.getElementById('sm2-sanka-lbl'); if (sl) sl.textContent = ['','短め','やや短め','普通','長め'][sanka]||'普通';
+  var ml = document.getElementById('sm2-maru-lbl'); if (ml) ml.textContent = maru>=5?'大きく延ばす':'少し延ばす';
+  var mxl = document.getElementById('sm2-max-lbl'); if (mxl) mxl.textContent = maxI + '日';
+  renderSM2Preview();
+}
+window.onSM2Slide = onSM2Slide;
+
 function applySM2Inputs() {
   var set = function(id, val) { var el = document.getElementById(id); if (el) el.value = val; };
   set('sm2-batu-days',     SM2_CFG.batuDays);
@@ -1211,6 +1248,7 @@ function applySM2Inputs() {
   set('sm2-maru-q',        SM2_CFG.maruQ);
   set('sm2-ef',            SM2_CFG.defaultEf);
   set('sm2-max-interval',  SM2_CFG.maxInterval);
+  onSM2Slide();
   renderSM2Preview();
 }
 
@@ -1399,10 +1437,12 @@ auth.onAuthStateChanged(function(user) {
     if (uidEl) uidEl.textContent = user.isAnonymous ? '匿名ユーザー' : (user.email || user.displayName || user.uid.slice(0,16) + '...');
     loadFromFirestore(user.uid).then(function() {
       setStatus('online');
-      renderToday();
-      renderProgress();
-      updateStreak();
-      SM2_DEFAULT_EF = SM2_CFG.defaultEf;
+      loadTodayGoalFirestore().then(function() {
+        renderToday();
+        renderProgress();
+        updateStreak();
+        SM2_DEFAULT_EF = SM2_CFG.defaultEf;
+      });
     });
   } else {
     currentUid = null;
@@ -1770,7 +1810,74 @@ function renderToday() {
   renderOvercomeList();
 }
 
-// ===== TODAY GOAL =====
+// ===== TODAY GOAL (共有・Firebase永続・日付リセット) =====
+var todayGoalDateKey = (function() {
+  var d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+})();
+function loadTodayGoal() {
+  var saved = JSON.parse(localStorage.getItem('fg_today_goal') || 'null');
+  if (saved && saved.date === todayGoalDateKey) {
+    todayGoal = saved.goal || 0;
+    var setUi = document.getElementById('goal-set-ui');
+    var declared = document.getElementById('goal-declared');
+    if (todayGoal > 0) {
+      if (setUi) setUi.style.display = 'none';
+      if (declared) declared.style.display = '';
+      var inp = document.getElementById('goal-input');
+      if (inp) inp.value = todayGoal;
+    }
+  } else {
+    todayGoal = 0;
+    localStorage.removeItem('fg_today_goal');
+  }
+}
+function saveTodayGoalLocal() {
+  localStorage.setItem('fg_today_goal', JSON.stringify({ date: todayGoalDateKey, goal: todayGoal }));
+}
+async function saveTodayGoalFirestore() {
+  if (!currentUid) return;
+  saveTodayGoalLocal();
+  try {
+    await db.collection('users').doc(currentUid).set({ todayGoal: { date: todayGoalDateKey, goal: todayGoal } }, { merge: true });
+  } catch(e) {}
+}
+async function loadTodayGoalFirestore() {
+  if (!currentUid) { loadTodayGoal(); return; }
+  try {
+    var snap = await db.collection('users').doc(currentUid).get();
+    if (snap.exists) {
+      var g = snap.data().todayGoal;
+      if (g && g.date === todayGoalDateKey) {
+        todayGoal = g.goal || 0;
+        localStorage.setItem('fg_today_goal', JSON.stringify(g));
+      } else {
+        todayGoal = 0;
+      }
+    } else { loadTodayGoal(); }
+  } catch(e) { loadTodayGoal(); }
+  var setUi = document.getElementById('goal-set-ui');
+  var declared = document.getElementById('goal-declared');
+  if (todayGoal > 0) {
+    if (setUi) setUi.style.display = 'none';
+    if (declared) declared.style.display = '';
+    var inp = document.getElementById('goal-input');
+    if (inp) inp.value = todayGoal;
+  }
+}
+function countTodayDone() {
+  // sessionStorageのdone_* + 今日学習した問題数（learnedAt == todayTs）
+  var doneSet = new Set();
+  Object.keys(sessionStorage).forEach(function(k) { if (k.startsWith('done_')) doneSet.add(k.replace('done_','')); });
+  // 今日記録した問題もカウント
+  var tts = todayTs();
+  Object.keys(state).forEach(function(pid) {
+    var s = state[pid];
+    if (s && s.learnedAt === tts) doneSet.add(pid);
+    if (s && (s.reviews||[]).some(function(r){ return r === tts; })) doneSet.add(pid);
+  });
+  return doneSet.size;
+}
+
 window.declareGoal = function() {
   var n = parseInt((document.getElementById('goal-input')||{}).value) || 10;
   todayGoal = n;
@@ -1778,6 +1885,7 @@ window.declareGoal = function() {
   var declared = document.getElementById('goal-declared');
   if (setUi) setUi.style.display = 'none';
   if (declared) declared.style.display = '';
+  saveTodayGoalFirestore();
   renderGoalProgress();
   showToast('🎯 今日の目標: ' + n + '問！頑張ろう！');
 };
@@ -1788,7 +1896,8 @@ function renderGoalProgress() {
   if (!todayGoal) { if (declared) declared.style.display = 'none'; if (setUi) setUi.style.display = ''; return; }
   if (declared) declared.style.display = '';
   if (setUi) setUi.style.display = 'none';
-  var done = Object.keys(sessionStorage).filter(function(k){ return k.startsWith('done_'); }).length;
+  var done = countTodayDone();
+  todayDoneCount = done;
   var pct = Math.min(100, Math.round(done / todayGoal * 100));
   var pt = document.getElementById('goal-progress-text');
   var bar = document.getElementById('goal-bar');
@@ -1797,7 +1906,6 @@ function renderGoalProgress() {
   if (done >= todayGoal && pct === 100) {
     showToast('🎉 今日の目標達成！');
     launchConfetti();
-    // 特別バッジ解放チェック
     checkBadges();
   }
 }
@@ -1882,11 +1990,24 @@ function renderWeeklyReport() {
 // ===== 最適学習時間帯 =====
 function renderBestTime() {
   var hourCounts = new Array(24).fill(0);
+  // learnedAt/reviewsAt は todayTs()（深夜0時）で記録されている可能性があるため
+  // actualLearnedAt (実際の記録時刻) がある場合はそちらを優先。なければ learnedAt を使う
   Object.keys(state).forEach(function(pid) {
     var s = state[pid]; if (!s) return;
-    function countHour(ts) { if (ts) hourCounts[new Date(ts).getHours()]++; }
-    countHour(s.learnedAt);
-    (s.reviews||[]).forEach(countHour);
+    function countHour(ts) {
+      if (!ts) return;
+      var h = new Date(ts).getHours();
+      // todayTs() は深夜0時なので、0時台に集中するのは正常だが
+      // もし actualTime フィールドがあればそちらを使う
+      hourCounts[h]++;
+    }
+    // actualLearnedAt: モーダルで記録した実時刻（Date.now()）
+    var learnTs = s.actualLearnedAt || s.learnedAt;
+    countHour(learnTs);
+    (s.reviewsAt || s.reviews || []).forEach(function(ts) {
+      // reviewsAt は実時刻配列、reviews は旧形式（内容不定）
+      if (typeof ts === 'number' && ts > 0) countHour(ts);
+    });
   });
   var maxH = Math.max.apply(null, hourCounts) || 1;
   var chart = document.getElementById('hourly-chart');
@@ -1894,14 +2015,15 @@ function renderBestTime() {
     chart.innerHTML = hourCounts.map(function(cnt, h) {
       var pct = Math.max(3, Math.round(cnt/maxH*100));
       var col = cnt === maxH ? 'var(--accent)' : cnt > 0 ? 'rgba(108,99,255,0.5)' : 'var(--bg4)';
-      return '<div style="flex:1;height:' + pct + '%;border-radius:2px 2px 0 0;background:' + col + '" title="' + h + '時: ' + cnt + '問"></div>';
+      return '<div style="flex:1;height:' + pct + '%;border-radius:2px 2px 0 0;background:' + col + ';cursor:default" title="' + h + '時: ' + cnt + '問"></div>';
     }).join('');
   }
   // ベスト時間帯
-  var bestH = hourCounts.indexOf(Math.max.apply(null, hourCounts));
+  var maxVal = Math.max.apply(null, hourCounts);
+  var bestH = hourCounts.indexOf(maxVal);
   var el = document.getElementById('best-time-display');
   if (el) {
-    if (maxH <= 0) { el.textContent = 'まだデータがありません'; return; }
+    if (maxVal <= 0) { el.textContent = 'まだデータがありません'; return; }
     el.innerHTML = 'あなたは <strong style="color:var(--accent2)">' + bestH + '時〜' + (bestH+1) + '時</strong> に最もよく学習しています（' + hourCounts[bestH] + '問）';
   }
   // 累計時間
@@ -1988,36 +2110,141 @@ function updateSessionBanner() {
   }
 }
 
-// ===== POMODORO =====
-window.togglePomodoro = function() {
-  if (pomodoroRunning) {
-    clearInterval(pomodoroInterval); pomodoroRunning = false;
-    document.getElementById('pomo-btn').textContent = '▶ 再開';
+// ===== POMODORO (FocusTodo style) =====
+var pomoState = {
+  workMin: 25, shortMin: 5, longMin: 15,
+  phase: 'work', // 'work'|'short'|'long'
+  running: false, seconds: 0, totalSeconds: 25*60,
+  session: 0, completedSessions: 0,
+  interval: null
+};
+function pomoUpdateUI() {
+  var remaining = pomoState.totalSeconds - pomoState.seconds;
+  if (remaining < 0) remaining = 0;
+  var m = Math.floor(remaining / 60), s = remaining % 60;
+  var disp = document.getElementById('pomo-display');
+  if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  // Ring
+  var ring = document.getElementById('pomo-ring');
+  if (ring) {
+    var pct = 1 - remaining / pomoState.totalSeconds;
+    ring.style.strokeDashoffset = 376.99 * pct;
+    ring.style.stroke = pomoState.phase === 'work' ? 'var(--accent)' : 'var(--green)';
+  }
+  // Phase label
+  var lbl = document.getElementById('pomo-phase-label');
+  if (lbl) lbl.textContent = pomoState.phase === 'work' ? '集中' : pomoState.phase === 'short' ? '短休憩' : '長休憩';
+  // Session dots
+  var dots = document.getElementById('pomo-dots');
+  if (dots) {
+    var html = '';
+    for (var i = 0; i < 4; i++) {
+      var filled = i < (pomoState.completedSessions % 4);
+      html += '<div style="width:8px;height:8px;border-radius:50%;background:' + (filled?'var(--accent)':'var(--bg4)') + ';border:1px solid var(--border2)"></div>';
+    }
+    dots.innerHTML = html;
+  }
+  var sc = document.getElementById('pomo-session-count');
+  if (sc) sc.textContent = '完了セッション: ' + pomoState.completedSessions;
+  // Btn
+  var btn = document.getElementById('pomo-btn');
+  if (btn) btn.textContent = pomoState.running ? '⏸ 停止' : (pomoState.seconds > 0 ? '▶ 再開' : '▶ 開始');
+}
+function pomoNextPhase() {
+  if (pomoState.phase === 'work') {
+    pomoState.completedSessions++;
+    playPomoSound('done');
+    if (pomoState.completedSessions % 4 === 0) {
+      pomoState.phase = 'long';
+      pomoState.totalSeconds = pomoState.longMin * 60;
+      showToast('🌴 長休憩タイム！' + pomoState.longMin + '分休もう');
+    } else {
+      pomoState.phase = 'short';
+      pomoState.totalSeconds = pomoState.shortMin * 60;
+      showToast('☕ 短休憩！' + pomoState.shortMin + '分休もう');
+    }
   } else {
-    pomodoroRunning = true;
-    document.getElementById('pomo-btn').textContent = '⏸ 停止';
-    pomodoroInterval = setInterval(function() {
-      pomodoroSeconds++;
-      var remaining = 25*60 - pomodoroSeconds;
-      if (remaining <= 0) {
-        clearInterval(pomodoroInterval); pomodoroRunning = false;
-        pomodoroSeconds = 0;
-        document.getElementById('pomo-display').textContent = '25:00';
-        document.getElementById('pomo-btn').textContent = '▶ 開始';
-        showToast('🍅 ポモドーロ完了！5分休憩しよう');
-        try { new Notification('FocusGold',{body:'ポモドーロ完了！5分休憩しよう'}); } catch(e){}
+    pomoState.phase = 'work';
+    pomoState.totalSeconds = pomoState.workMin * 60;
+    showToast('🍅 集中タイム！' + pomoState.workMin + '分頑張ろう');
+  }
+  pomoState.seconds = 0;
+  pomoState.running = false;
+  clearInterval(pomoState.interval); pomoState.interval = null;
+  pomoUpdateUI();
+}
+function playPomoSound(type) {
+  if (!soundEnabled) return;
+  try {
+    var actx = new (window.AudioContext||window.webkitAudioContext)();
+    if (type === 'tick') {
+      var osc = actx.createOscillator(); var g = actx.createGain();
+      osc.connect(g); g.connect(actx.destination);
+      osc.frequency.value = 800; g.gain.setValueAtTime(0.05, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.08);
+      osc.start(); osc.stop(actx.currentTime+0.08);
+    } else {
+      var freqs = [523,659,784,1047];
+      freqs.forEach(function(f, i) {
+        var osc = actx.createOscillator(); var g = actx.createGain();
+        osc.connect(g); g.connect(actx.destination);
+        osc.frequency.value = f; g.gain.setValueAtTime(0.25, actx.currentTime+i*0.12);
+        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+i*0.12+0.4);
+        osc.start(actx.currentTime+i*0.12); osc.stop(actx.currentTime+i*0.12+0.4);
+      });
+    }
+  } catch(e) {}
+}
+window.togglePomodoro = function() {
+  if (pomoState.running) {
+    clearInterval(pomoState.interval); pomoState.interval = null;
+    pomoState.running = false;
+  } else {
+    pomoState.running = true;
+    pomoState.interval = setInterval(function() {
+      playPomoSound('tick');
+      pomoState.seconds++;
+      if (pomoState.seconds >= pomoState.totalSeconds) {
+        clearInterval(pomoState.interval); pomoState.interval = null;
+        pomoState.running = false;
+        pomoNextPhase();
+        try { new Notification('FocusGold',{body: pomoState.phase==='work'?'集中タイム！':'休憩タイム！'}); } catch(e){}
         return;
       }
-      var m = Math.floor(remaining/60), s = remaining%60;
-      document.getElementById('pomo-display').textContent = m+':'+(s<10?'0':'')+s;
+      pomoUpdateUI();
     }, 1000);
   }
+  pomoUpdateUI();
 };
 window.resetPomodoro = function() {
-  clearInterval(pomodoroInterval); pomodoroRunning = false; pomodoroSeconds = 0;
-  document.getElementById('pomo-display').textContent = '25:00';
-  document.getElementById('pomo-btn').textContent = '▶ 開始';
+  clearInterval(pomoState.interval); pomoState.interval = null;
+  pomoState.running = false; pomoState.seconds = 0;
+  pomoState.phase = 'work'; pomoState.totalSeconds = pomoState.workMin * 60;
+  pomoUpdateUI();
 };
+window.skipPomoPhase = function() {
+  clearInterval(pomoState.interval); pomoState.interval = null;
+  pomoState.running = false; pomoState.seconds = 0;
+  pomoNextPhase();
+};
+window.adjustPomo = function(type, delta) {
+  if (pomoState.running) return;
+  if (type === 'work') {
+    pomoState.workMin = Math.max(5, Math.min(60, pomoState.workMin + delta));
+    var el = document.getElementById('pomo-work-val'); if (el) el.textContent = pomoState.workMin + '分';
+    if (pomoState.phase === 'work') { pomoState.totalSeconds = pomoState.workMin * 60; pomoState.seconds = 0; }
+  } else if (type === 'short') {
+    pomoState.shortMin = Math.max(1, Math.min(15, pomoState.shortMin + delta));
+    var el2 = document.getElementById('pomo-short-val'); if (el2) el2.textContent = pomoState.shortMin + '分';
+    if (pomoState.phase === 'short') { pomoState.totalSeconds = pomoState.shortMin * 60; pomoState.seconds = 0; }
+  } else {
+    pomoState.longMin = Math.max(5, Math.min(30, pomoState.longMin + delta));
+    var el3 = document.getElementById('pomo-long-val'); if (el3) el3.textContent = pomoState.longMin + '分';
+    if (pomoState.phase === 'long') { pomoState.totalSeconds = pomoState.longMin * 60; pomoState.seconds = 0; }
+  }
+  pomoUpdateUI();
+};
+setTimeout(pomoUpdateUI, 400);
 
 // ===== STUDY PLAN =====
 window.calcStudyPlan = function() {
@@ -2110,7 +2337,8 @@ function renderCalendar() {
     var isToday = (k === todayKey);
     var cnt = actMap[k] || 0;
     var cls = 'cal-day' + (cnt > 0 ? ' has-activity' : '') + (isToday ? ' today' : '');
-    html += '<div class="' + cls + '"><span>' + day + '</span>' + (cnt > 0 ? '<span class="cal-day-count">' + cnt + '</span>' : '') + '</div>';
+    var clickAttr = cnt > 0 ? ' onclick="showDayDetail(' + calYear + ',' + calMonth + ',' + day + ')" style="cursor:pointer"' : '';
+    html += '<div class="' + cls + '"' + clickAttr + '><span>' + day + '</span>' + (cnt > 0 ? '<span class="cal-day-count">' + cnt + '</span>' : '') + '</div>';
   }
   grid.innerHTML = html;
   renderWeeklyChart();
@@ -2174,8 +2402,50 @@ function renderRateChart() {
   }).join('');
 }
 
-window.calPrev = function() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); };
-window.calNext = function() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); };
+window.showDayDetail = function(y, m, d) {
+  var tgt = new Date(y, m, d); tgt.setHours(0,0,0,0);
+  var tgtTs = tgt.getTime();
+  var results = [];
+  var sym = {maru:'○', sanka:'△', batu:'×'};
+  var col = {maru:'var(--green)', sanka:'var(--amber)', batu:'var(--red)'};
+  CHAPTERS.forEach(function(ch) {
+    getProblems(ch).forEach(function(pid) {
+      var s = state[pid]; if (!s) return;
+      var hit = false;
+      var type = '';
+      var d2 = new Date(s.learnedAt); d2.setHours(0,0,0,0);
+      if (d2.getTime() === tgtTs) { hit = true; type = '初回学習'; }
+      (s.reviews||[]).forEach(function(r, i) {
+        var rd = new Date(r); rd.setHours(0,0,0,0);
+        if (rd.getTime() === tgtTs) { hit = true; type = (i+1) + '回目復習'; }
+      });
+      if (hit) results.push({ pid: pid, ch: ch.name, result: s.result || 'maru', type: type });
+    });
+  });
+  var dateStr = y + '年' + (m+1) + '月' + d + '日';
+  var old = document.getElementById('day-detail-modal');
+  if (old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'day-detail-modal';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:300;display:flex;align-items:flex-end;justify-content:center';
+  el.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:16px 18px 36px;width:100%;max-width:480px;max-height:70vh;overflow-y:auto">' +
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px"></div>' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+    '<div style="font-size:16px;font-weight:700">📅 ' + dateStr + 'の記録</div>' +
+    '<button onclick="document.getElementById(\'day-detail-modal\').remove()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer">×</button></div>' +
+    (results.length === 0 ? '<div class="empty-state">この日の記録がありません</div>' :
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:10px">' + results.length + '問を記録</div>' +
+    results.map(function(r) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="openTaskModal(\'' + r.pid + '\');document.getElementById(\'day-detail-modal\').remove()">' +
+        '<span style="color:' + col[r.result] + ';font-weight:700;font-size:16px;min-width:20px">' + sym[r.result] + '</span>' +
+        '<div style="flex:1"><div style="font-size:13px;font-weight:600">問題 ' + r.pid + '</div><div style="font-size:11px;color:var(--text3)">' + r.ch.replace(/第[一二三四五六七八九十]+章 /,'') + '</div></div>' +
+        '<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 7px;border-radius:10px">' + r.type + '</span></div>';
+    }).join('')) + '</div>';
+  el.addEventListener('click', function(e) { if (e.target === el) el.remove(); });
+  document.body.appendChild(el);
+};
+
+
 
 // ===== PROGRESS =====
 function renderProgress() {
@@ -2417,6 +2687,11 @@ window.openModal = function(pid, chName) {
   } else {
     actions += resultSelectorHTML(pendingResult) + memoHTML(pid) +
       '<button class="modal-btn primary" onclick="reviewProblem()">復習完了！</button>' +
+      '<div style="margin-top:8px">' +
+      '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">📅 次の復習タイミングを変更</div>' +
+      '<div style="display:flex;align-items:center;gap:6px">' +
+      '<input type="number" id="custom-review-days" min="1" max="365" placeholder="自動" style="width:70px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px;padding:5px 8px;font-family:inherit;outline:none;text-align:center" />' +
+      '<span style="font-size:12px;color:var(--text3)">日後 (空白=自動SM-2)</span></div></div>' +
       '<button class="modal-btn" onclick="closeModalDirect()">後で</button>';
   }
 
@@ -2476,15 +2751,42 @@ function getallTags() {
   return JSON.parse(localStorage.getItem('fg_tags') || '[]');
 }
 
-window.learnProblem = function() {
+// ===== 次の問題へのプロンプト =====
+function showNextProblemPrompt(donePid) {
+  // 次の未学習問題を探す
+  var allPids = [];
+  CHAPTERS.forEach(function(ch) { getProblems(ch).forEach(function(p) { allPids.push(p); }); });
+  var idx = allPids.indexOf(donePid);
+  var nextPid = null;
+  for (var i = idx + 1; i < allPids.length; i++) {
+    if (!state[allPids[i]]) { nextPid = allPids[i]; break; }
+  }
+  if (!nextPid) return; // 全問学習済みなら表示しない
+  var nextCh = CHAPTERS.find(function(c) { return getProblems(c).indexOf(nextPid) !== -1; });
+  // 既存のプロンプトを削除
+  var old = document.getElementById('next-prob-prompt');
+  if (old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'next-prob-prompt';
+  el.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+10px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px 16px;z-index:350;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,0.4);max-width:340px;width:90%;animation:slideUp 0.3s ease';
+  el.innerHTML = '<span style="font-size:13px;flex:1;color:var(--text2)">次の問題にチャレンジしよう！<br><span style="font-size:11px;color:var(--text3)">問題 ' + nextPid + '</span></span>' +
+    '<button onclick="openTaskModal(\'' + nextPid + '\');document.getElementById(\'next-prob-prompt\').remove()" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 13px;cursor:pointer;font-family:inherit;white-space:nowrap">進捗へ</button>' +
+    '<button onclick="this.closest(\'#next-prob-prompt\').remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px">×</button>';
+  document.body.appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.remove(); }, 6000);
+}
+
+
+  var nowTs = Date.now();
   var sm2 = sm2NextInterval({reviews:[], ef: SM2_DEFAULT_EF}, pendingResult);
-  state[modalPid] = { learnedAt: todayTs(), reviews: [], result: pendingResult, memo: getMemo(), tags: getModalTags(),
+  state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], result: pendingResult, memo: getMemo(), tags: getModalTags(),
     ef: sm2.ef, lastInterval: sm2.interval, lastReviewAt: todayTs(), sm2Active: true,
     difficulty: getModalDifficulty() };
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
   stopTimer();
   saveState(); closeModalDirect();
   playSound();
+  showNextProblemPrompt(modalPid);
   showToast('問題' + modalPid + ' 学習記録しました');
   if (sessionMode) { sessionDone++; sessionResults[pendingResult]++; updateSessionBanner(); }
   checkBadges(); checkChapterComplete(modalPid);
@@ -2492,14 +2794,19 @@ window.learnProblem = function() {
 };
 
 window.reviewProblem = function() {
-  if (!state[modalPid]) state[modalPid] = { learnedAt: todayTs(), reviews: [], ef: SM2_DEFAULT_EF };
+  var nowTs = Date.now();
+  var customDaysEl = document.getElementById('custom-review-days');
+  var customDays = customDaysEl ? parseInt(customDaysEl.value) : 0;
+  if (!state[modalPid]) state[modalPid] = { learnedAt: todayTs(), reviews: [], reviewsAt: [], ef: SM2_DEFAULT_EF };
   var sm2 = sm2NextInterval(state[modalPid], pendingResult);
+  var interval = (customDays && customDays > 0) ? customDays : sm2.interval;
   state[modalPid].reviews = (state[modalPid].reviews || []).concat([todayTs()]);
+  state[modalPid].reviewsAt = (state[modalPid].reviewsAt || []).concat([nowTs]);
   state[modalPid].result = pendingResult;
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
   state[modalPid].ef = sm2.ef;
-  state[modalPid].lastInterval = sm2.interval;
+  state[modalPid].lastInterval = interval;
   state[modalPid].lastReviewAt = todayTs();
   state[modalPid].sm2Active = true;
   state[modalPid].difficulty = getModalDifficulty() || state[modalPid].difficulty;
@@ -2510,7 +2817,8 @@ window.reviewProblem = function() {
   if (taskEl) { taskEl.classList.add('done'); sessionStorage.setItem('done_' + modalPid, '1'); }
   closeModalDirect();
   var lbls = {maru:'○',sanka:'△',batu:'×'};
-  var nextDays = sm2.interval;
+  var nextDays = interval;
+  showNextProblemPrompt(modalPid);
   showToast('問題' + modalPid + ' 復習完了 ' + lbls[pendingResult] + ' (次回:' + nextDays + '日後)');
   playSound();
   if ((state[modalPid].reviews||[]).length >= 3) launchConfetti();
@@ -2564,8 +2872,12 @@ window.showTab = function(t) {
   });
   if (t === 'today') { renderToday(); renderCountdown(); }
   if (t === 'calendar') { initCal(); renderCalendar(); render30DayStreak(); renderWeeklyReport(); }
-  if (t === 'settings') { setTimeout(applySM2Inputs, 50); }
-  if (t === 'progress') renderProgress();
+  if (t === 'settings') { setTimeout(applySM2Inputs, 50); setTimeout(renderThemePalette, 60); }
+  if (t === 'progress') {
+    renderProgress();
+    var exTab = document.getElementById('stab-example');
+    if (exTab) exTab.style.display = currentBook === 'seminar' ? 'none' : '';
+  }
   if (t === 'memo') { renderMemoSearch(); renderMemoTags(); renderProjects(); }
 };
 
@@ -2576,9 +2888,12 @@ window.switchProgressTab = function(tab) {
     var st = document.getElementById('stab-' + id);
     if (st) st.classList.toggle('active', id === tab);
   });
+  // セミナー物理では example タブを非表示
+  var exTab = document.getElementById('stab-example');
+  if (exTab) exTab.style.display = currentBook === 'seminar' ? 'none' : '';
   if (tab === 'heatmap') renderHeatmap();
   if (tab === 'badges') renderBadges();
-  if (tab === 'example') renderProgressEx();
+  if (tab === 'example' && currentBook !== 'seminar') renderProgressEx();
   if (tab === 'practice') renderProgress();
   if (tab === 'trends') { renderBestTime(); renderSparklines(); }
 };
@@ -2720,21 +3035,42 @@ window.stopTimer = function() {
 
 // ===== SOUND =====
 var soundEnabled = localStorage.getItem('fg_sound') !== 'off';
-function playSound() {
+var _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) { try { _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+  return _audioCtx;
+}
+function playTone(freqs, duration, vol) {
   if (!soundEnabled) return;
   try {
-    var actx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = actx.createOscillator();
-    var gain = actx.createGain();
-    osc.connect(gain); gain.connect(actx.destination);
-    osc.frequency.setValueAtTime(523, actx.currentTime);
-    osc.frequency.setValueAtTime(659, actx.currentTime + 0.1);
-    osc.frequency.setValueAtTime(784, actx.currentTime + 0.2);
-    gain.gain.setValueAtTime(0.3, actx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.5);
-    osc.start(actx.currentTime); osc.stop(actx.currentTime + 0.5);
+    var actx = getAudioCtx(); if (!actx) return;
+    (Array.isArray(freqs) ? freqs : [freqs]).forEach(function(f, i) {
+      var off = Array.isArray(freqs) ? i * (duration / freqs.length * 0.8) : 0;
+      var osc = actx.createOscillator(); var g = actx.createGain();
+      osc.connect(g); g.connect(actx.destination);
+      osc.frequency.value = f;
+      g.gain.setValueAtTime(vol || 0.25, actx.currentTime + off);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + off + duration);
+      osc.start(actx.currentTime + off); osc.stop(actx.currentTime + off + duration);
+    });
   } catch(e) {}
 }
+function playSound() { playTone([523,659,784], 0.18, 0.25); }
+function playTapSound() { playTone(900, 0.05, 0.08); }
+function playLoadSound() { playTone([261,330,392,523], 0.6, 0.15); }
+function playBadgeSound() { playTone([523,659,784,1047,1319], 0.25, 0.3); }
+
+// タップ音を全ボタンに
+document.addEventListener('click', function(e) {
+  if (!soundEnabled) return;
+  var el = e.target; while (el) {
+    if (el.tagName === 'BUTTON' || el.classList && (el.classList.contains('task-card')||el.classList.contains('prob-btn')||el.classList.contains('bn-tab'))) {
+      playTapSound(); break;
+    }
+    el = el.parentElement;
+  }
+}, true);
+
 window.toggleSound = function() {
   soundEnabled = !soundEnabled;
   localStorage.setItem('fg_sound', soundEnabled ? 'on' : 'off');
@@ -2742,6 +3078,8 @@ window.toggleSound = function() {
   showToast(soundEnabled ? '🔊 サウンドON' : '🔇 サウンドOFF');
 };
 setTimeout(function() { var t = document.getElementById('sound-toggle'); if (t) t.classList.toggle('on', soundEnabled); }, 400);
+// ロード完了音
+setTimeout(function() { playLoadSound(); }, 7000);
 
 // ===== OLED =====
 window.toggleOled = function() {
@@ -2751,6 +3089,115 @@ window.toggleOled = function() {
   localStorage.setItem('fg_oled', on ? '1' : '0');
 };
 if (localStorage.getItem('fg_oled') === '1') { document.body.classList.add('oled'); setTimeout(function() { var t = document.getElementById('oled-toggle'); if (t) t.classList.add('on'); }, 400); }
+
+// ===== 40 COLOR THEMES =====
+var COLOR_THEMES = [
+  // ダーク系
+  {name:'デフォルト',bg:'#0f0f13',accent:'#6c63ff',accent2:'#8b84ff',label:'🌌'},
+  {name:'ミッドナイト',bg:'#0d1117',accent:'#58a6ff',accent2:'#79c0ff',label:'🌙'},
+  {name:'ドラキュラ',bg:'#282a36',accent:'#bd93f9',accent2:'#caa9fa',label:'🧛'},
+  {name:'フォレスト',bg:'#0d1f0d',accent:'#4ade80',accent2:'#86efac',label:'🌲'},
+  {name:'オーシャン',bg:'#0a1628',accent:'#38bdf8',accent2:'#7dd3fc',label:'🌊'},
+  {name:'サンセット',bg:'#1a0a0a',accent:'#f97316',accent2:'#fb923c',label:'🌅'},
+  {name:'チェリー',bg:'#1a0a14',accent:'#f43f5e',accent2:'#fb7185',label:'🍒'},
+  {name:'ゴールド',bg:'#1a1400',accent:'#eab308',accent2:'#facc15',label:'✨'},
+  // ライト系（パステル・暖色・寒色）
+  {name:'ラベンダー',bg:'#f3f0ff',accent:'#7c3aed',accent2:'#8b5cf6',label:'💜'},
+  {name:'ミント',bg:'#f0fff4',accent:'#059669',accent2:'#10b981',label:'🌿'},
+  {name:'ベビーブルー',bg:'#eff6ff',accent:'#2563eb',accent2:'#3b82f6',label:'💙'},
+  {name:'ローズ',bg:'#fff1f2',accent:'#e11d48',accent2:'#f43f5e',label:'🌹'},
+  {name:'ピーチ',bg:'#fff7ed',accent:'#ea580c',accent2:'#f97316',label:'🍑'},
+  {name:'レモン',bg:'#fefce8',accent:'#ca8a04',accent2:'#eab308',label:'🍋'},
+  {name:'さくら',bg:'#fdf2f8',accent:'#db2777',accent2:'#ec4899',label:'🌸'},
+  {name:'アイスブルー',bg:'#f0f9ff',accent:'#0284c7',accent2:'#0ea5e9',label:'🧊'},
+  // パステル系
+  {name:'パステルパープル',bg:'#faf5ff',accent:'#9333ea',accent2:'#a855f7',label:'🎀'},
+  {name:'パステルグリーン',bg:'#f0fdf4',accent:'#16a34a',accent2:'#22c55e',label:'🍃'},
+  {name:'パステルピンク',bg:'#fdf4ff',accent:'#c026d3',accent2:'#d946ef',label:'🎀'},
+  {name:'パステルオレンジ',bg:'#fff8f0',accent:'#d97706',accent2:'#f59e0b',label:'🍊'},
+  // 暖色系
+  {name:'オータム',bg:'#1c0f05',accent:'#dc2626',accent2:'#ef4444',label:'🍂'},
+  {name:'キャラメル',bg:'#1a0f00',accent:'#b45309',accent2:'#d97706',label:'🍮'},
+  {name:'サーモン',bg:'#fff0ed',accent:'#ef4444',accent2:'#f87171',label:'🐟'},
+  {name:'コーラル',bg:'#0f0505',accent:'#fb7185',accent2:'#fda4af',label:'🪸'},
+  // 寒色系
+  {name:'アーティック',bg:'#f8faff',accent:'#1e40af',accent2:'#3b82f6',label:'❄️'},
+  {name:'スカイ',bg:'#e0f7fa',accent:'#0277bd',accent2:'#0288d1',label:'☁️'},
+  {name:'インディゴ',bg:'#1e1b4b',accent:'#6366f1',accent2:'#818cf8',label:'🔷'},
+  {name:'ティール',bg:'#002d2d',accent:'#0d9488',accent2:'#14b8a6',label:'🦚'},
+  // モノクロ系
+  {name:'グレー',bg:'#111111',accent:'#9ca3af',accent2:'#d1d5db',label:'⬛'},
+  {name:'チャコール',bg:'#1f2937',accent:'#6b7280',accent2:'#9ca3af',label:'🖤'},
+  {name:'スレート',bg:'#0f172a',accent:'#64748b',accent2:'#94a3b8',label:'🌫️'},
+  // ネオン系
+  {name:'ネオンピンク',bg:'#0a0010',accent:'#d946ef',accent2:'#e879f9',label:'💖'},
+  {name:'ネオングリーン',bg:'#001a00',accent:'#22c55e',accent2:'#4ade80',label:'💚'},
+  {name:'ネオンブルー',bg:'#00001a',accent:'#38bdf8',accent2:'#7dd3fc',label:'💙'},
+  {name:'ネオンオレンジ',bg:'#1a0500',accent:'#f97316',accent2:'#fb923c',label:'🔶'},
+  // 季節系
+  {name:'夏海',bg:'#001a33',accent:'#0ea5e9',accent2:'#38bdf8',label:'🏖️'},
+  {name:'紅葉',bg:'#1a0800',accent:'#ea580c',accent2:'#f97316',label:'🍁'},
+  {name:'雪景色',bg:'#f8faff',accent:'#3b82f6',accent2:'#60a5fa',label:'⛄'},
+  {name:'桜吹雪',bg:'#fff5f7',accent:'#ec4899',accent2:'#f9a8d4',label:'🌺'},
+  {name:'夜空',bg:'#020617',accent:'#a855f7',accent2:'#c084fc',label:'🌠'},
+];
+var currentColorTheme = parseInt(localStorage.getItem('fg_color_theme') || '0');
+function applyColorTheme(idx) {
+  var t = COLOR_THEMES[idx]; if (!t) return;
+  currentColorTheme = idx;
+  localStorage.setItem('fg_color_theme', idx);
+  var r = document.documentElement.style;
+  r.setProperty('--bg', t.bg);
+  // derive bg2/bg3/bg4 from bg
+  var isDark = t.bg.startsWith('#0') || t.bg.startsWith('#1') || t.bg.startsWith('#2') || t.bg === '#020617' || t.bg === '#001a33' || t.bg === '#0a0010' || t.bg === '#001a00' || t.bg === '#00001a' || t.bg === '#1a0a0a' || t.bg === '#1a0a14' || t.bg === '#1c0f05' || t.bg === '#1a1400' || t.bg === '#1a0f00' || t.bg === '#1a0800' || t.bg === '#0d1f0d' || t.bg === '#0a1628' || t.bg === '#282a36' || t.bg === '#0d1117' || t.bg === '#0f0505' || t.bg === '#002d2d' || t.bg === '#001a00' || t.bg === '#00001a' || t.bg === '#1a0500';
+  if (isDark) {
+    r.setProperty('--bg2', lighten(t.bg, 8));
+    r.setProperty('--bg3', lighten(t.bg, 14));
+    r.setProperty('--bg4', lighten(t.bg, 22));
+    r.setProperty('--text', '#e8e8f0');
+    r.setProperty('--text2', '#9090a8');
+    r.setProperty('--text3', '#5a5a72');
+  } else {
+    r.setProperty('--bg2', '#ffffff');
+    r.setProperty('--bg3', lightenLight(t.bg, 0.5));
+    r.setProperty('--bg4', lightenLight(t.bg, 0.3));
+    r.setProperty('--text', '#1a1a2e');
+    r.setProperty('--text2', '#5a5a72');
+    r.setProperty('--text3', '#9090a8');
+  }
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--accent2', t.accent2);
+  r.setProperty('--accent-bg', hexToRgbaCss(t.accent, 0.12));
+  renderThemePalette();
+}
+function lighten(hex, pct) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.min(255, r + pct*2); g = Math.min(255, g + pct*2); b = Math.min(255, b + pct*2);
+  return '#' + [r,g,b].map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');
+}
+function lightenLight(hex, ratio) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r * ratio + 255 * (1-ratio)); g = Math.round(g * ratio + 255 * (1-ratio)); b = Math.round(b * ratio + 255 * (1-ratio));
+  return '#' + [r,g,b].map(function(v){return ('0'+Math.round(v).toString(16)).slice(-2);}).join('');
+}
+function hexToRgbaCss(hex, a) {
+  var r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+}
+function renderThemePalette() {
+  var el = document.getElementById('theme-palette'); if (!el) return;
+  el.innerHTML = COLOR_THEMES.map(function(t, i) {
+    var sel = i === currentColorTheme;
+    return '<div title="' + t.name + '" onclick="applyColorTheme(' + i + ')" style="aspect-ratio:1;border-radius:8px;background:' + t.bg + ';border:2px solid ' + (sel?t.accent2:'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform 0.15s;' + (sel?'transform:scale(1.12)':'') + '">' + t.label + '</div>';
+  }).join('');
+}
+// Apply saved theme on load
+setTimeout(function() {
+  if (currentColorTheme > 0) applyColorTheme(currentColorTheme);
+  renderThemePalette();
+}, 300);
+window.applyColorTheme = applyColorTheme;
+window.renderThemePalette = renderThemePalette;
 
 // ===== EXAM COUNTDOWN =====
 function renderCountdown() {
@@ -2903,6 +3350,10 @@ function checkBadges() {
     if (earned) { earnedBadges.push(b.id); newBadges.push(b); }
   });
   if (newBadges.length > 0) {
+    // Save unlock dates
+    var badgeDates = JSON.parse(localStorage.getItem('fg_badge_dates') || '{}');
+    newBadges.forEach(function(b) { if (!badgeDates[b.id]) badgeDates[b.id] = Date.now(); });
+    localStorage.setItem('fg_badge_dates', JSON.stringify(badgeDates));
     // 即 localStorage + Firestore に保存して重複防止
     saveBadgesToFirestore();
     newBadges.forEach(function(b, i) { setTimeout(function() { showBadgeFlash(b); }, i * 3500); });
@@ -2916,21 +3367,70 @@ function showBadgeFlash(b) {
     '<div style="font-size:16px;font-weight:800">' + b.name + '</div>' +
     '<div style="font-size:11px;color:var(--text3);margin-top:5px">' + b.desc + '</div></div>';
   document.body.appendChild(el);
+  playBadgeSound();
   setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3800);
   launchConfetti();
 }
+// ===== XP SYSTEM =====
+function getTotalXP() {
+  var xp = 0;
+  BADGES.forEach(function(b, i) {
+    if (earnedBadges.indexOf(b.id) !== -1) xp += (10 + i % 5 * 5);
+  });
+  return xp;
+}
+function getBadgeXP(b, idx) { return 10 + idx % 5 * 5; }
+
 function renderBadges() {
   var wall = document.getElementById('badge-wall');
   var cnt = document.getElementById('badge-count');
   if (!wall) return;
-  if (cnt) cnt.textContent = earnedBadges.length + ' / ' + BADGES.length;
-  wall.innerHTML = BADGES.map(function(b) {
+  var totalXP = getTotalXP();
+  var totalSec = parseInt(localStorage.getItem('fg_total_time') || '0');
+  var totalMin = Math.round(totalSec / 60);
+  var timeStr = totalMin < 60 ? totalMin + '分' : Math.floor(totalMin/60) + '時間' + (totalMin%60) + '分';
+  if (cnt) cnt.innerHTML = earnedBadges.length + ' / ' + BADGES.length +
+    ' &nbsp;|&nbsp; <span style="color:var(--amber)">⚡ ' + totalXP + ' XP</span>' +
+    ' &nbsp;|&nbsp; <span style="color:var(--blue)">⏱ ' + timeStr + '</span>';
+  // Badge unlock dates stored in localStorage
+  var badgeDates = JSON.parse(localStorage.getItem('fg_badge_dates') || '{}');
+  wall.innerHTML = BADGES.map(function(b, idx) {
     var earned = earnedBadges.indexOf(b.id) !== -1;
-    return '<div class="badge-item ' + (earned?'earned':'locked') + '" title="' + b.desc + '">' +
-      '<span class="badge-icon">' + b.icon + '</span><div class="badge-name">' + b.name + '</div>' +
-      (earned ? '' : '<div style="font-size:9px;color:var(--text3)">🔒 未獲得</div>') + '</div>';
+    var xp = getBadgeXP(b, idx);
+    var dateStr = earned && badgeDates[b.id] ? '<div style="font-size:8px;color:var(--text3);margin-top:2px">' + new Date(badgeDates[b.id]).toLocaleDateString('ja-JP',{month:'short',day:'numeric'}) + '</div>' : '';
+    var xpStr = earned ? '<div style="font-size:9px;color:var(--amber);margin-top:1px">+' + xp + 'XP</div>' : '';
+    var condStr = b.desc ? '<div style="font-size:8px;color:var(--text3);margin-top:1px;line-height:1.2">' + b.desc + '</div>' : '';
+    return '<div class="badge-item ' + (earned?'earned':'locked') + '" title="' + b.desc + '" onclick="showBadgeDetail(\'' + b.id + '\',' + idx + ')">' +
+      '<span class="badge-icon">' + b.icon + '</span>' +
+      '<div class="badge-name">' + b.name + '</div>' +
+      xpStr + dateStr +
+      (earned ? '' : condStr) + '</div>';
   }).join('');
 }
+window.showBadgeDetail = function(bid, idx) {
+  var b = BADGES.find(function(x){ return x.id === bid; });
+  if (!b) return;
+  var earned = earnedBadges.indexOf(bid) !== -1;
+  var xp = getBadgeXP(b, idx);
+  var badgeDates = JSON.parse(localStorage.getItem('fg_badge_dates') || '{}');
+  var dateStr = earned && badgeDates[bid] ? new Date(badgeDates[bid]).toLocaleString('ja-JP') : '';
+  var old = document.getElementById('badge-detail-modal');
+  if (old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'badge-detail-modal';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px';
+  el.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:28px 24px;width:100%;max-width:300px;text-align:center">' +
+    '<div style="font-size:52px;margin-bottom:10px">' + b.icon + '</div>' +
+    '<div style="font-size:17px;font-weight:800;margin-bottom:5px">' + b.name + '</div>' +
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">' + b.desc + '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">' +
+    '<span style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--amber);font-weight:700">⚡ ' + xp + ' XP</span>' +
+    '<span style="background:' + (earned?'var(--green-bg)':'var(--bg3)') + ';border:1px solid ' + (earned?'rgba(74,222,128,0.3)':'var(--border2)') + ';border-radius:20px;padding:4px 12px;font-size:12px;color:' + (earned?'var(--green)':'var(--text3)') + '">' + (earned ? '✅ 獲得済み' : '🔒 未獲得') + '</span></div>' +
+    (dateStr ? '<div style="font-size:11px;color:var(--text3)">達成日: ' + dateStr + '</div>' : '') +
+    '<button onclick="document.getElementById(\'badge-detail-modal\').remove()" style="margin-top:16px;width:100%;padding:10px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">閉じる</button></div>';
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+  document.body.appendChild(el);
+};
 
 // ===== MEMO SEARCH =====
 function searchMemos() {
