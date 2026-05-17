@@ -392,6 +392,40 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 /* SPARKLINE */
 .sparkline-wrap { display: inline-flex; align-items: flex-end; gap: 1px; height: 20px; margin-left: 6px; vertical-align: middle; }
 .sparkline-bar { width: 4px; border-radius: 1px; }
+
+/* BOOK SWITCHER */
+.nav-logo { cursor: pointer; user-select: none; }
+.nav-logo:active { opacity: 0.75; }
+.book-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: flex; align-items: flex-end; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.book-modal-overlay.open { opacity: 1; pointer-events: all; }
+.book-modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 14px 18px 36px; width: 100%; max-width: 480px; transform: translateY(16px); transition: transform 0.22s; }
+.book-modal-overlay.open .book-modal { transform: translateY(0); }
+.book-modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 16px; }
+.book-modal-title { font-size: 13px; font-weight: 600; color: var(--text3); text-align: center; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+.book-option { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--radius-lg); border: 1px solid var(--border2); background: var(--bg3); cursor: pointer; margin-bottom: 10px; transition: all 0.15s; }
+.book-option:hover, .book-option:active { border-color: var(--border); background: var(--bg4); }
+.book-option.active-book { border-color: var(--book-accent, var(--accent)); background: var(--book-accent-bg, var(--accent-bg)); }
+.book-option-icon { font-size: 28px; flex-shrink: 0; }
+.book-option-info { flex: 1; }
+.book-option-name { font-size: 14px; font-weight: 700; }
+.book-option-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.book-option-check { font-size: 16px; color: var(--text3); }
+.book-option.active-book .book-option-check { color: var(--book-accent, var(--accent2)); }
+
+/* SEMINAR (green) theme override — applied to body when seminar mode */
+body.seminar-mode {
+  --accent: #22c55e;
+  --accent2: #4ade80;
+  --accent-bg: rgba(34,197,94,0.12);
+  --book-accent: #22c55e;
+  --book-accent-bg: rgba(34,197,94,0.12);
+}
+body.seminar-mode .progress-fill { background: linear-gradient(90deg,#16a34a,#4ade80); }
+body.seminar-mode .level-bar-fill { background: linear-gradient(90deg,#16a34a,#4ade80); }
+body.seminar-mode .project-progress-fill { background: linear-gradient(90deg,#16a34a,#4ade80); }
+body.seminar-mode .loading-bar-fill { background: linear-gradient(90deg,#16a34a,#4ade80,#86efac); }
+body.seminar-mode .badge-flash-card { border-color: #22c55e; box-shadow: 0 0 60px rgba(34,197,94,0.5); }
+body.seminar-mode .ring-circle-el { stroke: #22c55e; }
 </style>
 </head>
 <body>
@@ -433,11 +467,35 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 
 <!-- TOP NAV -->
 <nav class="top-nav" id="main-nav" style="display:none">
-  <div class="nav-logo">FocusGold <span>数2BC</span></div>
+  <div class="nav-logo" id="nav-logo-btn" onclick="openBookSwitcher()" title="教材を切替">FocusGold <span id="nav-logo-sub">数2BC</span> <span style="font-size:10px;opacity:0.5">▼</span></div>
   <span class="nav-streak" id="nav-streak">🔥 0</span>
   <div class="status-dot" id="status-dot" style="margin:0 2px"></div>
   <button class="nav-icon-btn" onclick="toggleTheme()" title="テーマ">☀</button>
 </nav>
+
+<!-- BOOK SWITCHER MODAL -->
+<div class="book-modal-overlay" id="book-modal-overlay" onclick="closeBookSwitcherBg(event)">
+  <div class="book-modal">
+    <div class="book-modal-handle"></div>
+    <div class="book-modal-title">教材を選択</div>
+    <div class="book-option" id="book-opt-focusgold" onclick="switchBook('focusgold')">
+      <div class="book-option-icon">📘</div>
+      <div class="book-option-info">
+        <div class="book-option-name">FocusGold 数2BC</div>
+        <div class="book-option-sub">数学2・B・C 練習問題 + 例題</div>
+      </div>
+      <div class="book-option-check">✓</div>
+    </div>
+    <div class="book-option" id="book-opt-seminar" onclick="switchBook('seminar')">
+      <div class="book-option-icon">📗</div>
+      <div class="book-option-info">
+        <div class="book-option-name">セミナー物理基礎＋物理</div>
+        <div class="book-option-sub">基本例題88問 + 発展例題52問 + 基本・発展問題633問</div>
+      </div>
+      <div class="book-option-check"></div>
+    </div>
+  </div>
+</div>
 
 <!-- MAIN -->
 <div id="main-content" style="display:none">
@@ -969,8 +1027,107 @@ var CHAPTERS = [
   { name: '第十章 平面上のベクトル', count: 41, prefix: 'C1.', startNum: 1 },
   { name: '第十一章 空間のベクトル', count: 40, prefix: 'C1.', startNum: 42 },
 ];
+
+// ===== セミナー物理基礎＋物理 章定義 =====
+// 基本例題: E1〜E88, 発展例題: A1〜A52, 基本・発展問題: P1〜P633
+var CHAPTERS_SEMINAR = [
+  { name: '基本例題', count: 88, prefix: 'E', startNum: 1, bookType: 'kihon-rei' },
+  { name: '発展例題', count: 52, prefix: 'A', startNum: 1, bookType: 'hatten-rei' },
+  { name: '基本・発展問題', count: 633, prefix: 'P', startNum: 1, bookType: 'kihon-hatten' },
+];
 var REVIEW_DAYS = [3, 7, 30]; // fallback only
 var SM2_DEFAULT_EF = 2.5;
+
+// ===== BOOK SWITCHER STATE =====
+var currentBook = localStorage.getItem('fg_current_book') || 'focusgold'; // 'focusgold' | 'seminar'
+// State for Seminar book (separate from FocusGold's state/stateEx)
+var stateSeminar = {};      // 基本・発展問題
+var stateSeminarEx = {};    // 基本例題 (prefix E) & 発展例題 (prefix A)
+var state = {};
+var stateFocusGold = state;
+
+function getActiveChapters() {
+  return currentBook === 'seminar' ? CHAPTERS_SEMINAR : CHAPTERS;
+}
+function getActiveState() {
+  return currentBook === 'seminar' ? stateSeminar : state;
+}
+function getActiveStateEx() {
+  return currentBook === 'seminar' ? stateSeminarEx : stateEx;
+}
+function setActiveState(val) {
+  if (currentBook === 'seminar') stateSeminar = val; else state = val;
+}
+function setActiveStateEx(val) {
+  if (currentBook === 'seminar') stateSeminarEx = val; else stateEx = val;
+}
+function firestoreKey() {
+  return currentBook === 'seminar' ? 'stateSeminar' : 'state';
+}
+function firestoreKeyEx() {
+  return currentBook === 'seminar' ? 'stateSeminarEx' : 'stateEx';
+}
+function localKey() {
+  return currentBook === 'seminar' ? 'sm_state' : 'fg_state';
+}
+function localKeyEx() {
+  return currentBook === 'seminar' ? 'sm_stateEx' : 'fg_stateEx';
+}
+
+window.openBookSwitcher = function() {
+  var el = document.getElementById('book-modal-overlay');
+  if (el) el.classList.add('open');
+  // update active state
+  ['focusgold','seminar'].forEach(function(b) {
+    var opt = document.getElementById('book-opt-' + b);
+    if (!opt) return;
+    opt.classList.toggle('active-book', b === currentBook);
+    var chk = opt.querySelector('.book-option-check');
+    if (chk) chk.textContent = (b === currentBook) ? '✓' : '';
+  });
+};
+window.closeBookSwitcherBg = function(e) {
+  if (e.target === document.getElementById('book-modal-overlay')) {
+    document.getElementById('book-modal-overlay').classList.remove('open');
+  }
+};
+window.switchBook = function(book) {
+  document.getElementById('book-modal-overlay').classList.remove('open');
+  if (book === currentBook) return;
+  currentBook = book;
+  localStorage.setItem('fg_current_book', book);
+  // Apply theme
+  document.body.classList.toggle('seminar-mode', book === 'seminar');
+  // Update nav label
+  var sub = document.getElementById('nav-logo-sub');
+  if (sub) sub.textContent = book === 'seminar' ? '物理' : '数2BC';
+  // Swap active chapter list
+  CHAPTERS = getActiveChapters();
+  // Swap active state references into the global pointers used by all render fns
+  applyActiveBookState();
+  renderToday(); renderCountdown(); updateStreak();
+};
+
+// Apply saved book on load
+(function() {
+  if (currentBook === 'seminar') {
+    document.body.classList.add('seminar-mode');
+    CHAPTERS = CHAPTERS_SEMINAR;
+  }
+})();
+
+// Swap global state/stateEx to the active book's data.
+// state/stateEx always reflect the CURRENT book so all existing render fns work unchanged.
+function applyActiveBookState() {
+  if (currentBook === 'seminar') {
+    state = stateSeminar;
+    stateEx = stateSeminarEx;
+  } else {
+    state = stateFocusGold;
+    stateEx = stateExFocusGold;
+  }
+  CHAPTERS = getActiveChapters();
+}
 
 // ===== SM-2 USER CONFIG =====
 var SM2_CFG = (function() {
@@ -1183,6 +1340,8 @@ auth.onAuthStateChanged(function(user) {
     document.getElementById('main-nav').style.display = '';
     document.getElementById('main-content').style.display = '';
     document.getElementById('bottom-nav').style.display = '';
+    var sub = document.getElementById('nav-logo-sub');
+    if (sub) sub.textContent = currentBook === 'seminar' ? '物理' : '数2BC';
     var uidEl = document.getElementById('uid-display');
     if (uidEl) uidEl.textContent = user.isAnonymous ? '匿名ユーザー' : (user.email || user.displayName || user.uid.slice(0,16) + '...');
     loadFromFirestore(user.uid).then(function() {
@@ -1201,85 +1360,68 @@ auth.onAuthStateChanged(function(user) {
 });
 
 // ===== FIRESTORE =====
-// 問題単位で新しい方を採用してマージ
-function mergeStates(local, remote) {
-  var merged = Object.assign({}, remote);
-  Object.keys(local).forEach(function(pid) {
-    var l = local[pid], r = remote[pid];
-    if (!r) {
-      merged[pid] = l; // リモートにない → ローカルを採用
-    } else {
-      // updatedAt / lastReviewAt / learnedAt の最新を優先
-      var lTs = l.lastReviewAt || l.learnedAt || 0;
-      var rTs = r.lastReviewAt || r.learnedAt || 0;
-      merged[pid] = lTs >= rTs ? l : r;
-    }
-  });
-  return merged;
-}
-
 async function loadFromFirestore(uid) {
-  var localState   = JSON.parse(localStorage.getItem('fg_state')   || '{}');
-  var localStateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
-  var localTs      = parseInt(localStorage.getItem('fg_updatedAt') || '0');
   try {
     var snap = await db.collection('users').doc(uid).get();
     if (snap.exists) {
       var data = snap.data();
-      var remoteTs = data.updatedAt || 0;
-      // 両方にデータがある → 問題単位でマージ
-      state   = mergeStates(localState,   data.state   || {});
-      stateEx = mergeStates(localStateEx, data.stateEx || {});
-      // マージ結果をすぐ保存（次回起動時に備えて）
-      localStorage.setItem('fg_state',     JSON.stringify(state));
-      localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
-      // ローカルの方が新しければ Firestore へ push
-      if (localTs > remoteTs) {
-        await saveToFirestore(uid);
-      }
+      stateFocusGold = data.state || {};
+      stateExFocusGold = data.stateEx || {};
+      stateSeminar = data.stateSeminar || {};
+      stateSeminarEx = data.stateSeminarEx || {};
     } else {
-      // Firestore にまだデータなし → ローカルをそのまま使ってアップ
-      state   = localState;
-      stateEx = localStateEx;
-      if (Object.keys(state).length > 0) await saveToFirestore(uid);
+      stateFocusGold = JSON.parse(localStorage.getItem('fg_state') || '{}');
+      stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
+      stateSeminar = JSON.parse(localStorage.getItem('sm_state') || '{}');
+      stateSeminarEx = JSON.parse(localStorage.getItem('sm_stateEx') || '{}');
+      if (Object.keys(stateFocusGold).length > 0) await saveToFirestore(uid);
     }
   } catch(e) {
     console.warn('Firestore load error:', e);
-    state   = localState;
-    stateEx = localStateEx;
+    stateFocusGold = JSON.parse(localStorage.getItem('fg_state') || '{}');
+    stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
+    stateSeminar = JSON.parse(localStorage.getItem('sm_state') || '{}');
+    stateSeminarEx = JSON.parse(localStorage.getItem('sm_stateEx') || '{}');
     setStatus('offline');
   }
+  // Swap active references
+  applyActiveBookState();
 }
 
 async function saveToFirestore(uid) {
   var targetUid = uid || currentUid;
   if (!targetUid) return;
-  var now = Date.now();
+  // sync active pointers back to named vars before saving
+  if (currentBook === 'seminar') { stateSeminar = state; stateSeminarEx = stateEx; }
+  else { stateFocusGold = state; stateExFocusGold = stateEx; }
   try {
     setStatus('syncing');
-    // merge:true で既存フィールドを消さずに更新
-    await db.collection('users').doc(targetUid).set(
-      { state: state, stateEx: stateEx, updatedAt: now },
-      { merge: true }
-    );
-    localStorage.setItem('fg_state',     JSON.stringify(state));
-    localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
-    localStorage.setItem('fg_updatedAt', String(now));
+    await db.collection('users').doc(targetUid).set({
+      state: stateFocusGold, stateEx: stateExFocusGold,
+      stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
+      updatedAt: Date.now()
+    });
+    localStorage.setItem('fg_state', JSON.stringify(stateFocusGold));
+    localStorage.setItem('fg_stateEx', JSON.stringify(stateExFocusGold));
+    localStorage.setItem('sm_state', JSON.stringify(stateSeminar));
+    localStorage.setItem('sm_stateEx', JSON.stringify(stateSeminarEx));
     setStatus('online');
     var el = document.getElementById('sync-status');
     if (el) el.textContent = '同期済み ' + new Date().toLocaleTimeString('ja-JP');
   } catch(e) {
     console.warn('Firestore save error:', e);
-    localStorage.setItem('fg_state',     JSON.stringify(state));
-    localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
-    localStorage.setItem('fg_updatedAt', String(now));
+    localStorage.setItem('fg_state', JSON.stringify(stateFocusGold));
+    localStorage.setItem('fg_stateEx', JSON.stringify(stateExFocusGold));
+    localStorage.setItem('sm_state', JSON.stringify(stateSeminar));
+    localStorage.setItem('sm_stateEx', JSON.stringify(stateSeminarEx));
     setStatus('offline');
     window._pendingUpload = true;
   }
 }
 
 function saveState() {
-  localStorage.setItem('fg_state', JSON.stringify(state));
+  if (currentBook === 'seminar') stateSeminar = state; else stateFocusGold = state;
+  localStorage.setItem(localKey(), JSON.stringify(state));
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
 }
@@ -2393,7 +2535,9 @@ window.showToast = function(msg) {
 // ===== SETTINGS =====
 window.resetData = function() {
   if (confirm('すべての学習データをリセットしますか？')) {
-    state = {}; saveState(); showToast('データをリセットしました'); renderToday();
+    state = {};
+    if (currentBook === 'seminar') stateSeminar = state; else stateFocusGold = state;
+    saveState(); showToast('データをリセットしました'); renderToday();
   }
 };
 
@@ -2434,6 +2578,8 @@ window.handleImportFile = function(event) {
 
 // ===== EXAMPLE STATE =====
 var stateEx = {};
+// Named backups for each book (state/stateEx are swapped to point at the active book)
+var stateExFocusGold = stateEx;
 async function loadExFromFirestore(uid) {
   try {
     var snap = await db.collection('users').doc(uid).get();
@@ -2441,9 +2587,19 @@ async function loadExFromFirestore(uid) {
   } catch(e) { stateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}'); }
 }
 function saveStateEx() {
-  localStorage.setItem('fg_stateEx', JSON.stringify(stateEx));
+  var lsKey = currentBook === 'seminar' ? 'sm_stateEx' : 'fg_stateEx';
+  localStorage.setItem(lsKey, JSON.stringify(stateEx));
+  // sync back to named vars
+  if (currentBook === 'seminar') stateSeminarEx = stateEx; else stateExFocusGold = stateEx;
   if (typeof saveTimeout !== 'undefined' && saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
+  saveTimeout = setTimeout(function() {
+    if (!currentUid) return;
+    db.collection('users').doc(currentUid).set({
+      state: stateFocusGold, stateEx: stateExFocusGold,
+      stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
+      updatedAt: Date.now()
+    }, { merge: true }).catch(function(){});
+  }, 800);
 }
 
 // ===== TIMER =====
