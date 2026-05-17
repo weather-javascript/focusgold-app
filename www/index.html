@@ -442,6 +442,62 @@ body.seminar-mode .project-progress-fill { background: linear-gradient(90deg,#16
 body.seminar-mode .loading-bar-fill { background: linear-gradient(90deg,#16a34a,#4ade80,#86efac); }
 body.seminar-mode .badge-flash-card { border-color: #22c55e; box-shadow: 0 0 60px rgba(34,197,94,0.5); }
 body.seminar-mode .ring-circle-el { stroke: #22c55e; }
+/* エクセル化学 (orange) */
+body.excel-chem-mode {
+  --accent: #f97316;
+  --accent2: #fb923c;
+  --accent-bg: rgba(249,115,22,0.12);
+  --book-accent: #f97316;
+  --book-accent-bg: rgba(249,115,22,0.12);
+}
+body.excel-chem-mode .progress-fill { background: linear-gradient(90deg,#ea580c,#fb923c); }
+body.excel-chem-mode .level-bar-fill { background: linear-gradient(90deg,#ea580c,#fb923c); }
+body.excel-chem-mode .project-progress-fill { background: linear-gradient(90deg,#ea580c,#fb923c); }
+body.excel-chem-mode .loading-bar-fill { background: linear-gradient(90deg,#ea580c,#fb923c,#fdba74); }
+body.excel-chem-mode .badge-flash-card { border-color: #f97316; box-shadow: 0 0 60px rgba(249,115,22,0.5); }
+body.excel-chem-mode .ring-circle-el { stroke: #f97316; }
+/* 化学重要問題集 (teal) */
+body.chem-jyuyo-mode {
+  --accent: #0d9488;
+  --accent2: #2dd4bf;
+  --accent-bg: rgba(13,148,136,0.12);
+  --book-accent: #0d9488;
+  --book-accent-bg: rgba(13,148,136,0.12);
+}
+body.chem-jyuyo-mode .progress-fill { background: linear-gradient(90deg,#0f766e,#2dd4bf); }
+body.chem-jyuyo-mode .level-bar-fill { background: linear-gradient(90deg,#0f766e,#2dd4bf); }
+body.chem-jyuyo-mode .project-progress-fill { background: linear-gradient(90deg,#0f766e,#2dd4bf); }
+body.chem-jyuyo-mode .loading-bar-fill { background: linear-gradient(90deg,#0f766e,#2dd4bf,#99f6e4); }
+body.chem-jyuyo-mode .badge-flash-card { border-color: #0d9488; box-shadow: 0 0 60px rgba(13,148,136,0.5); }
+body.chem-jyuyo-mode .ring-circle-el { stroke: #0d9488; }
+/* FocusGold 数3 (rose) */
+body.fg3-mode {
+  --accent: #e11d48;
+  --accent2: #fb7185;
+  --accent-bg: rgba(225,29,72,0.12);
+  --book-accent: #e11d48;
+  --book-accent-bg: rgba(225,29,72,0.12);
+}
+body.fg3-mode .progress-fill { background: linear-gradient(90deg,#be123c,#fb7185); }
+body.fg3-mode .level-bar-fill { background: linear-gradient(90deg,#be123c,#fb7185); }
+body.fg3-mode .project-progress-fill { background: linear-gradient(90deg,#be123c,#fb7185); }
+body.fg3-mode .loading-bar-fill { background: linear-gradient(90deg,#be123c,#fb7185,#fda4af); }
+body.fg3-mode .badge-flash-card { border-color: #e11d48; box-shadow: 0 0 60px rgba(225,29,72,0.5); }
+body.fg3-mode .ring-circle-el { stroke: #e11d48; }
+/* FocusGold 数1 (amber) */
+body.fg1-mode {
+  --accent: #d97706;
+  --accent2: #fbbf24;
+  --accent-bg: rgba(217,119,6,0.12);
+  --book-accent: #d97706;
+  --book-accent-bg: rgba(217,119,6,0.12);
+}
+body.fg1-mode .progress-fill { background: linear-gradient(90deg,#b45309,#fbbf24); }
+body.fg1-mode .level-bar-fill { background: linear-gradient(90deg,#b45309,#fbbf24); }
+body.fg1-mode .project-progress-fill { background: linear-gradient(90deg,#b45309,#fbbf24); }
+body.fg1-mode .loading-bar-fill { background: linear-gradient(90deg,#b45309,#fbbf24,#fde68a); }
+body.fg1-mode .badge-flash-card { border-color: #d97706; box-shadow: 0 0 60px rgba(217,119,6,0.5); }
+body.fg1-mode .ring-circle-el { stroke: #d97706; }
 </style>
 </head>
 <body>
@@ -507,6 +563,38 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
       <div class="book-option-info">
         <div class="book-option-name">セミナー物理基礎＋物理</div>
         <div class="book-option-sub">基本例題88問 + 発展例題52問 + 基本・発展問題633問</div>
+      </div>
+      <div class="book-option-check"></div>
+    </div>
+    <div class="book-option" id="book-opt-excel-chem" onclick="switchBook('excel-chem')">
+      <div class="book-option-icon">🧪</div>
+      <div class="book-option-info">
+        <div class="book-option-name">エクセル化学</div>
+        <div class="book-option-sub">基本・応用・発展問題624問 + 基本・応用例題121問</div>
+      </div>
+      <div class="book-option-check"></div>
+    </div>
+    <div class="book-option" id="book-opt-chem-jyuyo" onclick="switchBook('chem-jyuyo')">
+      <div class="book-option-icon">⚗️</div>
+      <div class="book-option-info">
+        <div class="book-option-name">化学重要問題集</div>
+        <div class="book-option-sub">練習問題270問</div>
+      </div>
+      <div class="book-option-check"></div>
+    </div>
+    <div class="book-option" id="book-opt-fg3" onclick="switchBook('fg3')">
+      <div class="book-option-icon">📕</div>
+      <div class="book-option-info">
+        <div class="book-option-name">FocusGold 数Ⅲ</div>
+        <div class="book-option-sub">数列〜式と曲線 練習問題 + 例題</div>
+      </div>
+      <div class="book-option-check"></div>
+    </div>
+    <div class="book-option" id="book-opt-fg1" onclick="switchBook('fg1')">
+      <div class="book-option-icon">📙</div>
+      <div class="book-option-info">
+        <div class="book-option-name">FocusGold 数Ⅰ</div>
+        <div class="book-option-sub">数と式〜整数 練習問題 + 例題</div>
       </div>
       <div class="book-option-check"></div>
     </div>
@@ -1079,50 +1167,143 @@ var CHAPTERS_SEMINAR = [
   { name: '発展例題', count: 52, prefix: 'A', startNum: 1, bookType: 'hatten-rei' },
   { name: '基本・発展問題', count: 633, prefix: 'P', startNum: 1, bookType: 'kihon-hatten' },
 ];
+
+// ===== エクセル化学 章定義 =====
+// 基本問題・応用問題・発展例題: 1〜624, 基本例題・応用例題: 1〜121
+var CHAPTERS_EXCEL_CHEM = [
+  { name: '基本問題', start: 1, end: 624 },
+  { name: '応用問題', count: 624, prefix: '応', startNum: 1 },
+  { name: '発展例題', count: 624, prefix: '発', startNum: 1 },
+  { name: '基本例題', count: 121, prefix: 'KE', startNum: 1 },
+  { name: '応用例題', count: 121, prefix: 'OE', startNum: 1 },
+];
+
+// ===== 化学重要問題集 章定義 =====
+var CHAPTERS_CHEM_JYUYO = [
+  { name: '練習問題', start: 1, end: 270 },
+];
+
+// ===== FocusGold 数Ⅲ 章定義 =====
+var CHAPTERS_FG3 = [
+  { name: '第一章 数列の極限', start: 1, end: 30 },
+  { name: '第二章 関数の極限', start: 31, end: 58 },
+  { name: '第三章 微分法', start: 59, end: 81 },
+  { name: '第四章 微分法の応用', start: 82, end: 136 },
+  { name: '第五章 積分法', start: 137, end: 179 },
+  { name: '第六章 積分法の応用', start: 180, end: 221 },
+  { name: '第七章 複素数平面', count: 47, prefix: 'C2.', startNum: 1 },
+  { name: '第八章 式と曲線', count: 37, prefix: 'C2.', startNum: 48 },
+];
+
+// ===== FocusGold 数Ⅰ 章定義 =====
+var CHAPTERS_FG1 = [
+  { name: '第一章 数と式', start: 1, end: 29 },
+  { name: '第二章 2次関数', start: 30, end: 88 },
+  { name: '第三章 集合と命題', start: 89, end: 107 },
+  { name: '第四章 図形と計量', start: 108, end: 141 },
+  { name: '第五章 データの分析', start: 142, end: 156 },
+  { name: '第六章 場合の数', start: 157, end: 189 },
+  { name: '第七章 確率', start: 190, end: 216 },
+  { name: '第八章 図形の性質', start: 217, end: 259 },
+  { name: '第九章 整数', start: 260, end: 303 },
+];
 var REVIEW_DAYS = [3, 7, 30]; // fallback only
 var SM2_DEFAULT_EF = 2.5;
 
 // ===== BOOK SWITCHER STATE =====
-var currentBook = localStorage.getItem('fg_current_book') || 'focusgold'; // 'focusgold' | 'seminar'
+var currentBook = localStorage.getItem('fg_current_book') || 'focusgold'; // 'focusgold' | 'seminar' | 'excel-chem' | 'chem-jyuyo' | 'fg3' | 'fg1'
 // State for Seminar book (separate from FocusGold's state/stateEx)
 var stateSeminar = {};      // 基本・発展問題
 var stateSeminarEx = {};    // 基本例題 (prefix E) & 発展例題 (prefix A)
+var stateExcelChem = {};    // エクセル化学 問題
+var stateExcelChemEx = {};  // エクセル化学 例題
+var stateChemJyuyo = {};    // 化学重要問題集
+var stateChemJyuyoEx = {};  // (未使用、互換性のため)
+var stateFg3 = {};          // FocusGold 数3
+var stateFg3Ex = {};        // FocusGold 数3 例題
+var stateFg1 = {};          // FocusGold 数1
+var stateFg1Ex = {};        // FocusGold 数1 例題
 var state = {};
 var stateFocusGold = state;
 
 function getActiveChapters() {
-  return currentBook === 'seminar' ? CHAPTERS_SEMINAR : CHAPTERS_FOCUSGOLD;
+  if (currentBook === 'seminar') return CHAPTERS_SEMINAR;
+  if (currentBook === 'excel-chem') return CHAPTERS_EXCEL_CHEM;
+  if (currentBook === 'chem-jyuyo') return CHAPTERS_CHEM_JYUYO;
+  if (currentBook === 'fg3') return CHAPTERS_FG3;
+  if (currentBook === 'fg1') return CHAPTERS_FG1;
+  return CHAPTERS_FOCUSGOLD;
 }
 function getActiveState() {
-  return currentBook === 'seminar' ? stateSeminar : state;
+  if (currentBook === 'seminar') return stateSeminar;
+  if (currentBook === 'excel-chem') return stateExcelChem;
+  if (currentBook === 'chem-jyuyo') return stateChemJyuyo;
+  if (currentBook === 'fg3') return stateFg3;
+  if (currentBook === 'fg1') return stateFg1;
+  return state;
 }
 function getActiveStateEx() {
-  return currentBook === 'seminar' ? stateSeminarEx : stateEx;
+  if (currentBook === 'seminar') return stateSeminarEx;
+  if (currentBook === 'excel-chem') return stateExcelChemEx;
+  if (currentBook === 'chem-jyuyo') return stateChemJyuyoEx;
+  if (currentBook === 'fg3') return stateFg3Ex;
+  if (currentBook === 'fg1') return stateFg1Ex;
+  return stateEx;
 }
 function setActiveState(val) {
-  if (currentBook === 'seminar') stateSeminar = val; else state = val;
+  if (currentBook === 'seminar') stateSeminar = val;
+  else if (currentBook === 'excel-chem') stateExcelChem = val;
+  else if (currentBook === 'chem-jyuyo') stateChemJyuyo = val;
+  else if (currentBook === 'fg3') stateFg3 = val;
+  else if (currentBook === 'fg1') stateFg1 = val;
+  else state = val;
 }
 function setActiveStateEx(val) {
-  if (currentBook === 'seminar') stateSeminarEx = val; else stateEx = val;
+  if (currentBook === 'seminar') stateSeminarEx = val;
+  else if (currentBook === 'excel-chem') stateExcelChemEx = val;
+  else if (currentBook === 'chem-jyuyo') stateChemJyuyoEx = val;
+  else if (currentBook === 'fg3') stateFg3Ex = val;
+  else if (currentBook === 'fg1') stateFg1Ex = val;
+  else stateEx = val;
 }
 function firestoreKey() {
-  return currentBook === 'seminar' ? 'stateSeminar' : 'state';
+  if (currentBook === 'seminar') return 'stateSeminar';
+  if (currentBook === 'excel-chem') return 'stateExcelChem';
+  if (currentBook === 'chem-jyuyo') return 'stateChemJyuyo';
+  if (currentBook === 'fg3') return 'stateFg3';
+  if (currentBook === 'fg1') return 'stateFg1';
+  return 'state';
 }
 function firestoreKeyEx() {
-  return currentBook === 'seminar' ? 'stateSeminarEx' : 'stateEx';
+  if (currentBook === 'seminar') return 'stateSeminarEx';
+  if (currentBook === 'excel-chem') return 'stateExcelChemEx';
+  if (currentBook === 'chem-jyuyo') return 'stateChemJyuyoEx';
+  if (currentBook === 'fg3') return 'stateFg3Ex';
+  if (currentBook === 'fg1') return 'stateFg1Ex';
+  return 'stateEx';
 }
 function localKey() {
-  return currentBook === 'seminar' ? 'sm_state' : 'fg_state';
+  if (currentBook === 'seminar') return 'sm_state';
+  if (currentBook === 'excel-chem') return 'ec_state';
+  if (currentBook === 'chem-jyuyo') return 'cj_state';
+  if (currentBook === 'fg3') return 'fg3_state';
+  if (currentBook === 'fg1') return 'fg1_state';
+  return 'fg_state';
 }
 function localKeyEx() {
-  return currentBook === 'seminar' ? 'sm_stateEx' : 'fg_stateEx';
+  if (currentBook === 'seminar') return 'sm_stateEx';
+  if (currentBook === 'excel-chem') return 'ec_stateEx';
+  if (currentBook === 'chem-jyuyo') return 'cj_stateEx';
+  if (currentBook === 'fg3') return 'fg3_stateEx';
+  if (currentBook === 'fg1') return 'fg1_stateEx';
+  return 'fg_stateEx';
 }
 
 window.openBookSwitcher = function() {
   var el = document.getElementById('book-modal-overlay');
   if (el) el.classList.add('open');
   // update active state
-  ['focusgold','seminar'].forEach(function(b) {
+  ['focusgold','seminar','excel-chem','chem-jyuyo','fg3','fg1'].forEach(function(b) {
     var opt = document.getElementById('book-opt-' + b);
     if (!opt) return;
     opt.classList.toggle('active-book', b === currentBook);
@@ -1140,23 +1321,39 @@ window.switchBook = function(book) {
   if (book === currentBook) return;
 
   // ===== ワープトランジション発火 =====
-  var label = book === 'seminar' ? 'セミナー物理' : 'FocusGold 数2';
-  var color = book === 'seminar' ? '#a8d8ea' : '#8b84ff';
-  playWarpTransition(label, color, function() {
+  var bookLabels = {
+    'seminar':    { label: 'セミナー物理', color: '#a8d8ea' },
+    'excel-chem': { label: 'エクセル化学', color: '#fb923c' },
+    'chem-jyuyo': { label: '化学重要問題集', color: '#2dd4bf' },
+    'fg3':        { label: 'FocusGold 数Ⅲ', color: '#fb7185' },
+    'fg1':        { label: 'FocusGold 数Ⅰ', color: '#fbbf24' },
+    'focusgold':  { label: 'FocusGold 数2', color: '#8b84ff' },
+  };
+  var info = bookLabels[book] || bookLabels['focusgold'];
+  playWarpTransition(info.label, info.color, function() {
     currentBook = book;
     localStorage.setItem('fg_current_book', book);
-    // Apply theme
-    document.body.classList.toggle('seminar-mode', book === 'seminar');
-    // Update nav label — main name + sub
+    // Apply theme class
+    document.body.classList.remove('seminar-mode','excel-chem-mode','chem-jyuyo-mode','fg3-mode','fg1-mode');
+    if (book === 'seminar')    document.body.classList.add('seminar-mode');
+    if (book === 'excel-chem') document.body.classList.add('excel-chem-mode');
+    if (book === 'chem-jyuyo') document.body.classList.add('chem-jyuyo-mode');
+    if (book === 'fg3')        document.body.classList.add('fg3-mode');
+    if (book === 'fg1')        document.body.classList.add('fg1-mode');
+    // Update nav label
     var logoMain = document.getElementById('nav-logo-main');
     var sub = document.getElementById('nav-logo-sub');
-    if (book === 'seminar') {
-      if (logoMain) logoMain.textContent = 'セミナー';
-      if (sub) sub.textContent = '物理';
-    } else {
-      if (logoMain) logoMain.textContent = 'FocusGold';
-      if (sub) sub.textContent = '数2BC';
-    }
+    var navLabels = {
+      'seminar':    { main: 'セミナー', sub: '物理' },
+      'excel-chem': { main: 'エクセル', sub: '化学' },
+      'chem-jyuyo': { main: '化学', sub: '重要問題集' },
+      'fg3':        { main: 'FocusGold', sub: '数Ⅲ' },
+      'fg1':        { main: 'FocusGold', sub: '数Ⅰ' },
+      'focusgold':  { main: 'FocusGold', sub: '数2BC' },
+    };
+    var nl = navLabels[book] || navLabels['focusgold'];
+    if (logoMain) logoMain.textContent = nl.main;
+    if (sub) sub.textContent = nl.sub;
     // Swap active chapter list
     CHAPTERS = getActiveChapters();
     // Swap active state references into the global pointers used by all render fns
@@ -1173,13 +1370,21 @@ window.switchBook = function(book) {
 
 // Apply saved book on load
 (function() {
-  if (currentBook === 'seminar') {
-    document.body.classList.add('seminar-mode');
-    CHAPTERS = CHAPTERS_SEMINAR;
+  var navLabels = {
+    'seminar':    { main: 'セミナー', sub: '物理', mode: 'seminar-mode' },
+    'excel-chem': { main: 'エクセル', sub: '化学', mode: 'excel-chem-mode' },
+    'chem-jyuyo': { main: '化学', sub: '重要問題集', mode: 'chem-jyuyo-mode' },
+    'fg3':        { main: 'FocusGold', sub: '数Ⅲ', mode: 'fg3-mode' },
+    'fg1':        { main: 'FocusGold', sub: '数Ⅰ', mode: 'fg1-mode' },
+  };
+  var nl = navLabels[currentBook];
+  if (nl) {
+    document.body.classList.add(nl.mode);
+    CHAPTERS = getActiveChapters();
     var logoMain = document.getElementById('nav-logo-main');
     var sub = document.getElementById('nav-logo-sub');
-    if (logoMain) logoMain.textContent = 'セミナー';
-    if (sub) sub.textContent = '物理';
+    if (logoMain) logoMain.textContent = nl.main;
+    if (sub) sub.textContent = nl.sub;
   }
 })();
 
@@ -1189,6 +1394,18 @@ function applyActiveBookState() {
   if (currentBook === 'seminar') {
     state = stateSeminar;
     stateEx = stateSeminarEx;
+  } else if (currentBook === 'excel-chem') {
+    state = stateExcelChem;
+    stateEx = stateExcelChemEx;
+  } else if (currentBook === 'chem-jyuyo') {
+    state = stateChemJyuyo;
+    stateEx = stateChemJyuyoEx;
+  } else if (currentBook === 'fg3') {
+    state = stateFg3;
+    stateEx = stateFg3Ex;
+  } else if (currentBook === 'fg1') {
+    state = stateFg1;
+    stateEx = stateFg1Ex;
   } else {
     state = stateFocusGold;
     stateEx = stateExFocusGold;
