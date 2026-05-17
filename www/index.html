@@ -2776,7 +2776,7 @@ function showNextProblemPrompt(donePid) {
   setTimeout(function() { if (el.parentNode) el.remove(); }, 6000);
 }
 
-
+window.learnProblem = function() {
   var nowTs = Date.now();
   var sm2 = sm2NextInterval({reviews:[], ef: SM2_DEFAULT_EF}, pendingResult);
   state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], result: pendingResult, memo: getMemo(), tags: getModalTags(),
