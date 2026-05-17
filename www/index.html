@@ -1648,6 +1648,22 @@ auth.onAuthStateChanged(function(user) {
     }
     var uidEl = document.getElementById('uid-display');
     if (uidEl) uidEl.textContent = user.isAnonymous ? '匿名ユーザー' : (user.email || user.displayName || user.uid.slice(0,16) + '...');
+    // ナビロゴを現在の教材に合わせて確実に設定
+    (function() {
+      var navLabels = {
+        'seminar':    { main: 'セミナー', sub: '物理' },
+        'excel-chem': { main: 'エクセル', sub: '化学' },
+        'chem-jyuyo': { main: '化学', sub: '重要問題集' },
+        'fg3':        { main: 'FocusGold', sub: '数Ⅲ' },
+        'fg1':        { main: 'FocusGold', sub: '数Ⅰ' },
+        'focusgold':  { main: 'FocusGold', sub: '数2BC' },
+      };
+      var nl = navLabels[currentBook] || navLabels['focusgold'];
+      var logoMain = document.getElementById('nav-logo-main');
+      var sub = document.getElementById('nav-logo-sub');
+      if (logoMain) logoMain.textContent = nl.main;
+      if (sub) sub.textContent = nl.sub;
+    })();
     loadFromFirestore(user.uid).then(function() {
       setStatus('online');
       loadTodayGoalFirestore().then(function() {
@@ -1676,6 +1692,14 @@ async function loadFromFirestore(uid) {
       stateExFocusGold = data.stateEx || {};
       stateSeminar = data.stateSeminar || {};
       stateSeminarEx = data.stateSeminarEx || {};
+      stateExcelChem = data.stateExcelChem || {};
+      stateExcelChemEx = data.stateExcelChemEx || {};
+      stateChemJyuyo = data.stateChemJyuyo || {};
+      stateChemJyuyoEx = data.stateChemJyuyoEx || {};
+      stateFg3 = data.stateFg3 || {};
+      stateFg3Ex = data.stateFg3Ex || {};
+      stateFg1 = data.stateFg1 || {};
+      stateFg1Ex = data.stateFg1Ex || {};
       loadBadgesFromFirestore(data);
       // fg_hour_log をFirestoreから復元（デバイス間同期）
       if (data.hourLog && typeof data.hourLog === 'object') {
@@ -1689,6 +1713,14 @@ async function loadFromFirestore(uid) {
       stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
       stateSeminar = JSON.parse(localStorage.getItem('sm_state') || '{}');
       stateSeminarEx = JSON.parse(localStorage.getItem('sm_stateEx') || '{}');
+      stateExcelChem = JSON.parse(localStorage.getItem('ec_state') || '{}');
+      stateExcelChemEx = JSON.parse(localStorage.getItem('ec_stateEx') || '{}');
+      stateChemJyuyo = JSON.parse(localStorage.getItem('cj_state') || '{}');
+      stateChemJyuyoEx = JSON.parse(localStorage.getItem('cj_stateEx') || '{}');
+      stateFg3 = JSON.parse(localStorage.getItem('fg3_state') || '{}');
+      stateFg3Ex = JSON.parse(localStorage.getItem('fg3_stateEx') || '{}');
+      stateFg1 = JSON.parse(localStorage.getItem('fg1_state') || '{}');
+      stateFg1Ex = JSON.parse(localStorage.getItem('fg1_stateEx') || '{}');
       if (Object.keys(stateFocusGold).length > 0) await saveToFirestore(uid);
     }
   } catch(e) {
@@ -1697,6 +1729,14 @@ async function loadFromFirestore(uid) {
     stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
     stateSeminar = JSON.parse(localStorage.getItem('sm_state') || '{}');
     stateSeminarEx = JSON.parse(localStorage.getItem('sm_stateEx') || '{}');
+    stateExcelChem = JSON.parse(localStorage.getItem('ec_state') || '{}');
+    stateExcelChemEx = JSON.parse(localStorage.getItem('ec_stateEx') || '{}');
+    stateChemJyuyo = JSON.parse(localStorage.getItem('cj_state') || '{}');
+    stateChemJyuyoEx = JSON.parse(localStorage.getItem('cj_stateEx') || '{}');
+    stateFg3 = JSON.parse(localStorage.getItem('fg3_state') || '{}');
+    stateFg3Ex = JSON.parse(localStorage.getItem('fg3_stateEx') || '{}');
+    stateFg1 = JSON.parse(localStorage.getItem('fg1_state') || '{}');
+    stateFg1Ex = JSON.parse(localStorage.getItem('fg1_stateEx') || '{}');
     setStatus('offline');
   }
   // Swap active references
@@ -1704,16 +1744,24 @@ async function loadFromFirestore(uid) {
   applyActiveBadges();
   // ナビロゴを確実に更新（DOMがある場合のみ）
   (function() {
+    var navLabels = {
+      'seminar':    { main: 'セミナー', sub: '物理' },
+      'excel-chem': { main: 'エクセル', sub: '化学' },
+      'chem-jyuyo': { main: '化学', sub: '重要問題集' },
+      'fg3':        { main: 'FocusGold', sub: '数Ⅲ' },
+      'fg1':        { main: 'FocusGold', sub: '数Ⅰ' },
+      'focusgold':  { main: 'FocusGold', sub: '数2BC' },
+    };
+    var nl = navLabels[currentBook] || navLabels['focusgold'];
     var logoMain = document.getElementById('nav-logo-main');
     var sub = document.getElementById('nav-logo-sub');
-    if (currentBook === 'seminar') {
-      if (logoMain) logoMain.textContent = 'セミナー';
-      if (sub) sub.textContent = '物理';
-    } else {
-      if (logoMain) logoMain.textContent = 'FocusGold';
-      if (sub) sub.textContent = '数2BC';
-    }
+    if (logoMain) logoMain.textContent = nl.main;
+    if (sub) sub.textContent = nl.sub;
     document.body.classList.toggle('seminar-mode', currentBook === 'seminar');
+    document.body.classList.toggle('excel-chem-mode', currentBook === 'excel-chem');
+    document.body.classList.toggle('chem-jyuyo-mode', currentBook === 'chem-jyuyo');
+    document.body.classList.toggle('fg3-mode', currentBook === 'fg3');
+    document.body.classList.toggle('fg1-mode', currentBook === 'fg1');
   })();
 }
 
@@ -1722,12 +1770,20 @@ async function saveToFirestore(uid) {
   if (!targetUid) return;
   // sync active pointers back to named vars before saving
   if (currentBook === 'seminar') { stateSeminar = state; stateSeminarEx = stateEx; earnedBadgesSeminar = earnedBadges; }
+  else if (currentBook === 'excel-chem') { stateExcelChem = state; stateExcelChemEx = stateEx; }
+  else if (currentBook === 'chem-jyuyo') { stateChemJyuyo = state; stateChemJyuyoEx = stateEx; }
+  else if (currentBook === 'fg3') { stateFg3 = state; stateFg3Ex = stateEx; }
+  else if (currentBook === 'fg1') { stateFg1 = state; stateFg1Ex = stateEx; }
   else { stateFocusGold = state; stateExFocusGold = stateEx; earnedBadgesFG = earnedBadges; }
   try {
     setStatus('syncing');
     await db.collection('users').doc(targetUid).set({
       state: stateFocusGold, stateEx: stateExFocusGold,
       stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
+      stateExcelChem: stateExcelChem, stateExcelChemEx: stateExcelChemEx,
+      stateChemJyuyo: stateChemJyuyo, stateChemJyuyoEx: stateChemJyuyoEx,
+      stateFg3: stateFg3, stateFg3Ex: stateFg3Ex,
+      stateFg1: stateFg1, stateFg1Ex: stateFg1Ex,
       badgesFG: earnedBadgesFG, badgesSeminar: earnedBadgesSeminar,
       hourLog: JSON.parse(localStorage.getItem('fg_hour_log') || '{}'),
       updatedAt: Date.now()
@@ -1736,6 +1792,14 @@ async function saveToFirestore(uid) {
     localStorage.setItem('fg_stateEx', JSON.stringify(stateExFocusGold));
     localStorage.setItem('sm_state', JSON.stringify(stateSeminar));
     localStorage.setItem('sm_stateEx', JSON.stringify(stateSeminarEx));
+    localStorage.setItem('ec_state', JSON.stringify(stateExcelChem));
+    localStorage.setItem('ec_stateEx', JSON.stringify(stateExcelChemEx));
+    localStorage.setItem('cj_state', JSON.stringify(stateChemJyuyo));
+    localStorage.setItem('cj_stateEx', JSON.stringify(stateChemJyuyoEx));
+    localStorage.setItem('fg3_state', JSON.stringify(stateFg3));
+    localStorage.setItem('fg3_stateEx', JSON.stringify(stateFg3Ex));
+    localStorage.setItem('fg1_state', JSON.stringify(stateFg1));
+    localStorage.setItem('fg1_stateEx', JSON.stringify(stateFg1Ex));
     setStatus('online');
     var el = document.getElementById('sync-status');
     if (el) el.textContent = '同期済み ' + new Date().toLocaleTimeString('ja-JP');
@@ -1745,6 +1809,14 @@ async function saveToFirestore(uid) {
     localStorage.setItem('fg_stateEx', JSON.stringify(stateExFocusGold));
     localStorage.setItem('sm_state', JSON.stringify(stateSeminar));
     localStorage.setItem('sm_stateEx', JSON.stringify(stateSeminarEx));
+    localStorage.setItem('ec_state', JSON.stringify(stateExcelChem));
+    localStorage.setItem('ec_stateEx', JSON.stringify(stateExcelChemEx));
+    localStorage.setItem('cj_state', JSON.stringify(stateChemJyuyo));
+    localStorage.setItem('cj_stateEx', JSON.stringify(stateChemJyuyoEx));
+    localStorage.setItem('fg3_state', JSON.stringify(stateFg3));
+    localStorage.setItem('fg3_stateEx', JSON.stringify(stateFg3Ex));
+    localStorage.setItem('fg1_state', JSON.stringify(stateFg1));
+    localStorage.setItem('fg1_stateEx', JSON.stringify(stateFg1Ex));
     setStatus('offline');
     window._pendingUpload = true;
   }
