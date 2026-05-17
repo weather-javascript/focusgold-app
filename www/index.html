@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -165,8 +164,8 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 .chapter-pct { font-size: 13px; font-weight: 700; color: var(--accent2); }
 .progress-bar { height: 4px; background: var(--bg4); border-radius: 4px; overflow: hidden; margin-bottom: 11px; }
 .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg,var(--accent),var(--accent2)); transition: width 0.4s; }
-.problem-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(34px,1fr)); gap: 4px; max-height: 0; overflow: hidden; transition: max-height 0.3s; }
-.chapter-card.expanded .problem-grid { max-height: 800px; }
+.problem-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(34px,1fr)); gap: 4px; max-height: 0; overflow: hidden; transition: max-height 0.6s ease; }
+.chapter-card.expanded .problem-grid { max-height: 999999px; }
 .prob-btn { aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border); background: var(--bg3); color: var(--text3); font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; position: relative; transition: all 0.1s; }
 .prob-btn:hover { border-color: var(--accent); color: var(--accent2); }
 .prob-btn.learned { background: var(--green-bg); border-color: rgba(74,222,128,0.3); color: var(--green); }
