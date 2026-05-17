@@ -1385,13 +1385,22 @@ auth.onAuthStateChanged(function(user) {
     document.getElementById('main-nav').style.display = '';
     document.getElementById('main-content').style.display = '';
     document.getElementById('bottom-nav').style.display = '';
+    // ナビロゴを現在の教材に合わせて確実に設定
+    var logoMain = document.getElementById('nav-logo-main');
     var sub = document.getElementById('nav-logo-sub');
-    if (sub) sub.textContent = currentBook === 'seminar' ? '物理' : '数2BC';
+    if (currentBook === 'seminar') {
+      if (logoMain) logoMain.textContent = 'セミナー';
+      if (sub) sub.textContent = '物理';
+    } else {
+      if (logoMain) logoMain.textContent = 'FocusGold';
+      if (sub) sub.textContent = '数2BC';
+    }
     var uidEl = document.getElementById('uid-display');
     if (uidEl) uidEl.textContent = user.isAnonymous ? '匿名ユーザー' : (user.email || user.displayName || user.uid.slice(0,16) + '...');
     loadFromFirestore(user.uid).then(function() {
       setStatus('online');
       renderToday();
+      renderProgress();
       updateStreak();
       SM2_DEFAULT_EF = SM2_CFG.defaultEf;
     });
@@ -1433,6 +1442,19 @@ async function loadFromFirestore(uid) {
   // Swap active references
   applyActiveBookState();
   applyActiveBadges();
+  // ナビロゴを確実に更新（DOMがある場合のみ）
+  (function() {
+    var logoMain = document.getElementById('nav-logo-main');
+    var sub = document.getElementById('nav-logo-sub');
+    if (currentBook === 'seminar') {
+      if (logoMain) logoMain.textContent = 'セミナー';
+      if (sub) sub.textContent = '物理';
+    } else {
+      if (logoMain) logoMain.textContent = 'FocusGold';
+      if (sub) sub.textContent = '数2BC';
+    }
+    document.body.classList.toggle('seminar-mode', currentBook === 'seminar');
+  })();
 }
 
 async function saveToFirestore(uid) {
