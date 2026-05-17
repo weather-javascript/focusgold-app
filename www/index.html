@@ -1105,6 +1105,8 @@ window.switchBook = function(book) {
   CHAPTERS = getActiveChapters();
   // Swap active state references into the global pointers used by all render fns
   applyActiveBookState();
+  applyActiveBadges();
+  BADGES = buildBadges(); // CHAPTERS 依存のバッジリストを本別に再生成
   renderToday(); renderCountdown(); updateStreak();
 };
 
@@ -1127,6 +1129,7 @@ function applyActiveBookState() {
     stateEx = stateExFocusGold;
   }
   CHAPTERS = getActiveChapters();
+  if (typeof buildBadges === 'function') BADGES = buildBadges();
 }
 
 // ===== SM-2 USER CONFIG =====
@@ -1369,6 +1372,7 @@ async function loadFromFirestore(uid) {
       stateExFocusGold = data.stateEx || {};
       stateSeminar = data.stateSeminar || {};
       stateSeminarEx = data.stateSeminarEx || {};
+      loadBadgesFromFirestore(data);
     } else {
       stateFocusGold = JSON.parse(localStorage.getItem('fg_state') || '{}');
       stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
@@ -1386,19 +1390,21 @@ async function loadFromFirestore(uid) {
   }
   // Swap active references
   applyActiveBookState();
+  applyActiveBadges();
 }
 
 async function saveToFirestore(uid) {
   var targetUid = uid || currentUid;
   if (!targetUid) return;
   // sync active pointers back to named vars before saving
-  if (currentBook === 'seminar') { stateSeminar = state; stateSeminarEx = stateEx; }
-  else { stateFocusGold = state; stateExFocusGold = stateEx; }
+  if (currentBook === 'seminar') { stateSeminar = state; stateSeminarEx = stateEx; earnedBadgesSeminar = earnedBadges; }
+  else { stateFocusGold = state; stateExFocusGold = stateEx; earnedBadgesFG = earnedBadges; }
   try {
     setStatus('syncing');
     await db.collection('users').doc(targetUid).set({
       state: stateFocusGold, stateEx: stateExFocusGold,
       stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
+      badgesFG: earnedBadgesFG, badgesSeminar: earnedBadgesSeminar,
       updatedAt: Date.now()
     });
     localStorage.setItem('fg_state', JSON.stringify(stateFocusGold));
@@ -2724,7 +2730,8 @@ function renderHeatmap() {
 }
 
 // ===== BADGES =====
-var BADGES = (function() {
+// CHAPTERS に依存するため、本切替時に buildBadges() で再生成する
+function buildBadges() {
   var list = [];
   var learnNs = [1,3,5,10,15,20,25,30,40,50,60,70,80,90,100,120,150,175,200,225,250,275,300,325,350,400,450,500,600,700,25,35,45,55,65,75,85,95,110,130,160,180,210,240,260,280,310,340,360,380];
   var lEmoji = ['📖','📚','🎒','✏️','📐','📏','🔬','🔭','🌟','⭐','💫','🌠','🎯','🏹','💡','🔦','🕯️','✨','🌈','🦋','🦅','🦁','🐯','🐉','🦄','🌊','🏔️','💎','👑','🏆','🥇','🥈','🥉','🎖️','🏅','🎗️','🎀','🎊','🎉','🎆','🎇','🧨','🎁','🎈','🎺','🎻','🎸','🎮','🕹️','🎲'];
@@ -2769,9 +2776,44 @@ var BADGES = (function() {
   extras.forEach(function(name,i) { if (list.length < 200) list.push({ id:'extra_'+i, icon:eEmoji[i%eEmoji.length], name:name, desc:name+'バッジ', check:null }); });
   while (list.length > 200) list.pop();
   return list;
-})();
+}
+var BADGES = buildBadges();
 
-var earnedBadges = JSON.parse(localStorage.getItem('fg_badges') || '[]');
+// ===== BADGES STORAGE（本別・永続） =====
+// earnedBadges は常にアクティブな本のリストを指す。本切替時に applyActiveBadges() で差し替える。
+var earnedBadgesFG      = JSON.parse(localStorage.getItem('fg_badges') || '[]');
+var earnedBadgesSeminar = JSON.parse(localStorage.getItem('sm_badges') || '[]');
+var earnedBadges = currentBook === 'seminar' ? earnedBadgesSeminar : earnedBadgesFG;
+
+function badgesLsKey() { return currentBook === 'seminar' ? 'sm_badges' : 'fg_badges'; }
+
+function applyActiveBadges() {
+  if (currentBook === 'seminar') {
+    earnedBadges = earnedBadgesSeminar;
+  } else {
+    earnedBadges = earnedBadgesFG;
+  }
+}
+
+// Firestoreからバッジを読込む（loadFromFirestoreの後に呼ぶ）
+function loadBadgesFromFirestore(data) {
+  earnedBadgesFG      = data.badgesFG      || JSON.parse(localStorage.getItem('fg_badges') || '[]');
+  earnedBadgesSeminar = data.badgesSeminar || JSON.parse(localStorage.getItem('sm_badges') || '[]');
+  applyActiveBadges();
+}
+
+function saveBadgesToFirestore() {
+  if (!currentUid) return;
+  // 現在の参照を named vars に同期してから保存
+  if (currentBook === 'seminar') earnedBadgesSeminar = earnedBadges;
+  else earnedBadgesFG = earnedBadges;
+  localStorage.setItem('fg_badges', JSON.stringify(earnedBadgesFG));
+  localStorage.setItem('sm_badges', JSON.stringify(earnedBadgesSeminar));
+  db.collection('users').doc(currentUid).set(
+    { badgesFG: earnedBadgesFG, badgesSeminar: earnedBadgesSeminar },
+    { merge: true }
+  ).catch(function(){});
+}
 
 function getStreakCount() {
   var days = {};
@@ -2790,13 +2832,15 @@ function checkBadges() {
   var streak = getStreakCount();
   var newBadges = [];
   BADGES.forEach(function(b) {
+    // 既に earned に含まれていたら絶対にスキップ（日付またぎ・再起動に関係なく）
     if (earnedBadges.indexOf(b.id) !== -1) return;
     var earned = false;
     if (b.check) { try { earned = b.check(state, streak); } catch(e) {} }
     if (earned) { earnedBadges.push(b.id); newBadges.push(b); }
   });
   if (newBadges.length > 0) {
-    localStorage.setItem('fg_badges', JSON.stringify(earnedBadges));
+    // 即 localStorage + Firestore に保存して重複防止
+    saveBadgesToFirestore();
     newBadges.forEach(function(b, i) { setTimeout(function() { showBadgeFlash(b); }, i * 3500); });
   }
 }
@@ -2908,9 +2952,10 @@ function checkChapterComplete(pid) {
   var probs = getProblems(ch);
   var allDone = probs.every(function(p) { return state[p]; });
   if (allDone) {
-    var key = 'fg_ch_done_' + ch.name;
-    if (!sessionStorage.getItem(key)) {
-      sessionStorage.setItem(key, '1');
+    // localStorage で永続管理（日付またぎ・再起動でも再表示しない）
+    var lsKey = (currentBook === 'seminar' ? 'sm' : 'fg') + '_ch_done_' + ch.name;
+    if (!localStorage.getItem(lsKey)) {
+      localStorage.setItem(lsKey, '1');
       setTimeout(function() {
         var el = document.createElement('div');
         el.className = 'badge-flash';
