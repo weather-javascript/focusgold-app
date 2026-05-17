@@ -588,12 +588,17 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
       </div>
       <button class="sort-chip" onclick="jumpToProblem()" style="flex-shrink:0">ジャンプ</button>
     </div>
-    <div class="section-title">復習タスク</div>
+    <div class="section-title">📋 今日の復習タスク</div>
     <div class="task-list" id="task-list"></div>
+    <div class="section-title" id="new-learn-title" style="display:none">🆕 新しく学ぶ（未学習）</div>
+    <div class="task-list" id="new-learn-list"></div>
     <div class="section-title" id="weak-title" style="display:none">苦手問題（×）</div>
     <div class="weak-list" id="weak-list"></div>
     <div class="section-title" id="overcome-title" style="display:none">📌 今週の克服リスト</div>
     <div id="overcome-list"></div>
+    <div style="text-align:center;padding:16px 0 8px">
+      <button onclick="showDailySummary()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-size:13px;font-weight:600;padding:10px 22px;cursor:pointer;font-family:inherit">📊 今日のふり返り</button>
+    </div>
   </div>
 
   <!-- CALENDAR -->
@@ -623,8 +628,9 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
       <div class="bar-chart" id="weekly-chart"></div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">正答率の推移（○の割合）</div>
-      <div class="bar-chart" id="rate-chart"></div>
+      <div class="chart-title">📈 正答率トレンド（過去8週・折れ線）</div>
+      <svg id="rate-line-chart" width="100%" height="100" viewBox="0 0 320 100" preserveAspectRatio="none" style="display:block;overflow:visible"></svg>
+      <div class="bar-chart" id="rate-chart" style="margin-top:8px"></div>
     </div>
   </div>
 
@@ -642,6 +648,8 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
       <button class="tag-chip" id="pf-kihon" onclick="setProgressFilter('kihon')">基本</button>
       <button class="tag-chip" id="pf-standard" onclick="setProgressFilter('standard')">標準</button>
       <button class="tag-chip" id="pf-hatten" onclick="setProgressFilter('hatten')">発展</button>
+      <button class="tag-chip" id="pf-imp1" onclick="setProgressFilter('imp1')">★重要</button>
+      <button class="tag-chip" id="pf-imp3" onclick="setProgressFilter('imp3')">★★★</button>
     </div>
     <div class="sub-tabs">
       <button class="sub-tab active" id="stab-practice" onclick="switchProgressTab('practice')">練習問題</button>
@@ -693,7 +701,7 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
         <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px"><span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>23時</span></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">📉 問題別 正答率トレンド</div>
+        <div class="chart-title">📊 復習回数ランキング（上位10問）</div>
         <div id="sparkline-list" style="font-size:12px;color:var(--text2)"></div>
       </div>
       <div class="chart-card">
@@ -770,9 +778,9 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
         <div><div class="settings-label">OLEDモード（純黒）</div><div class="settings-sub">バッテリー節約</div></div>
         <button class="toggle" id="oled-toggle" onclick="toggleOled()"></button>
       </div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <div><div class="settings-label">🎨 カラーテーマ</div><div class="settings-sub">40種類から選択</div></div>
-        <div id="theme-palette" style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px;width:100%;margin-top:4px"></div>
+      <div style="padding:4px 0 8px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">🎨 カラーテーマ <span style="font-size:10px;color:var(--text3);font-weight:400">背景色を変更</span></div>
+        <div id="theme-palette"></div>
       </div>
     </div>
     <div class="settings-card">
@@ -833,16 +841,7 @@ body.seminar-mode .ring-circle-el { stroke: #22c55e; }
         <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>少し延ばす</span><span>大きく延ばす</span></div>
       </div>
 
-      <!-- 最大間隔 スライダー -->
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <div style="font-size:12px;font-weight:700">最大復習間隔</div>
-          <div style="font-size:13px;font-weight:700;color:var(--accent2)" id="sm2-max-lbl">180日</div>
-        </div>
-        <input type="range" id="sm2-max-interval" min="30" max="365" value="180" step="30"
-          style="width:100%;accent-color:var(--accent)" oninput="onSM2Slide()" onchange="saveSM2Settings()" />
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3)"><span>30日</span><span>6ヶ月</span><span>1年</span></div>
-      </div>
+
 
       <!-- プレビュー -->
       <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:10px">
@@ -1464,6 +1463,13 @@ async function loadFromFirestore(uid) {
       stateSeminar = data.stateSeminar || {};
       stateSeminarEx = data.stateSeminarEx || {};
       loadBadgesFromFirestore(data);
+      // fg_hour_log をFirestoreから復元（デバイス間同期）
+      if (data.hourLog && typeof data.hourLog === 'object') {
+        var localLog = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
+        var merged = Object.assign({}, data.hourLog);
+        Object.keys(localLog).forEach(function(h) { merged[h] = (merged[h] || 0) + localLog[h]; });
+        localStorage.setItem('fg_hour_log', JSON.stringify(merged));
+      }
     } else {
       stateFocusGold = JSON.parse(localStorage.getItem('fg_state') || '{}');
       stateExFocusGold = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
@@ -1509,6 +1515,7 @@ async function saveToFirestore(uid) {
       state: stateFocusGold, stateEx: stateExFocusGold,
       stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
       badgesFG: earnedBadgesFG, badgesSeminar: earnedBadgesSeminar,
+      hourLog: JSON.parse(localStorage.getItem('fg_hour_log') || '{}'),
       updatedAt: Date.now()
     });
     localStorage.setItem('fg_state', JSON.stringify(stateFocusGold));
@@ -1765,7 +1772,7 @@ function renderToday() {
   var listEl = document.getElementById('task-list');
   if (!listEl) return;
   if (tasks.length === 0) {
-    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div>今日の復習タスクはありません！<br><span style="font-size:12px">「進捗」から新しい問題を学習しましょう</span></div>';
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div>今日の復習タスクはありません！</div>';
   } else {
     listEl.innerHTML = tasks.map(function(t) {
       var done = sessionStorage.getItem('done_' + t.pid);
@@ -1783,6 +1790,27 @@ function renderToday() {
         '<div class="task-info"><div class="task-num">問題 ' + t.pid + overdueTag + '</div>' +
         '<div class="task-meta">' + t.ch + '&nbsp;前回: <span style="color:' + chipCols[lr] + ';font-weight:700">' + chipLbls[lr] + '</span></div></div>' +
         '<span class="task-badge ' + bCls[Math.min(t.stage, 2)] + '">' + bLbl[Math.min(t.stage, 2)] + '</span></div>';
+    }).join('');
+  }
+
+  // 新しく学ぶ（未学習）セクション
+  var newLearnTitle = document.getElementById('new-learn-title');
+  var newLearnList = document.getElementById('new-learn-list');
+  if (newLearnList) {
+    var unlearnedPids = [];
+    CHAPTERS.forEach(function(ch) {
+      getProblems(ch).forEach(function(pid) {
+        if (!state[pid]) unlearnedPids.push({ pid: pid, ch: ch.name });
+      });
+    });
+    var nextUnlearned = unlearnedPids.slice(0, 5);
+    if (newLearnTitle) newLearnTitle.style.display = nextUnlearned.length > 0 ? '' : 'none';
+    newLearnList.innerHTML = nextUnlearned.map(function(t) {
+      return '<div class="task-card" onclick="openTaskModal(\'' + t.pid + '\')">' +
+        '<div class="task-checkbox" style="color:var(--text3)">＋</div>' +
+        '<div class="task-info"><div class="task-num">問題 ' + t.pid + '</div>' +
+        '<div class="task-meta">' + t.ch + '</div></div>' +
+        '<span class="task-badge" style="background:var(--bg3);color:var(--text3)">未学習</span></div>';
     }).join('');
   }
 
@@ -1989,26 +2017,10 @@ function renderWeeklyReport() {
 
 // ===== 最適学習時間帯 =====
 function renderBestTime() {
+  // fg_hour_log: 問題を記録した時刻の時間帯カウント（キー: 0-23の文字列）
+  var logRaw = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
   var hourCounts = new Array(24).fill(0);
-  // learnedAt/reviewsAt は todayTs()（深夜0時）で記録されている可能性があるため
-  // actualLearnedAt (実際の記録時刻) がある場合はそちらを優先。なければ learnedAt を使う
-  Object.keys(state).forEach(function(pid) {
-    var s = state[pid]; if (!s) return;
-    function countHour(ts) {
-      if (!ts) return;
-      var h = new Date(ts).getHours();
-      // todayTs() は深夜0時なので、0時台に集中するのは正常だが
-      // もし actualTime フィールドがあればそちらを使う
-      hourCounts[h]++;
-    }
-    // actualLearnedAt: モーダルで記録した実時刻（Date.now()）
-    var learnTs = s.actualLearnedAt || s.learnedAt;
-    countHour(learnTs);
-    (s.reviewsAt || s.reviews || []).forEach(function(ts) {
-      // reviewsAt は実時刻配列、reviews は旧形式（内容不定）
-      if (typeof ts === 'number' && ts > 0) countHour(ts);
-    });
-  });
+  for (var h = 0; h < 24; h++) { hourCounts[h] = logRaw[String(h)] || 0; }
   var maxH = Math.max.apply(null, hourCounts) || 1;
   var chart = document.getElementById('hourly-chart');
   if (chart) {
@@ -2037,26 +2049,34 @@ function renderBestTime() {
 function renderSparklines() {
   var el = document.getElementById('sparkline-list');
   if (!el) return;
-  // 最近復習が多い問題トップ10
+  // 復習回数が多い問題トップ10
   var reviewed = Object.keys(state).filter(function(pid) {
     return state[pid] && (state[pid].reviews||[]).length > 0;
   }).sort(function(a,b) {
     return (state[b].reviews||[]).length - (state[a].reviews||[]).length;
   }).slice(0, 10);
-  if (reviewed.length === 0) { el.textContent = 'まだ復習データがありません'; return; }
-  el.innerHTML = reviewed.map(function(pid) {
+  if (reviewed.length === 0) {
+    el.innerHTML = '<div style="color:var(--text3);text-align:center;padding:20px 0;font-size:12px">復習した問題がまだありません</div>';
+    return;
+  }
+  var maxRev = (state[reviewed[0]].reviews||[]).length || 1;
+  el.innerHTML = reviewed.map(function(pid, rank) {
     var s = state[pid];
-    var hist = [{r: s.result || 'maru'}].concat((s.reviews||[]).map(function(_,i){
-      return { r: (i === (s.reviews.length-1)) ? s.result : 'sanka' };
-    }));
-    var spark = hist.map(function(h) {
-      var col = h.r === 'maru' ? 'var(--green)' : h.r === 'sanka' ? 'var(--amber)' : 'var(--red)';
-      return '<div class="sparkline-bar" style="height:' + (h.r==='maru'?16:h.r==='sanka'?10:5) + 'px;background:' + col + '"></div>';
-    }).join('');
-    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">' +
-      '<span style="font-size:12px;font-weight:700;min-width:50px">問題 ' + pid + '</span>' +
-      '<div class="sparkline-wrap">' + spark + '</div>' +
-      '<span style="font-size:11px;color:var(--text3)">' + (s.reviews||[]).length + '回復習</span></div>';
+    var revCount = (s.reviews||[]).length;
+    var result = s.result || 'maru';
+    var resultCol = result === 'maru' ? 'var(--green)' : result === 'sanka' ? 'var(--amber)' : 'var(--red)';
+    var resultLabel = result === 'maru' ? '○' : result === 'sanka' ? '△' : '×';
+    var barW = Math.round(revCount / maxRev * 100);
+    return '<div style="padding:7px 0;border-bottom:1px solid var(--border)">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+        '<span style="font-size:11px;color:var(--text3);min-width:18px;text-align:right">' + (rank+1) + '</span>' +
+        '<span style="font-size:12px;font-weight:700;min-width:52px">問題 ' + pid + '</span>' +
+        '<span style="font-size:11px;color:' + resultCol + ';font-weight:700;min-width:20px">' + resultLabel + '</span>' +
+        '<span style="font-size:11px;color:var(--text3)">' + revCount + '回復習</span>' +
+      '</div>' +
+      '<div style="height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-left:26px">' +
+        '<div style="height:100%;width:' + barW + '%;background:' + resultCol + ';border-radius:3px"></div>' +
+      '</div></div>';
   }).join('');
 }
 
@@ -2288,7 +2308,7 @@ window.calcStudyPlan = function() {
 var progressFilter = 'all';
 window.setProgressFilter = function(f) {
   progressFilter = f;
-  ['all','batu','review','kihon','standard','hatten'].forEach(function(id) {
+  ['all','batu','review','kihon','standard','hatten','imp1','imp3'].forEach(function(id) {
     var el = document.getElementById('pf-' + id);
     if (el) el.classList.toggle('active', id === f);
   });
@@ -2391,15 +2411,28 @@ function renderRateChart() {
   var weeks = [];
   for (var w = 7; w >= 0; w--) {
     var data = getWeekData(w);
-    var rate = data.total > 0 ? Math.round(data.maru / data.total * 100) : 0;
+    var rate = data.total > 0 ? Math.round(data.maru / data.total * 100) : null;
     weeks.push({ rate: rate, hasData: data.total > 0, current: w === 0 });
   }
   el.innerHTML = weeks.map(function(w) {
     return '<div class="bar-wrap">' +
-      '<div class="bar' + (w.current ? ' active' : '') + '" style="height:' + w.rate + '%;min-height:' + (w.hasData ? 3 : 2) + 'px;' + (w.hasData ? 'background:var(--green)' : '') + '"></div>' +
+      '<div class="bar' + (w.current ? ' active' : '') + '" style="height:' + (w.rate || 0) + '%;min-height:' + (w.hasData ? 3 : 2) + 'px;' + (w.hasData ? 'background:var(--green)' : '') + '"></div>' +
       '<div class="bar-label">' + (w.current ? '今' : '') + '</div>' +
       '<div class="bar-val">' + (w.hasData ? w.rate + '%' : '') + '</div></div>';
   }).join('');
+  // SVG 折れ線グラフ
+  var svg = document.getElementById('rate-line-chart');
+  if (!svg) return;
+  var pts = weeks.map(function(w, i) { return { x: Math.round(i / 7 * 300) + 10, y: w.hasData ? Math.round((100 - w.rate) / 100 * 80) + 10 : null }; });
+  var validPts = pts.filter(function(p) { return p.y !== null; });
+  if (validPts.length < 2) { svg.innerHTML = ''; return; }
+  var polyline = validPts.map(function(p) { return p.x + ',' + p.y; }).join(' ');
+  var area = validPts.map(function(p) { return p.x + ',' + p.y; }).join(' ') + ' ' + validPts[validPts.length-1].x + ',90 ' + validPts[0].x + ',90';
+  svg.innerHTML =
+    '<defs><linearGradient id="rg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--green)" stop-opacity="0.3"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs>' +
+    '<polygon points="' + area + '" fill="url(#rg)"/>' +
+    '<polyline points="' + polyline + '" fill="none" stroke="var(--green)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    validPts.map(function(p) { return '<circle cx="' + p.x + '" cy="' + p.y + '" r="3" fill="var(--green)"/>'; }).join('');
 }
 
 window.showDayDetail = function(y, m, d) {
@@ -2463,18 +2496,35 @@ function renderProgress() {
       if (progressFilter === 'kihon') return s && s.difficulty === '基本';
       if (progressFilter === 'standard') return s && s.difficulty === '標準';
       if (progressFilter === 'hatten') return s && s.difficulty === '発展';
+      if (progressFilter === 'imp1') return s && (s.importance || 0) >= 1;
+      if (progressFilter === 'imp3') return s && (s.importance || 0) >= 3;
       return true;
     });
     if (searchQ && filteredProbs.length === 0) return '';
     var total = probs.length;
     var done = probs.filter(function(p) { return state[p]; }).length;
     var mastered = probs.filter(function(p) { return state[p] && (state[p].reviews||[]).length >= 3; }).length;
+    var maruCnt = probs.filter(function(p) { return state[p] && state[p].result === 'maru'; }).length;
+    var sankaCnt = probs.filter(function(p) { return state[p] && state[p].result === 'sanka'; }).length;
+    var batuCnt = probs.filter(function(p) { return state[p] && state[p].result === 'batu'; }).length;
     var pct = Math.round(done / total * 100);
+    var stackedBar = done > 0 ?
+      '<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:4px;background:var(--bg4)">' +
+        '<div style="width:' + Math.round(maruCnt/total*100) + '%;background:var(--green)"></div>' +
+        '<div style="width:' + Math.round(sankaCnt/total*100) + '%;background:var(--amber)"></div>' +
+        '<div style="width:' + Math.round(batuCnt/total*100) + '%;background:var(--red)"></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;font-size:9px;color:var(--text3);margin-top:2px">' +
+        (maruCnt > 0 ? '<span style="color:var(--green)">○' + maruCnt + '</span>' : '') +
+        (sankaCnt > 0 ? '<span style="color:var(--amber)">△' + sankaCnt + '</span>' : '') +
+        (batuCnt > 0 ? '<span style="color:var(--red)">×' + batuCnt + '</span>' : '') +
+      '</div>' : '';
     return '<div class="chapter-card" id="ch-card-' + ci + '">' +
       '<div class="chapter-header" onclick="toggleChapter(' + ci + ')">' +
       '<div><div class="chapter-name">' + ch.name + '</div><div class="chapter-range">' + total + '問 習得' + mastered + '問</div></div>' +
       '<div class="chapter-pct">' + pct + '%</div></div>' +
       '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+      stackedBar +
       '<div class="problem-grid" id="pg-' + ci + '">' +
       (searchQ ? filteredProbs : probs).map(function(pid) {
         var stage = getStage(pid);
@@ -2591,10 +2641,11 @@ function historyGraphHTML(pid) {
   if (!s) return '';
   var sym = {maru:'○', sanka:'△', batu:'×'};
   var col = {maru:'var(--green)', sanka:'var(--amber)', batu:'var(--red)'};
-  // 最初の学習結果 + 各復習後の結果
-  var items = [{r: s.result || 'maru', label:'初回'}];
+  // 最初の学習結果 + 各復習後の結果（reviewResults配列から取得）
+  var items = [{r: s.firstResult || s.result || 'maru', label:'初回'}];
   (s.reviews || []).forEach(function(_, i) {
-    items.push({r: s.result || 'maru', label: (i+1) + '回目'});
+    var rr = s.reviewResults || [];
+    items.push({r: rr[i] || s.result || 'maru', label: (i+1) + '回目'});
   });
   if (items.length < 2) return '';
   return '<div style="margin-bottom:12px;padding:8px 0;border-top:1px solid var(--border)">' +
@@ -2617,14 +2668,23 @@ function memoHTML(pid) {
     var active = savedTags.indexOf(tg) !== -1;
     return '<button class="tag-chip ' + (active ? 'active' : '') + '" onclick="toggleMemoTag(\'' + tg.replace(/'/g,"\\'") + '\')" id="tag-chip-' + encodeURIComponent(tg) + '">' + tg + '</button>';
   }).join('');
+  var savedImportance = (state[pid] && state[pid].importance) || 0;
   // Difficulty row
   var diffHtml = '<div id="modal-difficulty-row" style="display:flex;gap:5px;margin-bottom:8px">' +
     DIFFICULTY_TAGS.map(function(d) {
       return '<button class="diff-chip tag-chip' + (savedDiff===d?' active':'') + '" data-diff="'+d+'" onclick="selectDifficulty(\''+d+'\')">' + d + '</button>';
     }).join('') + '</div>';
+  // Importance stars
+  var starsHtml = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">' +
+    '<span style="font-size:11px;color:var(--text3)">重要度:</span>' +
+    [1,2,3].map(function(n) {
+      return '<button id="imp-star-'+n+'" onclick="selectImportance('+n+')" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0;line-height:1;color:' + (n<=savedImportance?'var(--amber)':'var(--bg4)') + '">★</button>';
+    }).join('') + '</div>';
   return '<div class="memo-label">📝 メモ</div>' +
+    (memo ? '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap">📌 前回のメモ: ' + memo.replace(/</g,'&lt;') + '</div>' : '') +
     '<textarea class="memo-input" id="prob-memo" placeholder="ここにメモを入力...">' + memo + '</textarea>' +
     '<div class="tag-area"><div class="tag-label">🎯 難易度</div>' + diffHtml +
+    starsHtml +
     '<div class="tag-label">🏷 タグ</div>' +
     '<div class="tag-list" id="modal-tag-list">' + tagsHtml + '</div>' +
     '<div class="tag-new-row">' +
@@ -2713,6 +2773,25 @@ function getModalTags() {
   return Array.from(chips).map(function(c) { return c.textContent; });
 }
 
+window.selectImportance = function(n) {
+  var current = parseInt((document.getElementById('imp-star-1') && document.getElementById('imp-star-1').dataset.val) || '0');
+  [1,2,3].forEach(function(i) {
+    var btn = document.getElementById('imp-star-' + i);
+    if (btn) btn.style.color = i <= n ? 'var(--amber)' : 'var(--bg4)';
+  });
+  var inp = document.getElementById('imp-val');
+  if (inp) inp.value = n;
+};
+
+function getModalImportance() {
+  // read from star button colors
+  for (var n = 3; n >= 1; n--) {
+    var btn = document.getElementById('imp-star-' + n);
+    if (btn && btn.style.color.indexOf('amber') !== -1) return n;
+  }
+  return 0;
+}
+
 window.selectDifficulty = function(d) {
   document.querySelectorAll('#modal-difficulty-row .diff-chip').forEach(function(btn) {
     btn.classList.toggle('active', btn.dataset.diff === d);
@@ -2751,38 +2830,84 @@ function getallTags() {
   return JSON.parse(localStorage.getItem('fg_tags') || '[]');
 }
 
-// ===== 次の問題へのプロンプト =====
+window.showDailySummary = function() {
+  var tts = todayTs();
+  var todayPids = Object.keys(state).filter(function(pid) {
+    var s = state[pid];
+    if (!s) return false;
+    var d = new Date(s.learnedAt); d.setHours(0,0,0,0);
+    if (d.getTime() === tts) return true;
+    return (s.reviews||[]).some(function(r) { var rd = new Date(r); rd.setHours(0,0,0,0); return rd.getTime() === tts; });
+  });
+  var total = todayPids.length;
+  var maru = todayPids.filter(function(p){ return state[p].result==='maru'; }).length;
+  var sanka = todayPids.filter(function(p){ return state[p].result==='sanka'; }).length;
+  var batu = todayPids.filter(function(p){ return state[p].result==='batu'; }).length;
+  var rate = total > 0 ? Math.round(maru/total*100) : 0;
+  var hardest = todayPids.filter(function(p){ return state[p].result==='batu'; }).slice(0,3);
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center';
+  el.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:28px 24px;width:90%;max-width:360px;text-align:center;animation:badgePop 0.3s ease">' +
+    '<div style="font-size:22px;font-weight:800;margin-bottom:4px">📊 今日のふり返り</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:20px">' + new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric'}) + '</div>' +
+    '<div style="display:flex;justify-content:space-around;margin-bottom:20px">' +
+      '<div><div style="font-size:32px;font-weight:800;color:var(--accent2)">' + total + '</div><div style="font-size:11px;color:var(--text3)">取り組んだ問題</div></div>' +
+      '<div><div style="font-size:32px;font-weight:800;color:var(--green)">' + rate + '%</div><div style="font-size:11px;color:var(--text3)">正答率</div></div>' +
+    '</div>' +
+    '<div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px">' +
+      '<span style="color:var(--green);font-weight:700">○ ' + maru + '</span>' +
+      '<span style="color:var(--amber);font-weight:700">△ ' + sanka + '</span>' +
+      '<span style="color:var(--red);font-weight:700">× ' + batu + '</span>' +
+    '</div>' +
+    (hardest.length > 0 ? '<div style="font-size:11px;color:var(--text3);margin-bottom:14px">要復習: ' + hardest.map(function(p){ return '問題'+p; }).join('・') + '</div>' : '') +
+    '<button onclick="this.closest(\'div[style*=\"inset:0\"]\').remove()" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:14px;font-weight:700;padding:10px 32px;cursor:pointer;font-family:inherit">閉じる</button>' +
+  '</div>';
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+  document.body.appendChild(el);
+};
+
+// ===== NEXT PROBLEM PROMPT =====
 function showNextProblemPrompt(donePid) {
-  // 次の未学習問題を探す
+  // 次の復習タスク優先、なければ未学習
   var allPids = [];
   CHAPTERS.forEach(function(ch) { getProblems(ch).forEach(function(p) { allPids.push(p); }); });
-  var idx = allPids.indexOf(donePid);
   var nextPid = null;
-  for (var i = idx + 1; i < allPids.length; i++) {
-    if (!state[allPids[i]]) { nextPid = allPids[i]; break; }
+  var nextLabel = '次の問題へ';
+  // 1) 今日の復習タスクから次を探す
+  for (var i = 0; i < allPids.length; i++) {
+    var pid = allPids[i];
+    if (pid === donePid) continue;
+    if (isDueToday(pid) && !sessionStorage.getItem('done_' + pid)) { nextPid = pid; nextLabel = '次の復習へ'; break; }
   }
-  if (!nextPid) return; // 全問学習済みなら表示しない
-  var nextCh = CHAPTERS.find(function(c) { return getProblems(c).indexOf(nextPid) !== -1; });
-  // 既存のプロンプトを削除
+  // 2) なければ未学習から次を探す
+  if (!nextPid) {
+    var idx = allPids.indexOf(donePid);
+    for (var j = idx + 1; j < allPids.length; j++) {
+      if (!state[allPids[j]]) { nextPid = allPids[j]; nextLabel = '次を学ぶ'; break; }
+    }
+  }
+  if (!nextPid) return;
   var old = document.getElementById('next-prob-prompt');
   if (old) old.remove();
   var el = document.createElement('div');
   el.id = 'next-prob-prompt';
   el.style.cssText = 'position:fixed;bottom:calc(var(--bottom-h)+10px);left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:12px 16px;z-index:350;display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(0,0,0,0.4);max-width:340px;width:90%;animation:slideUp 0.3s ease';
-  el.innerHTML = '<span style="font-size:13px;flex:1;color:var(--text2)">次の問題にチャレンジしよう！<br><span style="font-size:11px;color:var(--text3)">問題 ' + nextPid + '</span></span>' +
-    '<button onclick="openTaskModal(\'' + nextPid + '\');document.getElementById(\'next-prob-prompt\').remove()" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 13px;cursor:pointer;font-family:inherit;white-space:nowrap">進捗へ</button>' +
-    '<button onclick="this.closest(\'#next-prob-prompt\').remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px">×</button>';
+  el.innerHTML = '<span style="font-size:13px;flex:1;color:var(--text2)">完了！<br><span style="font-size:11px;color:var(--text3)">問題 ' + nextPid + '</span></span>' +
+    '<button onclick="openTaskModal(\'' + nextPid + '\');document.getElementById(\'next-prob-prompt\').remove()" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 13px;cursor:pointer;font-family:inherit;white-space:nowrap">' + nextLabel + ' →</button>' +
+    '<button onclick="this.parentNode.remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px">×</button>';
   document.body.appendChild(el);
-  setTimeout(function() { if (el.parentNode) el.remove(); }, 6000);
+  setTimeout(function() { if (el.parentNode) el.remove(); }, 12000);
 }
 
 window.learnProblem = function() {
   var nowTs = Date.now();
   var sm2 = sm2NextInterval({reviews:[], ef: SM2_DEFAULT_EF}, pendingResult);
-  state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], result: pendingResult, memo: getMemo(), tags: getModalTags(),
+  state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], reviewResults: [], result: pendingResult, firstResult: pendingResult, memo: getMemo(), tags: getModalTags(),
     ef: sm2.ef, lastInterval: sm2.interval, lastReviewAt: todayTs(), sm2Active: true,
-    difficulty: getModalDifficulty() };
+    difficulty: getModalDifficulty(), importance: getModalImportance() };
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
+  // 時間帯ログ記録（actualLearnedAt の時を記録）
+  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log')||'{}'); log[h]=(log[h]||0)+1; localStorage.setItem('fg_hour_log',JSON.stringify(log)); })();
   stopTimer();
   saveState(); closeModalDirect();
   playSound();
@@ -2802,6 +2927,9 @@ window.reviewProblem = function() {
   var interval = (customDays && customDays > 0) ? customDays : sm2.interval;
   state[modalPid].reviews = (state[modalPid].reviews || []).concat([todayTs()]);
   state[modalPid].reviewsAt = (state[modalPid].reviewsAt || []).concat([nowTs]);
+  state[modalPid].reviewResults = (state[modalPid].reviewResults || []).concat([pendingResult]);
+  // 時間帯ログ記録
+  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log')||'{}'); log[h]=(log[h]||0)+1; localStorage.setItem('fg_hour_log',JSON.stringify(log)); })();
   state[modalPid].result = pendingResult;
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
@@ -2810,6 +2938,7 @@ window.reviewProblem = function() {
   state[modalPid].lastReviewAt = todayTs();
   state[modalPid].sm2Active = true;
   state[modalPid].difficulty = getModalDifficulty() || state[modalPid].difficulty;
+  state[modalPid].importance = getModalImportance() || state[modalPid].importance || 0;
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
   stopTimer();
   saveState();
@@ -3092,54 +3221,54 @@ if (localStorage.getItem('fg_oled') === '1') { document.body.classList.add('oled
 
 // ===== 40 COLOR THEMES =====
 var COLOR_THEMES = [
-  // ダーク系
-  {name:'デフォルト',bg:'#0f0f13',accent:'#6c63ff',accent2:'#8b84ff',label:'🌌'},
-  {name:'ミッドナイト',bg:'#0d1117',accent:'#58a6ff',accent2:'#79c0ff',label:'🌙'},
-  {name:'ドラキュラ',bg:'#282a36',accent:'#bd93f9',accent2:'#caa9fa',label:'🧛'},
-  {name:'フォレスト',bg:'#0d1f0d',accent:'#4ade80',accent2:'#86efac',label:'🌲'},
-  {name:'オーシャン',bg:'#0a1628',accent:'#38bdf8',accent2:'#7dd3fc',label:'🌊'},
-  {name:'サンセット',bg:'#1a0a0a',accent:'#f97316',accent2:'#fb923c',label:'🌅'},
-  {name:'チェリー',bg:'#1a0a14',accent:'#f43f5e',accent2:'#fb7185',label:'🍒'},
-  {name:'ゴールド',bg:'#1a1400',accent:'#eab308',accent2:'#facc15',label:'✨'},
-  // ライト系（パステル・暖色・寒色）
-  {name:'ラベンダー',bg:'#f3f0ff',accent:'#7c3aed',accent2:'#8b5cf6',label:'💜'},
-  {name:'ミント',bg:'#f0fff4',accent:'#059669',accent2:'#10b981',label:'🌿'},
-  {name:'ベビーブルー',bg:'#eff6ff',accent:'#2563eb',accent2:'#3b82f6',label:'💙'},
-  {name:'ローズ',bg:'#fff1f2',accent:'#e11d48',accent2:'#f43f5e',label:'🌹'},
-  {name:'ピーチ',bg:'#fff7ed',accent:'#ea580c',accent2:'#f97316',label:'🍑'},
-  {name:'レモン',bg:'#fefce8',accent:'#ca8a04',accent2:'#eab308',label:'🍋'},
-  {name:'さくら',bg:'#fdf2f8',accent:'#db2777',accent2:'#ec4899',label:'🌸'},
-  {name:'アイスブルー',bg:'#f0f9ff',accent:'#0284c7',accent2:'#0ea5e9',label:'🧊'},
-  // パステル系
-  {name:'パステルパープル',bg:'#faf5ff',accent:'#9333ea',accent2:'#a855f7',label:'🎀'},
-  {name:'パステルグリーン',bg:'#f0fdf4',accent:'#16a34a',accent2:'#22c55e',label:'🍃'},
-  {name:'パステルピンク',bg:'#fdf4ff',accent:'#c026d3',accent2:'#d946ef',label:'🎀'},
-  {name:'パステルオレンジ',bg:'#fff8f0',accent:'#d97706',accent2:'#f59e0b',label:'🍊'},
-  // 暖色系
-  {name:'オータム',bg:'#1c0f05',accent:'#dc2626',accent2:'#ef4444',label:'🍂'},
-  {name:'キャラメル',bg:'#1a0f00',accent:'#b45309',accent2:'#d97706',label:'🍮'},
-  {name:'サーモン',bg:'#fff0ed',accent:'#ef4444',accent2:'#f87171',label:'🐟'},
-  {name:'コーラル',bg:'#0f0505',accent:'#fb7185',accent2:'#fda4af',label:'🪸'},
-  // 寒色系
-  {name:'アーティック',bg:'#f8faff',accent:'#1e40af',accent2:'#3b82f6',label:'❄️'},
-  {name:'スカイ',bg:'#e0f7fa',accent:'#0277bd',accent2:'#0288d1',label:'☁️'},
-  {name:'インディゴ',bg:'#1e1b4b',accent:'#6366f1',accent2:'#818cf8',label:'🔷'},
-  {name:'ティール',bg:'#002d2d',accent:'#0d9488',accent2:'#14b8a6',label:'🦚'},
-  // モノクロ系
-  {name:'グレー',bg:'#111111',accent:'#9ca3af',accent2:'#d1d5db',label:'⬛'},
-  {name:'チャコール',bg:'#1f2937',accent:'#6b7280',accent2:'#9ca3af',label:'🖤'},
-  {name:'スレート',bg:'#0f172a',accent:'#64748b',accent2:'#94a3b8',label:'🌫️'},
-  // ネオン系
-  {name:'ネオンピンク',bg:'#0a0010',accent:'#d946ef',accent2:'#e879f9',label:'💖'},
-  {name:'ネオングリーン',bg:'#001a00',accent:'#22c55e',accent2:'#4ade80',label:'💚'},
-  {name:'ネオンブルー',bg:'#00001a',accent:'#38bdf8',accent2:'#7dd3fc',label:'💙'},
-  {name:'ネオンオレンジ',bg:'#1a0500',accent:'#f97316',accent2:'#fb923c',label:'🔶'},
-  // 季節系
-  {name:'夏海',bg:'#001a33',accent:'#0ea5e9',accent2:'#38bdf8',label:'🏖️'},
-  {name:'紅葉',bg:'#1a0800',accent:'#ea580c',accent2:'#f97316',label:'🍁'},
-  {name:'雪景色',bg:'#f8faff',accent:'#3b82f6',accent2:'#60a5fa',label:'⛄'},
-  {name:'桜吹雪',bg:'#fff5f7',accent:'#ec4899',accent2:'#f9a8d4',label:'🌺'},
-  {name:'夜空',bg:'#020617',accent:'#a855f7',accent2:'#c084fc',label:'🌠'},
+  // ── ダーク単色 ──
+  {cat:'🌑 ダーク',name:'デフォルト',  bg:'#0f0f13',bg2:null,          accent:'#6c63ff',accent2:'#8b84ff'},
+  {cat:'🌑 ダーク',name:'ミッドナイト',bg:'#0d1117',bg2:null,          accent:'#58a6ff',accent2:'#79c0ff'},
+  {cat:'🌑 ダーク',name:'ドラキュラ',  bg:'#282a36',bg2:null,          accent:'#bd93f9',accent2:'#caa9fa'},
+  {cat:'🌑 ダーク',name:'フォレスト',  bg:'#0d1f0d',bg2:null,          accent:'#4ade80',accent2:'#86efac'},
+  {cat:'🌑 ダーク',name:'オーシャン',  bg:'#0a1628',bg2:null,          accent:'#38bdf8',accent2:'#7dd3fc'},
+  {cat:'🌑 ダーク',name:'チェリー',    bg:'#1a0a14',bg2:null,          accent:'#f43f5e',accent2:'#fb7185'},
+  {cat:'🌑 ダーク',name:'ゴールド',    bg:'#1a1400',bg2:null,          accent:'#eab308',accent2:'#facc15'},
+  {cat:'🌑 ダーク',name:'ティール',    bg:'#002d2d',bg2:null,          accent:'#0d9488',accent2:'#14b8a6'},
+  // ── ライト単色 ──
+  {cat:'☀️ ライト',name:'ラベンダー',  bg:'#f3f0ff',bg2:null,          accent:'#7c3aed',accent2:'#8b5cf6'},
+  {cat:'☀️ ライト',name:'ミント',      bg:'#f0fff4',bg2:null,          accent:'#059669',accent2:'#10b981'},
+  {cat:'☀️ ライト',name:'ベビーブルー',bg:'#eff6ff',bg2:null,          accent:'#2563eb',accent2:'#3b82f6'},
+  {cat:'☀️ ライト',name:'ローズ',      bg:'#fff1f2',bg2:null,          accent:'#e11d48',accent2:'#f43f5e'},
+  {cat:'☀️ ライト',name:'ピーチ',      bg:'#fff7ed',bg2:null,          accent:'#ea580c',accent2:'#f97316'},
+  {cat:'☀️ ライト',name:'さくら',      bg:'#fdf2f8',bg2:null,          accent:'#db2777',accent2:'#ec4899'},
+  {cat:'☀️ ライト',name:'レモン',      bg:'#fefce8',bg2:null,          accent:'#ca8a04',accent2:'#eab308'},
+  {cat:'☀️ ライト',name:'アイスブルー',bg:'#f0f9ff',bg2:null,          accent:'#0284c7',accent2:'#0ea5e9'},
+  // ── グラデーション ──
+  {cat:'🌈 グラデ',name:'オーロラ',    bg:'#0d0221',bg2:'#1a0a2e',     accent:'#a855f7',accent2:'#38bdf8'},
+  {cat:'🌈 グラデ',name:'サンセット',  bg:'#1a0a0a',bg2:'#1a1200',     accent:'#f97316',accent2:'#eab308'},
+  {cat:'🌈 グラデ',name:'オーシャン',  bg:'#001a33',bg2:'#002d2d',     accent:'#0ea5e9',accent2:'#14b8a6'},
+  {cat:'🌈 グラデ',name:'フォレスト',  bg:'#0d1f0d',bg2:'#1a1400',     accent:'#4ade80',accent2:'#facc15'},
+  {cat:'🌈 グラデ',name:'チェリー炎',  bg:'#1a0a14',bg2:'#1a0800',     accent:'#f43f5e',accent2:'#f97316'},
+  {cat:'🌈 グラデ',name:'コスモス',    bg:'#0d0221',bg2:'#0a1628',     accent:'#818cf8',accent2:'#38bdf8'},
+  {cat:'🌈 グラデ',name:'桜グラデ',    bg:'#fff5f7',bg2:'#fdf2f8',     accent:'#ec4899',accent2:'#f9a8d4'},
+  {cat:'🌈 グラデ',name:'夕焼け空',    bg:'#fff7ed',bg2:'#fff1f2',     accent:'#f97316',accent2:'#f43f5e'},
+  // ── ネオン ──
+  {cat:'⚡ ネオン',name:'ネオンパープル',bg:'#0a0010',bg2:null,        accent:'#d946ef',accent2:'#e879f9'},
+  {cat:'⚡ ネオン',name:'ネオングリーン',bg:'#001a00',bg2:null,        accent:'#22c55e',accent2:'#4ade80'},
+  {cat:'⚡ ネオン',name:'ネオンブルー', bg:'#00001a',bg2:null,         accent:'#38bdf8',accent2:'#7dd3fc'},
+  {cat:'⚡ ネオン',name:'ネオンオレンジ',bg:'#1a0500',bg2:null,        accent:'#f97316',accent2:'#fb923c'},
+  {cat:'⚡ ネオン',name:'ネオンピンク', bg:'#1a0010',bg2:null,         accent:'#f43f5e',accent2:'#fb7185'},
+  {cat:'⚡ ネオン',name:'サイバーティール',bg:'#000d10',bg2:null,      accent:'#0d9488',accent2:'#14b8a6'},
+  {cat:'⚡ ネオン',name:'サイバーイエロー',bg:'#0a0a00',bg2:null,      accent:'#eab308',accent2:'#facc15'},
+  {cat:'⚡ ネオン',name:'ネオンレッド', bg:'#0f0000',bg2:null,         accent:'#dc2626',accent2:'#f87171'},
+  // ── サイバーパンク ──
+  {cat:'🤖 サイバー',name:'サイバーパンク',bg:'#0a0010',bg2:'#001a00', accent:'#d946ef',accent2:'#4ade80'},
+  {cat:'🤖 サイバー',name:'ブレードランナー',bg:'#0a0505',bg2:'#001a33',accent:'#f43f5e',accent2:'#38bdf8'},
+  {cat:'🤖 サイバー',name:'マトリックス',bg:'#000a00',bg2:null,        accent:'#22c55e',accent2:'#4ade80'},
+  {cat:'🤖 サイバー',name:'ゴーストシェル',bg:'#020617',bg2:null,      accent:'#818cf8',accent2:'#c084fc'},
+  {cat:'🤖 サイバー',name:'トロン',     bg:'#000820',bg2:null,         accent:'#38bdf8',accent2:'#7dd3fc'},
+  {cat:'🤖 サイバー',name:'アトム',     bg:'#00001a',bg2:'#001a00',    accent:'#38bdf8',accent2:'#4ade80'},
+  // ── モノ ──
+  {cat:'⬛ モノ',name:'ピュアブラック',bg:'#000000',bg2:null,          accent:'#ffffff',accent2:'#d1d5db'},
+  {cat:'⬛ モノ',name:'チャコール',    bg:'#1f2937',bg2:null,          accent:'#9ca3af',accent2:'#d1d5db'},
+  {cat:'⬛ モノ',name:'スレート',      bg:'#0f172a',bg2:null,          accent:'#64748b',accent2:'#94a3b8'},
+  {cat:'⬛ モノ',name:'ホワイト',      bg:'#f9fafb',bg2:null,          accent:'#374151',accent2:'#6b7280'},
 ];
 var currentColorTheme = parseInt(localStorage.getItem('fg_color_theme') || '0');
 function applyColorTheme(idx) {
@@ -3148,8 +3277,17 @@ function applyColorTheme(idx) {
   localStorage.setItem('fg_color_theme', idx);
   var r = document.documentElement.style;
   r.setProperty('--bg', t.bg);
+  // グラデーション背景
+  if (t.bg2) {
+    document.body.style.background = 'linear-gradient(135deg, ' + t.bg + ' 0%, ' + t.bg2 + ' 100%)';
+    document.body.style.backgroundAttachment = 'fixed';
+  } else {
+    document.body.style.background = '';
+    document.body.style.backgroundAttachment = '';
+  }
   // derive bg2/bg3/bg4 from bg
-  var isDark = t.bg.startsWith('#0') || t.bg.startsWith('#1') || t.bg.startsWith('#2') || t.bg === '#020617' || t.bg === '#001a33' || t.bg === '#0a0010' || t.bg === '#001a00' || t.bg === '#00001a' || t.bg === '#1a0a0a' || t.bg === '#1a0a14' || t.bg === '#1c0f05' || t.bg === '#1a1400' || t.bg === '#1a0f00' || t.bg === '#1a0800' || t.bg === '#0d1f0d' || t.bg === '#0a1628' || t.bg === '#282a36' || t.bg === '#0d1117' || t.bg === '#0f0505' || t.bg === '#002d2d' || t.bg === '#001a00' || t.bg === '#00001a' || t.bg === '#1a0500';
+  var bgLum = parseInt(t.bg.slice(1,3),16)*0.299 + parseInt(t.bg.slice(3,5),16)*0.587 + parseInt(t.bg.slice(5,7),16)*0.114;
+  var isDark = bgLum < 100;
   if (isDark) {
     r.setProperty('--bg2', lighten(t.bg, 8));
     r.setProperty('--bg3', lighten(t.bg, 14));
@@ -3186,9 +3324,29 @@ function hexToRgbaCss(hex, a) {
 }
 function renderThemePalette() {
   var el = document.getElementById('theme-palette'); if (!el) return;
-  el.innerHTML = COLOR_THEMES.map(function(t, i) {
-    var sel = i === currentColorTheme;
-    return '<div title="' + t.name + '" onclick="applyColorTheme(' + i + ')" style="aspect-ratio:1;border-radius:8px;background:' + t.bg + ';border:2px solid ' + (sel?t.accent2:'transparent') + ';cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:transform 0.15s;' + (sel?'transform:scale(1.12)':'') + '">' + t.label + '</div>';
+  // カテゴリ別にグループ化
+  var cats = [];
+  var catMap = {};
+  COLOR_THEMES.forEach(function(t, i) {
+    var c = t.cat || 'その他';
+    if (!catMap[c]) { catMap[c] = []; cats.push(c); }
+    catMap[c].push({t:t, i:i});
+  });
+  el.innerHTML = cats.map(function(cat) {
+    var items = catMap[cat].map(function(obj) {
+      var t = obj.t; var i = obj.i;
+      var sel = i === currentColorTheme;
+      var bgStyle = t.bg2
+        ? 'background:linear-gradient(135deg,' + t.bg + ',' + t.bg2 + ')'
+        : 'background:' + t.bg;
+      return '<div title="' + t.name + '" onclick="applyColorTheme(' + i + ')" style="width:28px;height:28px;border-radius:6px;' + bgStyle + ';border:2px solid ' + (sel ? t.accent2 : 'transparent') + ';cursor:pointer;overflow:hidden;position:relative;flex-shrink:0;transition:transform 0.12s;box-shadow:' + (sel?'0 0 0 1px '+t.accent2+',0 2px 6px rgba(0,0,0,0.4)':'0 1px 3px rgba(0,0,0,0.3)') + ';' + (sel?'transform:scale(1.2)':'') + '">' +
+        '<div style="position:absolute;bottom:0;left:0;right:0;height:38%;background:' + t.accent + ';opacity:0.85"></div>' +
+        '</div>';
+    }).join('');
+    return '<div style="margin-bottom:8px">' +
+      '<div style="font-size:9px;color:var(--text3);margin-bottom:4px;font-weight:600;letter-spacing:0.5px">' + cat + '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:4px">' + items + '</div>' +
+    '</div>';
   }).join('');
 }
 // Apply saved theme on load
@@ -3279,12 +3437,50 @@ function buildBadges() {
     {id:'year1',icon:'🎂',name:'1年継続',desc:'365日継続した',check:function(st,str){return str>=365;}},
     {id:'tag_user',icon:'🏷️',name:'タグ活用',desc:'タグを初めて使った',check:function(){return JSON.parse(localStorage.getItem('fg_tags')||'[]').length>0;}},
     {id:'weak_0',icon:'💪',name:'弱点克服',desc:'苦手問題0達成',check:function(st){return Object.keys(st).length>10&&!Object.keys(st).some(function(p){return st[p]&&st[p].result==='batu'&&(st[p].reviews||[]).length<3;});}},
+    {id:'time_30',icon:'⏱️',name:'30分学習',desc:'累計30分以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=1800;}},
+    {id:'time_60',icon:'⏰',name:'1時間突破',desc:'累計1時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=3600;}},
+    {id:'time_300',icon:'🕐',name:'5時間の壁',desc:'累計5時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=18000;}},
+    {id:'time_600',icon:'🕙',name:'10時間達成',desc:'累計10時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=36000;}},
+    {id:'time_1800',icon:'🌙',name:'30時間の猛者',desc:'累計30時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=108000;}},
+    {id:'time_3600',icon:'🌟',name:'60時間マスター',desc:'累計60時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=216000;}},
+    {id:'time_7200',icon:'🏆',name:'100時間の伝説',desc:'累計100時間以上勉強した',check:function(){return parseInt(localStorage.getItem('fg_total_time')||'0')>=360000;}},
   ];
   specials.forEach(function(s) { list.push(s); });
   // 残り埋め
-  var extras = ['微分の達人','積分の達人','三角の達人','対数の達人','数列の達人','ベクトルの達人','確率の達人','図形の達人','方程式の達人','式の達人','朝型学習者','夜型学習者','週末戦士','平日の猛者','春の学習者','夏の学習者','秋の学習者','冬の学習者','雨の日学習者','晴れの日学習者','速習者','丁寧な学習者','タグコレクター','メモ職人','復習の鬼','完璧主義者','マイペース','集中力の鬼','ラストスパート','逆境の勇者','粘り強い学習者'];
-  var eEmoji = ['∂','∫','🔺','📉','∑','→','σ','△','≡','±','🌄','🌃','⚔️','🏙️','🌸','☀️','🍂','❄️','🌧️','🌞','⚡','🔍','🏷️','✍️','🔄','✅','🐢','🎯','🚀','🔥','🌱'];
-  extras.forEach(function(name,i) { if (list.length < 200) list.push({ id:'extra_'+i, icon:eEmoji[i%eEmoji.length], name:name, desc:name+'バッジ', check:null }); });
+  var extrasData = [
+    {name:'微分の達人', icon:'∂', desc:'微分を含む問題を10問学習した', check:function(st){return Object.keys(st).filter(function(p){return /^[0-9]/.test(p);}).length>=10;}},
+    {name:'積分の達人', icon:'∫', desc:'積分を含む問題を10問学習した', check:function(st){return Object.keys(st).filter(function(p){return /^[0-9]/.test(p);}).length>=20;}},
+    {name:'三角の達人', icon:'🔺', desc:'30問以上を学習した', check:function(st){return Object.keys(st).length>=30;}},
+    {name:'対数の達人', icon:'📉', desc:'40問以上を学習した', check:function(st){return Object.keys(st).length>=40;}},
+    {name:'数列の達人', icon:'∑', desc:'50問以上を学習した', check:function(st){return Object.keys(st).length>=50;}},
+    {name:'ベクトルの達人', icon:'→', desc:'60問以上を学習した', check:function(st){return Object.keys(st).length>=60;}},
+    {name:'確率の達人', icon:'σ', desc:'70問以上を学習した', check:function(st){return Object.keys(st).length>=70;}},
+    {name:'図形の達人', icon:'△', desc:'80問以上を学習した', check:function(st){return Object.keys(st).length>=80;}},
+    {name:'方程式の達人', icon:'≡', desc:'90問以上を学習した', check:function(st){return Object.keys(st).length>=90;}},
+    {name:'式の達人', icon:'±', desc:'100問以上を学習した', check:function(st){return Object.keys(st).length>=100;}},
+    {name:'朝型学習者', icon:'🌄', desc:'6〜9時台に10回以上学習した', check:function(st){var c=0;Object.keys(st).forEach(function(p){var s=st[p];if(!s)return;var h=new Date(s.actualLearnedAt||s.learnedAt).getHours();if(h>=6&&h<10)c++;});return c>=10;}},
+    {name:'夜型学習者', icon:'🌃', desc:'22〜25時台に10回以上学習した', check:function(st){var c=0;Object.keys(st).forEach(function(p){var s=st[p];if(!s)return;var h=new Date(s.actualLearnedAt||s.learnedAt).getHours();if(h>=22)c++;});return c>=10;}},
+    {name:'週末戦士', icon:'⚔️', desc:'土日に合計20問以上学習した', check:function(st){var c=0;Object.keys(st).forEach(function(p){var s=st[p];if(!s)return;var d=new Date(s.actualLearnedAt||s.learnedAt).getDay();if(d===0||d===6)c++;});return c>=20;}},
+    {name:'平日の猛者', icon:'🏙️', desc:'平日だけで30問以上学習した', check:function(st){var c=0;Object.keys(st).forEach(function(p){var s=st[p];if(!s)return;var d=new Date(s.actualLearnedAt||s.learnedAt).getDay();if(d>=1&&d<=5)c++;});return c>=30;}},
+    {name:'春の学習者', icon:'🌸', desc:'3〜5月に学習した記録がある', check:function(st){return Object.keys(st).some(function(p){var s=st[p];if(!s)return false;var m=new Date(s.actualLearnedAt||s.learnedAt).getMonth();return m>=2&&m<=4;});}},
+    {name:'夏の学習者', icon:'☀️', desc:'6〜8月に学習した記録がある', check:function(st){return Object.keys(st).some(function(p){var s=st[p];if(!s)return false;var m=new Date(s.actualLearnedAt||s.learnedAt).getMonth();return m>=5&&m<=7;});}},
+    {name:'秋の学習者', icon:'🍂', desc:'9〜11月に学習した記録がある', check:function(st){return Object.keys(st).some(function(p){var s=st[p];if(!s)return false;var m=new Date(s.actualLearnedAt||s.learnedAt).getMonth();return m>=8&&m<=10;});}},
+    {name:'冬の学習者', icon:'❄️', desc:'12〜2月に学習した記録がある', check:function(st){return Object.keys(st).some(function(p){var s=st[p];if(!s)return false;var m=new Date(s.actualLearnedAt||s.learnedAt).getMonth();return m===11||m<=1;});}},
+    {name:'雨の日学習者', icon:'🌧️', desc:'5日以上連続で学習した', check:function(st,str){return str>=5;}},
+    {name:'晴れの日学習者', icon:'🌞', desc:'10日以上連続で学習した', check:function(st,str){return str>=10;}},
+    {name:'速習者', icon:'⚡', desc:'1日に10問以上学習した', check:function(st){var today=new Date();today.setHours(0,0,0,0);var ts=today.getTime();return Object.keys(st).filter(function(p){var s=st[p];if(!s)return false;var d=new Date(s.actualLearnedAt||s.learnedAt);d.setHours(0,0,0,0);return d.getTime()===ts;}).length>=10;}},
+    {name:'丁寧な学習者', icon:'🔍', desc:'メモつきの問題が20問以上ある', check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].memo;}).length>=20;}},
+    {name:'タグコレクター', icon:'🏷️', desc:'3種類以上のタグを作成した', check:function(){return JSON.parse(localStorage.getItem('fg_tags')||'[]').length>=3;}},
+    {name:'メモ職人', icon:'✍️', desc:'30問以上にメモを書いた', check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].memo;}).length>=30;}},
+    {name:'復習の鬼', icon:'🔄', desc:'合計50回以上復習した', check:function(st){return Object.keys(st).reduce(function(a,p){return a+(st[p]?(st[p].reviews||[]).length:0);},0)>=50;}},
+    {name:'完璧主義者', icon:'✅', desc:'20問以上を3回以上復習して完全習得した', check:function(st){return Object.keys(st).filter(function(p){return st[p]&&(st[p].reviews||[]).length>=3&&st[p].result==='maru';}).length>=20;}},
+    {name:'マイペース', icon:'🐢', desc:'30日以上かけてコツコツ学習を続けた', check:function(st,str){return str>=30;}},
+    {name:'集中力の鬼', icon:'🎯', desc:'1日に20問以上学習した', check:function(st){var today=new Date();today.setHours(0,0,0,0);var ts=today.getTime();return Object.keys(st).filter(function(p){var s=st[p];if(!s)return false;var d=new Date(s.actualLearnedAt||s.learnedAt);d.setHours(0,0,0,0);return d.getTime()===ts;}).length>=20;}},
+    {name:'ラストスパート', icon:'🚀', desc:'試験日まで7日以内に10問以上学習した', check:function(st){var exam=JSON.parse(localStorage.getItem('fg_exam')||'null');if(!exam||!exam.date)return false;var diff=Math.ceil((new Date(exam.date)-new Date())/86400000);return diff>=0&&diff<=7&&Object.keys(st).length>=10;}},
+    {name:'逆境の勇者', icon:'🔥', desc:'×問題を10問以上○に変えた', check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].result==='maru'&&(st[p].reviews||[]).length>=1;}).length>=10;}},
+    {name:'粘り強い学習者', icon:'🌱', desc:'14日以上継続して学習した', check:function(st,str){return str>=14;}},
+  ];
+  extrasData.forEach(function(b,i) { if (list.length < 200) list.push({ id:'extra_'+i, icon:b.icon, name:b.name, desc:b.desc, check:b.check }); });
   while (list.length > 200) list.pop();
   return list;
 }
@@ -3362,15 +3558,34 @@ function checkBadges() {
 function showBadgeFlash(b) {
   var el = document.createElement('div');
   el.className = 'badge-flash';
+  var streak = getStreakCount();
+  var shareText = b.icon + ' バッジ獲得！「' + b.name + '」\n🔥 ストリーク ' + streak + '日 #FocusGold学習記録';
   el.innerHTML = '<div class="badge-flash-card"><div style="font-size:44px;margin-bottom:10px">' + b.icon + '</div>' +
     '<div style="font-size:13px;color:var(--accent2);font-weight:700;margin-bottom:4px">🏅 バッジ獲得！</div>' +
     '<div style="font-size:16px;font-weight:800">' + b.name + '</div>' +
-    '<div style="font-size:11px;color:var(--text3);margin-top:5px">' + b.desc + '</div></div>';
+    '<div style="font-size:11px;color:var(--text3);margin-top:5px;margin-bottom:12px">' + b.desc + '</div>' +
+    '<button onclick="shareAchievement(' + JSON.stringify(shareText) + ')" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 18px;cursor:pointer;font-family:inherit">📤 シェアする</button></div>';
   document.body.appendChild(el);
   playBadgeSound();
-  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3800);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 5000);
   launchConfetti();
 }
+
+window.shareAchievement = function(text) {
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 クリップボードにコピーしました！');
+    }).catch(function() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('📋 コピーしました！');
+    });
+  }
+};
 // ===== XP SYSTEM =====
 function getTotalXP() {
   var xp = 0;
