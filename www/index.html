@@ -1201,23 +1201,52 @@ auth.onAuthStateChanged(function(user) {
 });
 
 // ===== FIRESTORE =====
+// 問題単位で新しい方を採用してマージ
+function mergeStates(local, remote) {
+  var merged = Object.assign({}, remote);
+  Object.keys(local).forEach(function(pid) {
+    var l = local[pid], r = remote[pid];
+    if (!r) {
+      merged[pid] = l; // リモートにない → ローカルを採用
+    } else {
+      // updatedAt / lastReviewAt / learnedAt の最新を優先
+      var lTs = l.lastReviewAt || l.learnedAt || 0;
+      var rTs = r.lastReviewAt || r.learnedAt || 0;
+      merged[pid] = lTs >= rTs ? l : r;
+    }
+  });
+  return merged;
+}
+
 async function loadFromFirestore(uid) {
+  var localState   = JSON.parse(localStorage.getItem('fg_state')   || '{}');
+  var localStateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
+  var localTs      = parseInt(localStorage.getItem('fg_updatedAt') || '0');
   try {
     var snap = await db.collection('users').doc(uid).get();
     if (snap.exists) {
-      state = snap.data().state || {};
-      stateEx = snap.data().stateEx || {};
+      var data = snap.data();
+      var remoteTs = data.updatedAt || 0;
+      // 両方にデータがある → 問題単位でマージ
+      state   = mergeStates(localState,   data.state   || {});
+      stateEx = mergeStates(localStateEx, data.stateEx || {});
+      // マージ結果をすぐ保存（次回起動時に備えて）
+      localStorage.setItem('fg_state',     JSON.stringify(state));
+      localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
+      // ローカルの方が新しければ Firestore へ push
+      if (localTs > remoteTs) {
+        await saveToFirestore(uid);
+      }
     } else {
-      var local = localStorage.getItem('fg_state');
-      state = local ? JSON.parse(local) : {};
-      stateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
-      if (local) await saveToFirestore(uid);
+      // Firestore にまだデータなし → ローカルをそのまま使ってアップ
+      state   = localState;
+      stateEx = localStateEx;
+      if (Object.keys(state).length > 0) await saveToFirestore(uid);
     }
   } catch(e) {
     console.warn('Firestore load error:', e);
-    var local = localStorage.getItem('fg_state');
-    state = local ? JSON.parse(local) : {};
-    stateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}');
+    state   = localState;
+    stateEx = localStateEx;
     setStatus('offline');
   }
 }
@@ -1225,20 +1254,26 @@ async function loadFromFirestore(uid) {
 async function saveToFirestore(uid) {
   var targetUid = uid || currentUid;
   if (!targetUid) return;
+  var now = Date.now();
   try {
     setStatus('syncing');
-    await db.collection('users').doc(targetUid).set({ state: state, stateEx: stateEx, updatedAt: Date.now() });
-    localStorage.setItem('fg_state', JSON.stringify(state));
-    localStorage.setItem('fg_stateEx', JSON.stringify(stateEx));
+    // merge:true で既存フィールドを消さずに更新
+    await db.collection('users').doc(targetUid).set(
+      { state: state, stateEx: stateEx, updatedAt: now },
+      { merge: true }
+    );
+    localStorage.setItem('fg_state',     JSON.stringify(state));
+    localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
+    localStorage.setItem('fg_updatedAt', String(now));
     setStatus('online');
     var el = document.getElementById('sync-status');
     if (el) el.textContent = '同期済み ' + new Date().toLocaleTimeString('ja-JP');
   } catch(e) {
     console.warn('Firestore save error:', e);
-    localStorage.setItem('fg_state', JSON.stringify(state));
-    localStorage.setItem('fg_stateEx', JSON.stringify(stateEx));
+    localStorage.setItem('fg_state',     JSON.stringify(state));
+    localStorage.setItem('fg_stateEx',   JSON.stringify(stateEx));
+    localStorage.setItem('fg_updatedAt', String(now));
     setStatus('offline');
-    // オフライン時は再接続時に自動アップロード
     window._pendingUpload = true;
   }
 }
@@ -2408,10 +2443,7 @@ async function loadExFromFirestore(uid) {
 function saveStateEx() {
   localStorage.setItem('fg_stateEx', JSON.stringify(stateEx));
   if (typeof saveTimeout !== 'undefined' && saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(function() {
-    if (!currentUid) return;
-    db.collection('users').doc(currentUid).set({ state: state, stateEx: stateEx, updatedAt: Date.now() }, { merge: true }).catch(function(){});
-  }, 800);
+  saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
 }
 
 // ===== TIMER =====
