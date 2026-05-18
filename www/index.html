@@ -610,6 +610,11 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div class="page-title">今日のタスク</div>
       <div class="page-sub" id="today-date"></div>
     </div>
+    <!-- 今日のひとこと -->
+    <div id="daily-message-card" style="background:linear-gradient(135deg,var(--accent-bg),var(--bg2));border:1px solid rgba(108,99,255,0.2);border-radius:var(--radius-lg);padding:13px 15px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="loadDailyMessage()">
+      <span style="font-size:20px;flex-shrink:0">✨</span>
+      <div style="flex:1"><div style="font-size:10px;color:var(--accent2);font-weight:700;margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px">今日のひとこと</div><div id="daily-message-text" style="font-size:13px;color:var(--text);line-height:1.5">タップして取得...</div></div>
+    </div>
     <div id="streak-alert" class="streak-alert" style="display:none">🔥 今日まだ0問！ストリークが途切れる前に1問やろう！</div>
     <div id="countdown-banner" style="display:none" class="countdown-banner">
       <div class="countdown-days" id="countdown-days">-</div>
@@ -712,6 +717,13 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div class="cal-grid" id="cal-grid"></div>
     </div>
     <div class="chart-card">
+      <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>🏆 今週の学習ランキング（匿名）</span>
+        <button onclick="loadRanking()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-size:11px;padding:4px 10px;cursor:pointer;font-family:inherit">更新</button>
+      </div>
+      <div id="ranking-list"><div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">「更新」を押すとランキングを表示します</div></div>
+    </div>
+    <div class="chart-card">
       <div class="chart-title">週別学習数（過去8週）</div>
       <div class="bar-chart" id="weekly-chart"></div>
     </div>
@@ -797,6 +809,16 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <div id="total-time-display" style="font-size:28px;font-weight:800;color:var(--accent2)">0分</div>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">モーダルタイマー計測分の合計</div>
       </div>
+      <div class="chart-card">
+        <div class="chart-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>🕐 解答時間 ランキング（上位10問）</span>
+        </div>
+        <div id="solve-time-list"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">❌ ミスの理由 分析</div>
+        <div id="miss-reason-chart"></div>
+      </div>
     </div>
   </div>
 
@@ -807,6 +829,7 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <button class="sub-tab active" id="mtab-search" onclick="switchMemoTab('search')">🔍 メモ検索</button>
       <button class="sub-tab" id="mtab-tags" onclick="switchMemoTab('tags')">🏷 タグ管理</button>
       <button class="sub-tab" id="mtab-projects" onclick="switchMemoTab('projects')">📁 プロジェクト</button>
+      <button class="sub-tab" id="mtab-notes" onclick="switchMemoTab('notes')">📔 自由メモ</button>
     </div>
     <div id="memo-search-panel">
       <div class="memo-search-wrap">
@@ -829,6 +852,16 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     <div id="memo-projects-panel" style="display:none">
       <div id="projects-list"></div>
       <button class="modal-btn" style="margin-top:8px" onclick="openNewProject()">＋ 新規プロジェクト</button>
+    </div>
+    <div id="memo-notes-panel" style="display:none">
+      <div class="settings-card">
+        <div class="settings-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📔 自由メモ</span>
+          <button onclick="addFreeNote()" style="background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:5px 12px;cursor:pointer;font-family:inherit">＋ 追加</button>
+        </div>
+        <textarea id="free-note-input" class="memo-input" placeholder="自由にメモを書こう（学習の気づき・作戦・目標など）..." style="min-height:80px;margin-bottom:8px"></textarea>
+      </div>
+      <div id="free-notes-list"></div>
     </div>
   </div>
 
@@ -1823,7 +1856,13 @@ async function saveToFirestore(uid) {
 }
 
 function saveState() {
-  if (currentBook === 'seminar') stateSeminar = state; else stateFocusGold = state;
+  // Sync active pointer back to named book var
+  if (currentBook === 'seminar')    stateSeminar    = state;
+  else if (currentBook === 'excel-chem') stateExcelChem = state;
+  else if (currentBook === 'chem-jyuyo') stateChemJyuyo = state;
+  else if (currentBook === 'fg3')   stateFg3        = state;
+  else if (currentBook === 'fg1')   stateFg1        = state;
+  else stateFocusGold = state;
   localStorage.setItem(localKey(), JSON.stringify(state));
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
@@ -2943,6 +2982,26 @@ function historyGraphHTML(pid) {
     }).join('') + '</div></div>';
 }
 
+function missReasonHTML(pid) {
+  var saved = (state[pid] && state[pid].missReason) || '';
+  var reasons = ['計算ミス','概念理解不足','問題文読み違い','解法知らず','時間不足','その他'];
+  return '<div id="miss-reason-row" style="margin-bottom:10px;display:' + (((state[pid]&&state[pid].result)||'maru')==='batu'?'':'none') + '">' +
+    '<div style="font-size:11px;color:var(--red);margin-bottom:5px">❌ ミスの理由（×のとき）</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:4px">' +
+    reasons.map(function(r) {
+      return '<button class="tag-chip' + (saved===r?' active':'') + '" id="mr-chip-' + encodeURIComponent(r) + '" onclick="selectMissReason(\'' + r.replace(/'/g,"\\'") + '\')" style="font-size:10px">' + r + '</button>';
+    }).join('') + '</div></div>';
+}
+function getMissReason() {
+  var active = document.querySelector('#miss-reason-row .tag-chip.active');
+  return active ? active.textContent : '';
+}
+window.selectMissReason = function(r) {
+  document.querySelectorAll('#miss-reason-row .tag-chip').forEach(function(b) {
+    b.classList.toggle('active', b.textContent === r);
+  });
+};
+
 function memoHTML(pid) {
   var memo = (state[pid] && state[pid].memo) || '';
   var savedTags = (state[pid] && state[pid].tags) || [];
@@ -2966,7 +3025,11 @@ function memoHTML(pid) {
     [1,2,3].map(function(n) {
       return '<button id="imp-star-'+n+'" onclick="selectImportance('+n+')" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0;line-height:1;color:' + (n<=savedImportance?'var(--amber)':'var(--bg4)') + '">★</button>';
     }).join('') + '</div>';
+  var prevTime = (state[pid] && state[pid].lastTime) ? state[pid].lastTime : 0;
+  var timeStr = prevTime > 0 ? '⏱ 前回: ' + Math.floor(prevTime/60) + '分' + (prevTime%60) + '秒' : '';
   return '<div class="memo-label">📝 メモ</div>' +
+    (timeStr ? '<div style="font-size:10px;color:var(--blue);margin-bottom:5px">' + timeStr + '</div>' : '') +
+    missReasonHTML(pid) +
     (memo ? '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap">📌 前回のメモ: ' + memo.replace(/</g,'&lt;') + '</div>' : '') +
     '<textarea class="memo-input" id="prob-memo" placeholder="ここにメモを入力...">' + memo + '</textarea>' +
     '<div class="tag-area"><div class="tag-label">🎯 難易度</div>' + diffHtml +
@@ -2993,6 +3056,8 @@ window.selectResult = function(key) {
     var el = document.getElementById('ropt-' + k);
     if (el) el.className = 'result-opt' + (k === key ? ' selected-' + k : '');
   });
+  var mr = document.getElementById('miss-reason-row');
+  if (mr) mr.style.display = key === 'batu' ? '' : 'none';
 };
 
 window.openTaskModal = function(pid) {
@@ -3188,7 +3253,7 @@ function showNextProblemPrompt(donePid) {
 window.learnProblem = function() {
   var nowTs = Date.now();
   var sm2 = sm2NextInterval({reviews:[], ef: SM2_DEFAULT_EF}, pendingResult);
-  state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], reviewResults: [], result: pendingResult, firstResult: pendingResult, memo: getMemo(), tags: getModalTags(),
+  state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], reviewResults: [], result: pendingResult, firstResult: pendingResult, memo: getMemo(), tags: getModalTags(), missReason: getMissReason(),
     ef: sm2.ef, lastInterval: sm2.interval, lastReviewAt: todayTs(), sm2Active: true,
     difficulty: getModalDifficulty(), importance: getModalImportance() };
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
@@ -3219,6 +3284,7 @@ window.reviewProblem = function() {
   state[modalPid].result = pendingResult;
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
+  state[modalPid].missReason = getMissReason();
   state[modalPid].ef = sm2.ef;
   state[modalPid].lastInterval = interval;
   state[modalPid].lastReviewAt = todayTs();
@@ -3285,7 +3351,7 @@ window.showTab = function(t) {
     var bn = document.getElementById('bn-' + id);
     if (bn) bn.classList.toggle('active', id === t);
   });
-  if (t === 'today') { renderToday(); renderCountdown(); }
+  if (t === 'today') { renderToday(); renderCountdown(); setTimeout(loadDailyMessage, 300); }
   if (t === 'calendar') { initCal(); renderCalendar(); render30DayStreak(); renderWeeklyReport(); }
   if (t === 'settings') { setTimeout(applySM2Inputs, 50); setTimeout(renderThemePalette, 60); }
   if (t === 'progress') {
@@ -3310,11 +3376,11 @@ window.switchProgressTab = function(tab) {
   if (tab === 'badges') renderBadges();
   if (tab === 'example' && currentBook !== 'seminar') renderProgressEx();
   if (tab === 'practice') renderProgress();
-  if (tab === 'trends') { renderBestTime(); renderSparklines(); }
+  if (tab === 'trends') { renderBestTime(); renderSparklines(); renderMissReasonChart(); renderSolveTimeRanking(); }
 };
 
 window.switchMemoTab = function(tab) {
-  ['search','tags','projects'].forEach(function(id) {
+  ['search','tags','projects','notes'].forEach(function(id) {
     var el = document.getElementById('memo-' + id + '-panel');
     if (el) el.style.display = id === tab ? '' : 'none';
     var st = document.getElementById('mtab-' + id);
@@ -3322,6 +3388,7 @@ window.switchMemoTab = function(tab) {
   });
   if (tab === 'tags') renderMemoTags();
   if (tab === 'projects') renderProjects();
+  if (tab === 'notes') renderFreeNotes();
 };
 
 // ===== TOAST =====
@@ -3387,19 +3454,16 @@ async function loadExFromFirestore(uid) {
   } catch(e) { stateEx = JSON.parse(localStorage.getItem('fg_stateEx') || '{}'); }
 }
 function saveStateEx() {
-  var lsKey = currentBook === 'seminar' ? 'sm_stateEx' : 'fg_stateEx';
-  localStorage.setItem(lsKey, JSON.stringify(stateEx));
+  localStorage.setItem(localKeyEx(), JSON.stringify(stateEx));
   // sync back to named vars
-  if (currentBook === 'seminar') stateSeminarEx = stateEx; else stateExFocusGold = stateEx;
+  if (currentBook === 'seminar')    stateSeminarEx    = stateEx;
+  else if (currentBook === 'excel-chem') stateExcelChemEx = stateEx;
+  else if (currentBook === 'chem-jyuyo') stateChemJyuyoEx = stateEx;
+  else if (currentBook === 'fg3')   stateFg3Ex        = stateEx;
+  else if (currentBook === 'fg1')   stateFg1Ex        = stateEx;
+  else stateExFocusGold = stateEx;
   if (typeof saveTimeout !== 'undefined' && saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(function() {
-    if (!currentUid) return;
-    db.collection('users').doc(currentUid).set({
-      state: stateFocusGold, stateEx: stateExFocusGold,
-      stateSeminar: stateSeminar, stateSeminarEx: stateSeminarEx,
-      updatedAt: Date.now()
-    }, { merge: true }).catch(function(){});
-  }, 800);
+  saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
 }
 
 // ===== TIMER =====
@@ -3703,7 +3767,12 @@ function buildBadges() {
     list.push({ id:'chm_'+i, icon:'🌟', name:ch.name.replace(/第[^章]+章 /,'')+'完全習得', desc:ch.name+'をすべて習得', check:function(st){return getProblems(ch).every(function(p){return st[p]&&(st[p].reviews||[]).length>=3;});} });
   });
   var specials = [
-    {id:'memo_1',icon:'📝',name:'初メモ',desc:'初めてメモを書いた',check:function(st){return Object.keys(st).some(function(p){return st[p]&&st[p].memo;});}},
+    {id:'batu2maru_10',icon:'🔄',name:'逆転10回',desc:'×から○に変えた問題が10問',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].result==='maru'&&st[p].firstResult==='batu';}).length>=10;}},
+    {id:'batu2maru_30',icon:'🌟',name:'逆転の達人',desc:'×から○に変えた問題が30問',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].result==='maru'&&st[p].firstResult==='batu';}).length>=30;}},
+    {id:'miss_reason_1',icon:'🔬',name:'原因分析家',desc:'ミスの理由を初めて記録',check:function(st){return Object.keys(st).some(function(p){return st[p]&&st[p].missReason;});}},
+    {id:'miss_reason_20',icon:'🧠',name:'弱点分析マスター',desc:'ミスの理由を20問記録',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].missReason;}).length>=20;}},
+    {id:'speed_10',icon:'⚡',name:'スピードスター',desc:'10問以上の解答時間を記録',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].lastTime;}).length>=10;}},
+    {id:'free_note_1',icon:'📔',name:'ノート開始',desc:'自由メモを初めて書いた',check:function(){return JSON.parse(localStorage.getItem('fg_free_notes')||'[]').length>0;}},
     {id:'memo_10',icon:'📓',name:'メモ魔10',desc:'10問にメモ',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].memo;}).length>=10;}},
     {id:'memo_50',icon:'📒',name:'メモ魔50',desc:'50問にメモ',check:function(st){return Object.keys(st).filter(function(p){return st[p]&&st[p].memo;}).length>=50;}},
     {id:'first_review',icon:'🔁',name:'初復習',desc:'初めて復習した',check:function(st){return Object.keys(st).some(function(p){return st[p]&&(st[p].reviews||[]).length>0;});}},
@@ -4654,7 +4723,165 @@ function playWarpTransition(label, accentColor, onMidpoint) {
   animId = requestAnimationFrame(draw);
 }
 
+
+// ===== FREE NOTES =====
+function getFreeNotes() { return JSON.parse(localStorage.getItem('fg_free_notes') || '[]'); }
+function saveFreeNotes(notes) { localStorage.setItem('fg_free_notes', JSON.stringify(notes)); }
+window.addFreeNote = function() {
+  var inp = document.getElementById('free-note-input');
+  var text = inp ? inp.value.trim() : '';
+  if (!text) return;
+  var notes = getFreeNotes();
+  notes.unshift({ id: Date.now(), text: text, date: new Date().toISOString() });
+  saveFreeNotes(notes);
+  if (inp) inp.value = '';
+  renderFreeNotes();
+  checkBadges();
+  showToast('📔 メモを追加しました');
+};
+window.deleteFreeNote = function(id) {
+  var notes = getFreeNotes().filter(function(n) { return n.id !== id; });
+  saveFreeNotes(notes);
+  renderFreeNotes();
+};
+window.renderFreeNotes = function() {
+  var el = document.getElementById('free-notes-list');
+  if (!el) return;
+  var notes = getFreeNotes();
+  if (notes.length === 0) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📔</div>メモがありません</div>'; return; }
+  el.innerHTML = notes.map(function(n) {
+    var d = new Date(n.date).toLocaleDateString('ja-JP', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 13px;margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
+        '<span style="font-size:10px;color:var(--text3)">' + d + '</span>' +
+        '<button onclick="deleteFreeNote(' + n.id + ')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:0">×</button>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--text);white-space:pre-wrap;line-height:1.6">' + n.text.replace(/</g,'&lt;') + '</div>' +
+    '</div>';
+  }).join('');
+};
+
+// ===== TODAY'S MESSAGE (AI-powered) =====
+var _msgCache = null, _msgCacheKey = '';
+async function loadDailyMessage() {
+  var el = document.getElementById('daily-message-text');
+  if (!el) return;
+  var totalLearned = Object.keys(state).length;
+  var streak = getStreakCount();
+  var exam = JSON.parse(localStorage.getItem('fg_exam') || 'null');
+  var daysLeft = exam && exam.date ? Math.ceil((new Date(exam.date) - new Date()) / 86400000) : -1;
+  var cacheKey = [totalLearned, streak, daysLeft, new Date().toDateString()].join(':');
+  if (_msgCacheKey === cacheKey && _msgCache) { el.textContent = _msgCache; return; }
+  el.textContent = '今日のメッセージを取得中...';
+  try {
+    var prompt = '高校生の数学・理科の学習アプリユーザーへの短い励ましメッセージを1文（30〜50文字）で書いてください。学習済み問題数=' + totalLearned + '問、連続学習=' + streak + '日' + (daysLeft > 0 ? '、試験まで' + daysLeft + '日' : '') + '。元気が出る具体的なひとことを。';
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:100, messages:[{role:'user',content:prompt}] })
+    });
+    var data = await resp.json();
+    var msg = (data.content && data.content[0] && data.content[0].text) || '今日も一歩ずつ！積み重ねが力になる 💪';
+    _msgCache = msg; _msgCacheKey = cacheKey;
+    el.textContent = msg;
+  } catch(e) {
+    var totalLearned2 = Object.keys(state).length, streak2 = getStreakCount();
+    var fallbacks = [
+      '今日の1問が、明日の自信になる ✨',
+      'わからなかった問題が、一番の先生だ 📚',
+      '継続は力なり。今日も着実に進もう 🔥',
+      streak2 + '日連続！この調子で突き進め 💪',
+      totalLearned2 + '問突破！次の目標が見えてきた 🎯'
+    ];
+    var msg2 = fallbacks[Math.floor(Date.now() / 86400000) % fallbacks.length];
+    _msgCache = msg2; _msgCacheKey = cacheKey;
+    el.textContent = msg2;
+  }
+}
+
+// ===== WEEKLY RANKING =====
+async function loadRanking() {
+  var el = document.getElementById('ranking-list');
+  if (!el) return;
+  el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px">読み込み中...</div>';
+  try {
+    var bookKey = currentBook || 'focusgold';
+    var weekStart = new Date(); weekStart.setHours(0,0,0,0); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    var weekSolves = 0;
+    Object.keys(state).forEach(function(pid) {
+      var s = state[pid]; if (!s) return;
+      function chk(ts) { if (ts >= weekStart.getTime()) weekSolves++; }
+      chk(s.learnedAt); (s.reviews||[]).forEach(chk);
+    });
+    if (currentUid && weekSolves > 0) {
+      var rankId = currentUid.slice(0,8);
+      var rankObj = {}; rankObj[rankId] = { score: weekSolves, ts: Date.now(), streak: getStreakCount() };
+      await db.collection('rankings').doc(bookKey + '_week').set(rankObj, { merge: true }).catch(function(){});
+    }
+    var snap = await db.collection('rankings').doc(bookKey + '_week').get();
+    if (!snap.exists) { el.innerHTML = '<div class="empty-state">まだランキングデータがありません</div>'; return; }
+    var data = snap.data();
+    var entries = Object.keys(data).map(function(k) { return { id: k, score: data[k].score||0, streak: data[k].streak||0 }; });
+    entries.sort(function(a,b){ return b.score - a.score; });
+    var myId = currentUid ? currentUid.slice(0,8) : '';
+    el.innerHTML = entries.slice(0,20).map(function(e, i) {
+      var isMe = e.id === myId;
+      var medal = ['🥇','🥈','🥉'][i] || (i+1) + '.';
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);background:' + (isMe?'var(--accent-bg)':'var(--bg3)') + ';border:1px solid ' + (isMe?'var(--accent)':'var(--border)') + ';margin-bottom:5px">' +
+        '<span style="font-size:16px;min-width:28px">' + medal + '</span>' +
+        '<span style="font-size:11px;color:var(--text3);min-width:60px">' + e.id + (isMe?' <span style="color:var(--accent2)">(あなた)</span>':'') + '</span>' +
+        '<span style="font-size:15px;font-weight:700;color:var(--accent2);flex:1">' + e.score + '問</span>' +
+        '<span style="font-size:11px;color:var(--amber)">🔥' + e.streak + '</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty-state">ランキングを読み込めませんでした<br><span style="font-size:11px;color:var(--text3)">Firestoreルールでrankingsコレクションの読み書きを許可してください</span></div>';
+  }
+}
+window.loadRanking = loadRanking;
+
+// ===== MISS REASON ANALYSIS =====
+function renderMissReasonChart() {
+  var el = document.getElementById('miss-reason-chart');
+  if (!el) return;
+  var counts = {};
+  Object.keys(state).forEach(function(pid) {
+    var s = state[pid];
+    if (s && s.missReason) counts[s.missReason] = (counts[s.missReason] || 0) + 1;
+  });
+  var entries = Object.keys(counts).map(function(k){ return [k, counts[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+  if (entries.length === 0) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">×のとき「ミスの理由」を記録するとここに表示されます</div>'; return; }
+  var max = entries[0][1];
+  el.innerHTML = entries.map(function(kv) {
+    var pct = Math.round(kv[1]/max*100);
+    return '<div style="margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>' + kv[0] + '</span><span style="color:var(--accent2)">' + kv[1] + '問</span></div>' +
+      '<div style="height:6px;background:var(--bg4);border-radius:3px"><div style="height:100%;width:' + pct + '%;background:var(--red);border-radius:3px;transition:width 0.5s"></div></div>' +
+    '</div>';
+  }).join('');
+}
+
+// ===== SOLVE TIME RANKING =====
+function renderSolveTimeRanking() {
+  var el = document.getElementById('solve-time-list');
+  if (!el) return;
+  var timed = Object.keys(state).filter(function(pid) { return state[pid] && state[pid].lastTime; })
+    .sort(function(a,b) { return (state[b].lastTime||0) - (state[a].lastTime||0); }).slice(0,10);
+  if (timed.length === 0) { el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">モーダルのタイマーで計測した問題が表示されます</div>'; return; }
+  el.innerHTML = timed.map(function(pid, i) {
+    var t = state[pid].lastTime;
+    var m = Math.floor(t/60), s = t%60;
+    var sym = {maru:'○',sanka:'△',batu:'×'}[state[pid].result||'maru'];
+    var col = {maru:'var(--green)',sanka:'var(--amber)',batu:'var(--red)'}[state[pid].result||'maru'];
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+      '<span style="font-size:11px;color:var(--text3);min-width:18px">' + (i+1) + '</span>' +
+      '<span style="font-size:12px;font-weight:700;min-width:52px">問題 ' + pid + '</span>' +
+      '<span style="color:' + col + ';font-weight:700;min-width:20px">' + sym + '</span>' +
+      '<span style="font-size:13px;font-weight:700;color:var(--accent2);flex:1">' + m + ':' + (s<10?'0':'') + s + '</span>' +
+    '</div>';
+  }).join('');
+}
+
 initCal();
-</script>
 </body>
 </html>
