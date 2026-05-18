@@ -850,9 +850,8 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div class="chart-card">
         <div class="chart-title">📈 最適学習時間帯</div>
         <div id="best-time-display" style="font-size:13px;color:var(--text2);padding:6px 0"></div>
-        <div id="hourly-chart" style="display:flex;align-items:flex-end;gap:2px;height:80px;margin-top:10px"></div>
+        <div id="hourly-chart" style="display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:10px"></div>
         <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:4px"><span>0時</span><span>6時</span><span>12時</span><span>18時</span><span>23時</span></div>
-        <div id="hourly-legend" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
       </div>
       <div class="chart-card">
         <div class="chart-title">📊 復習回数ランキング（上位10問）</div>
@@ -862,10 +861,6 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <div class="chart-title">⏱ 累計学習時間</div>
         <div id="total-time-display" style="font-size:28px;font-weight:800;color:var(--accent2)">0分</div>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">モーダルタイマー計測分の合計</div>
-        <div style="margin-top:14px">
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">📋 過去の学習記録</div>
-          <div id="session-history-list" style="font-size:12px;color:var(--text2);max-height:240px;overflow-y:auto"></div>
-        </div>
       </div>
     </div>
   </div>
@@ -965,15 +960,6 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <div><div class="settings-label"><span class="sound-wave">🔊</span> 学習完了音</div></div>
         <button class="toggle" id="sound-toggle" onclick="toggleSound()"></button>
       </div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div class="settings-label">音量調節</div>
-        <div style="display:flex;align-items:center;gap:10px;width:100%">
-          <span style="font-size:12px;color:var(--text3)">🔈</span>
-          <input type="range" id="sound-volume-slider" min="0" max="100" value="50" style="flex:1;accent-color:var(--accent);cursor:pointer" oninput="setSoundVolume(this.value)">
-          <span style="font-size:12px;color:var(--text3)">🔊</span>
-          <span id="sound-volume-label" style="font-size:12px;font-weight:700;color:var(--accent2);min-width:32px;text-align:right">50%</span>
-        </div>
-      </div>
     </div>
     <div class="settings-card">
       <div class="settings-title" style="display:flex;align-items:center;justify-content:space-between">
@@ -1055,11 +1041,6 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     </div>
     <div class="settings-card" id="pomo-card">
       <div class="settings-title">🍅 ポモドーロタイマー</div>
-      <!-- モード切替 -->
-      <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="pomo-mode-countdown" onclick="setPomoMode('countdown')" style="flex:1;padding:7px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">⏱ カウントダウン</button>
-        <button id="pomo-mode-countup" onclick="setPomoMode('countup')" style="flex:1;padding:7px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">⏫ カウントアップ</button>
-      </div>
       <!-- SVG ring timer -->
       <div style="display:flex;flex-direction:column;align-items:center;padding:16px 0 8px">
         <div style="position:relative;width:140px;height:140px">
@@ -1077,7 +1058,7 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <!-- Session dots -->
         <div style="display:flex;gap:6px;margin:10px 0 4px" id="pomo-dots"></div>
         <!-- Cycle config -->
-        <div id="pomo-countdown-config" style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+        <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
           <div style="text-align:center">
             <div style="font-size:10px;color:var(--text3);margin-bottom:3px">集中</div>
             <div style="display:flex;align-items:center;gap:4px">
@@ -1109,24 +1090,6 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
           <button onclick="skipPomoPhase()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:10px 16px;cursor:pointer;font-family:inherit">⏭</button>
         </div>
         <div id="pomo-session-count" style="font-size:11px;color:var(--text3);margin-top:8px">完了セッション: 0</div>
-        <!-- 通知インターバル設定 -->
-        <div style="margin-top:12px;width:100%;background:var(--bg3);border-radius:var(--radius);padding:10px 12px">
-          <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">🔔 定期通知・音楽</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-size:11px;color:var(--text3)">間隔</span>
-            <input type="number" id="pomo-notify-interval" min="5" max="120" value="30" style="width:60px;background:var(--bg4);border:1px solid var(--border2);border-radius:5px;color:var(--text);font-size:12px;padding:4px 7px;font-family:inherit;outline:none">
-            <span style="font-size:11px;color:var(--text3)">分ごと</span>
-            <button class="toggle" id="pomo-notify-toggle" onclick="togglePomoNotify()" style="margin-left:auto"></button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:6px">🎵 チャイム音選択</div>
-          <div style="display:flex;flex-wrap:wrap;gap:4px">
-            <button onclick="selectPomoChime('jingle20')" id="chime-jingle20" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit">🎵 Jingle20</button>
-            <button onclick="selectPomoChime('jingle21')" id="chime-jingle21" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit">🎵 Jingle21</button>
-            <button onclick="selectPomoChime('beep')" id="chime-beep" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--accent);color:#fff;font-size:11px;cursor:pointer;font-family:inherit">🔔 ビープ</button>
-            <button onclick="selectPomoChime('bell')" id="chime-bell" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit">🔔 ベル</button>
-            <button onclick="selectPomoChime('melody')" id="chime-melody" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--bg4);color:var(--text2);font-size:11px;cursor:pointer;font-family:inherit">🎶 メロディ</button>
-          </div>
-        </div>
       </div>
     </div>
     <div class="settings-card">
@@ -2423,80 +2386,35 @@ function renderWeeklyReport() {
 
 // ===== 最適学習時間帯 =====
 function renderBestTime() {
-  // fg_hour_log_v2: {hour: {bookKey: count}} 全参考書を積み上げ棒グラフで表示
-  var logRaw = JSON.parse(localStorage.getItem('fg_hour_log_v2') || '{}');
-  var bookKeys = ['focusgold','seminar','excel-chem','chem-jyuyo','fg3','fg1'];
-  var bookColors = { 'focusgold':'#6c63ff','seminar':'#4ade80','excel-chem':'#f97316','chem-jyuyo':'#14b8a6','fg3':'#fb7185','fg1':'#fbbf24' };
-  var hourTotals = new Array(24).fill(0);
-  for (var h = 0; h < 24; h++) {
-    var slot = logRaw[String(h)] || {};
-    bookKeys.forEach(function(k){ hourTotals[h] += (slot[k] || 0); });
-  }
-  var maxH = Math.max.apply(null, hourTotals) || 1;
+  // fg_hour_log: 問題を記録した時刻の時間帯カウント（キー: 0-23の文字列）
+  var logRaw = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
+  var hourCounts = new Array(24).fill(0);
+  for (var h = 0; h < 24; h++) { hourCounts[h] = logRaw[String(h)] || 0; }
+  var maxH = Math.max.apply(null, hourCounts) || 1;
   var chart = document.getElementById('hourly-chart');
   if (chart) {
-    chart.innerHTML = hourTotals.map(function(total, h) {
-      var slot = logRaw[String(h)] || {};
-      var pct = Math.max(total > 0 ? 4 : 2, Math.round(total / maxH * 100));
-      var segments = '';
-      var usedPct = 0;
-      bookKeys.forEach(function(k) {
-        var cnt = slot[k] || 0;
-        if (cnt <= 0) return;
-        var segPct = Math.round(cnt / maxH * 100);
-        usedPct += segPct;
-        segments += '<div style="flex:none;width:100%;height:' + segPct + '%;background:' + bookColors[k] + ';"></div>';
-      });
-      return '<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;cursor:default" title="' + h + '時: ' + total + '回">' +
-        '<div style="display:flex;flex-direction:column;justify-content:flex-end;height:' + pct + '%;border-radius:2px 2px 0 0;overflow:hidden;background:' + (total>0?'transparent':'var(--bg4)') + '">' +
-        segments + '</div></div>';
+    chart.innerHTML = hourCounts.map(function(cnt, h) {
+      var pct = Math.max(3, Math.round(cnt/maxH*100));
+      var col = cnt === maxH ? 'var(--accent)' : cnt > 0 ? 'rgba(108,99,255,0.5)' : 'var(--bg4)';
+      return '<div style="flex:1;height:' + pct + '%;border-radius:2px 2px 0 0;background:' + col + ';cursor:default" title="' + h + '時: ' + cnt + '問"></div>';
     }).join('');
   }
-  // 凡例
-  var legend = document.getElementById('hourly-legend');
-  if (legend) {
-    legend.innerHTML = bookKeys.map(function(k){ return '<span style="display:inline-flex;align-items:center;gap:3px;font-size:9px;color:var(--text3)"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+bookColors[k]+'"></span>'+k+'</span>'; }).join('');
-  }
   // ベスト時間帯
-  var maxVal = Math.max.apply(null, hourTotals);
-  var bestH = hourTotals.indexOf(maxVal);
+  var maxVal = Math.max.apply(null, hourCounts);
+  var bestH = hourCounts.indexOf(maxVal);
   var el = document.getElementById('best-time-display');
   if (el) {
     if (maxVal <= 0) { el.textContent = 'まだデータがありません'; return; }
-    el.innerHTML = 'あなたは <strong style="color:var(--accent2)">' + bestH + '時〜' + (bestH+1) + '時</strong> に最もよく学習しています（' + maxVal + '回）';
+    el.innerHTML = 'あなたは <strong style="color:var(--accent2)">' + bestH + '時〜' + (bestH+1) + '時</strong> に最もよく学習しています（' + hourCounts[bestH] + '問）';
   }
   // 累計時間
   var totalSec = parseInt(localStorage.getItem('fg_total_time') || '0');
   var totalMin = Math.round(totalSec / 60);
   var te = document.getElementById('total-time-display');
   if (te) te.textContent = totalMin < 60 ? totalMin + '分' : Math.floor(totalMin/60) + '時間' + (totalMin%60) + '分';
-  // 過去セッション履歴
-  renderSessionHistory();
 }
 
-// ===== セッション履歴 =====
-function recordStudySession(seconds) {
-  if (seconds < 10) return;
-  var history = JSON.parse(localStorage.getItem('fg_session_history') || '[]');
-  history.unshift({ ts: Date.now(), sec: seconds, book: currentBook });
-  if (history.length > 200) history = history.slice(0, 200);
-  localStorage.setItem('fg_session_history', JSON.stringify(history));
-}
-function renderSessionHistory() {
-  var el = document.getElementById('session-history-list'); if (!el) return;
-  var history = JSON.parse(localStorage.getItem('fg_session_history') || '[]');
-  if (history.length === 0) { el.innerHTML = '<div style="color:var(--text3);padding:10px 0;font-size:12px">まだ記録がありません</div>'; return; }
-  el.innerHTML = history.slice(0, 50).map(function(s) {
-    var d = new Date(s.ts);
-    var dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + ('0'+d.getMinutes()).slice(-2);
-    var m = Math.floor(s.sec/60), sec2 = s.sec % 60;
-    var durStr = m > 0 ? m + '分' + (sec2>0?sec2+'秒':'') : sec2 + '秒';
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">' +
-      '<span style="color:var(--text3);font-size:11px">' + dateStr + '</span>' +
-      '<span style="font-size:11px;color:var(--text2)">' + (s.book||'') + '</span>' +
-      '<span style="color:var(--accent2);font-weight:700">' + durStr + '</span></div>';
-  }).join('');
-}
+// ===== スパークライン =====
 function renderSparklines() {
   var el = document.getElementById('sparkline-list');
   if (!el) return;
@@ -2587,35 +2505,25 @@ var pomoState = {
   phase: 'work', // 'work'|'short'|'long'
   running: false, seconds: 0, totalSeconds: 25*60,
   session: 0, completedSessions: 0,
-  interval: null,
-  mode: localStorage.getItem('fg_pomo_mode') || 'countdown', // 'countdown'|'countup'
-  chime: localStorage.getItem('fg_pomo_chime') || 'beep',
-  notifyEnabled: localStorage.getItem('fg_pomo_notify') === '1',
-  notifyInterval: parseInt(localStorage.getItem('fg_pomo_notify_interval') || '30'),
-  notifyTimer: null
+  interval: null
 };
 function pomoUpdateUI() {
-  var isUp = pomoState.mode === 'countup';
+  var remaining = pomoState.totalSeconds - pomoState.seconds;
+  if (remaining < 0) remaining = 0;
+  var m = Math.floor(remaining / 60), s = remaining % 60;
   var disp = document.getElementById('pomo-display');
-  if (isUp) {
-    var m = Math.floor(pomoState.seconds / 60), s = pomoState.seconds % 60;
-    if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-    var ring = document.getElementById('pomo-ring');
-    if (ring) { ring.style.strokeDashoffset = 0; ring.style.stroke = 'var(--accent)'; }
-  } else {
-    var remaining = pomoState.totalSeconds - pomoState.seconds;
-    if (remaining < 0) remaining = 0;
-    var m = Math.floor(remaining / 60), s = remaining % 60;
-    if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-    var ring = document.getElementById('pomo-ring');
-    if (ring) {
-      var pct = 1 - remaining / pomoState.totalSeconds;
-      ring.style.strokeDashoffset = 376.99 * pct;
-      ring.style.stroke = pomoState.phase === 'work' ? 'var(--accent)' : 'var(--green)';
-    }
+  if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  // Ring
+  var ring = document.getElementById('pomo-ring');
+  if (ring) {
+    var pct = 1 - remaining / pomoState.totalSeconds;
+    ring.style.strokeDashoffset = 376.99 * pct;
+    ring.style.stroke = pomoState.phase === 'work' ? 'var(--accent)' : 'var(--green)';
   }
+  // Phase label
   var lbl = document.getElementById('pomo-phase-label');
-  if (lbl) lbl.textContent = isUp ? 'カウントアップ' : (pomoState.phase === 'work' ? '集中' : pomoState.phase === 'short' ? '短休憩' : '長休憩');
+  if (lbl) lbl.textContent = pomoState.phase === 'work' ? '集中' : pomoState.phase === 'short' ? '短休憩' : '長休憩';
+  // Session dots
   var dots = document.getElementById('pomo-dots');
   if (dots) {
     var html = '';
@@ -2627,6 +2535,7 @@ function pomoUpdateUI() {
   }
   var sc = document.getElementById('pomo-session-count');
   if (sc) sc.textContent = '完了セッション: ' + pomoState.completedSessions;
+  // Btn
   var btn = document.getElementById('pomo-btn');
   if (btn) btn.textContent = pomoState.running ? '⏸ 停止' : (pomoState.seconds > 0 ? '▶ 再開' : '▶ 開始');
 }
@@ -2678,28 +2587,14 @@ function playPomoSound(type) {
 window.togglePomodoro = function() {
   if (pomoState.running) {
     clearInterval(pomoState.interval); pomoState.interval = null;
-    clearInterval(pomoState.notifyTimer); pomoState.notifyTimer = null;
     pomoState.running = false;
   } else {
     pomoState.running = true;
-    // 定期通知タイマー
-    if (pomoState.notifyEnabled) {
-      var notifySec = pomoState.notifyInterval * 60;
-      var notifyCount = 0;
-      pomoState.notifyTimer = setInterval(function() {
-        notifyCount++;
-        if (notifyCount * notifySec <= pomoState.seconds || pomoState.mode === 'countup') {
-          playPomoChime();
-          try { new Notification('FocusGold', {body: pomoState.notifyInterval + '分経過！'}); } catch(e){}
-        }
-      }, notifySec * 1000);
-    }
     pomoState.interval = setInterval(function() {
       playPomoSound('tick');
       pomoState.seconds++;
-      if (pomoState.mode === 'countdown' && pomoState.seconds >= pomoState.totalSeconds) {
+      if (pomoState.seconds >= pomoState.totalSeconds) {
         clearInterval(pomoState.interval); pomoState.interval = null;
-        clearInterval(pomoState.notifyTimer); pomoState.notifyTimer = null;
         pomoState.running = false;
         pomoNextPhase();
         try { new Notification('FocusGold',{body: pomoState.phase==='work'?'集中タイム！':'休憩タイム！'}); } catch(e){}
@@ -2738,100 +2633,6 @@ window.adjustPomo = function(type, delta) {
   }
   pomoUpdateUI();
 };
-window.adjustPomo = function(type, delta) {
-  if (pomoState.running) return;
-  if (type === 'work') {
-    pomoState.workMin = Math.max(5, Math.min(60, pomoState.workMin + delta));
-    var el = document.getElementById('pomo-work-val'); if (el) el.textContent = pomoState.workMin + '分';
-    if (pomoState.phase === 'work') { pomoState.totalSeconds = pomoState.workMin * 60; pomoState.seconds = 0; }
-  } else if (type === 'short') {
-    pomoState.shortMin = Math.max(1, Math.min(15, pomoState.shortMin + delta));
-    var el2 = document.getElementById('pomo-short-val'); if (el2) el2.textContent = pomoState.shortMin + '分';
-    if (pomoState.phase === 'short') { pomoState.totalSeconds = pomoState.shortMin * 60; pomoState.seconds = 0; }
-  } else {
-    pomoState.longMin = Math.max(5, Math.min(30, pomoState.longMin + delta));
-    var el3 = document.getElementById('pomo-long-val'); if (el3) el3.textContent = pomoState.longMin + '分';
-    if (pomoState.phase === 'long') { pomoState.totalSeconds = pomoState.longMin * 60; pomoState.seconds = 0; }
-  }
-  pomoUpdateUI();
-};
-window.setPomoMode = function(mode) {
-  pomoState.mode = mode;
-  localStorage.setItem('fg_pomo_mode', mode);
-  var cdBtn = document.getElementById('pomo-mode-countdown');
-  var cuBtn = document.getElementById('pomo-mode-countup');
-  var cfg = document.getElementById('pomo-countdown-config');
-  if (cdBtn) { cdBtn.style.background = mode==='countdown'?'var(--accent)':'var(--bg3)'; cdBtn.style.color = mode==='countdown'?'#fff':'var(--text2)'; }
-  if (cuBtn) { cuBtn.style.background = mode==='countup'?'var(--accent)':'var(--bg3)'; cuBtn.style.color = mode==='countup'?'#fff':'var(--text2)'; }
-  if (cfg) cfg.style.display = mode==='countup'?'none':'';
-  resetPomodoro();
-};
-window.selectPomoChime = function(chime) {
-  pomoState.chime = chime;
-  localStorage.setItem('fg_pomo_chime', chime);
-  ['jingle20','jingle21','beep','bell','melody'].forEach(function(c) {
-    var btn = document.getElementById('chime-'+c);
-    if (!btn) return;
-    btn.style.background = c === chime ? 'var(--accent)' : 'var(--bg4)';
-    btn.style.color = c === chime ? '#fff' : 'var(--text2)';
-  });
-  playPomoChime(); // プレビュー再生
-};
-window.togglePomoNotify = function() {
-  pomoState.notifyEnabled = !pomoState.notifyEnabled;
-  localStorage.setItem('fg_pomo_notify', pomoState.notifyEnabled ? '1' : '0');
-  var btn = document.getElementById('pomo-notify-toggle');
-  if (btn) btn.classList.toggle('on', pomoState.notifyEnabled);
-};
-// Jingle20/21はBase64 URLとして埋め込む（ファイル読み込み）
-var _pomoAudioCache = {};
-function playPomoChime() {
-  if (!soundEnabled) return;
-  var chime = pomoState.chime;
-  if (chime === 'jingle20' || chime === 'jingle21') {
-    var key = chime === 'jingle20' ? 'jingle_20.mp3' : 'jingle_21.mp3';
-    if (!_pomoAudioCache[chime]) {
-      var audio = new Audio(key); audio.volume = Math.min(1, soundVolume * 2);
-      _pomoAudioCache[chime] = audio;
-    }
-    var a = _pomoAudioCache[chime]; a.currentTime = 0; a.volume = Math.min(1, soundVolume * 2); a.play().catch(function(){});
-    return;
-  }
-  try {
-    var actx = new (window.AudioContext||window.webkitAudioContext)();
-    var vol = Math.min(1, soundVolume * 2);
-    if (chime === 'beep') {
-      playTone([880, 1100, 1320], 0.3, vol * 0.5);
-    } else if (chime === 'bell') {
-      var freqs = [1047, 1319, 1568]; freqs.forEach(function(f,i){
-        var osc=actx.createOscillator(); var g=actx.createGain();
-        osc.connect(g); g.connect(actx.destination); osc.type='sine';
-        osc.frequency.value=f; g.gain.setValueAtTime(vol*0.4, actx.currentTime+i*0.15);
-        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+i*0.15+0.8);
-        osc.start(actx.currentTime+i*0.15); osc.stop(actx.currentTime+i*0.15+0.8);
-      });
-    } else if (chime === 'melody') {
-      var mFreqs=[523,659,784,659,880,784,1047,784];
-      mFreqs.forEach(function(f,i){
-        var osc=actx.createOscillator(); var g=actx.createGain();
-        osc.connect(g); g.connect(actx.destination);
-        osc.frequency.value=f; g.gain.setValueAtTime(vol*0.35, actx.currentTime+i*0.14);
-        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+i*0.14+0.25);
-        osc.start(actx.currentTime+i*0.14); osc.stop(actx.currentTime+i*0.14+0.25);
-      });
-    }
-  } catch(e) {}
-}
-setTimeout(function() {
-  setPomoMode(pomoState.mode);
-  selectPomoChime(pomoState.chime);
-  var ni = document.getElementById('pomo-notify-interval');
-  if (ni) ni.value = pomoState.notifyInterval;
-  var ntBtn = document.getElementById('pomo-notify-toggle');
-  if (ntBtn) ntBtn.classList.toggle('on', pomoState.notifyEnabled);
-  var inp = document.getElementById('pomo-notify-interval');
-  if (inp) inp.addEventListener('change', function(){ pomoState.notifyInterval = parseInt(this.value)||30; localStorage.setItem('fg_pomo_notify_interval', pomoState.notifyInterval); });
-}, 500);
 setTimeout(pomoUpdateUI, 400);
 
 // ===== STUDY PLAN =====
@@ -3494,7 +3295,7 @@ window.learnProblem = function() {
     difficulty: getModalDifficulty(), importance: getModalImportance() };
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
   // 時間帯ログ記録（actualLearnedAt の時を記録）
-  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log_v2')||'{}'); if(!log[h])log[h]={}; log[h][currentBook]=(log[h][currentBook]||0)+1; localStorage.setItem('fg_hour_log_v2',JSON.stringify(log)); })();
+  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log')||'{}'); log[h]=(log[h]||0)+1; localStorage.setItem('fg_hour_log',JSON.stringify(log)); })();
   stopTimer();
   saveState(); closeModalDirect();
   playSound();
@@ -3516,7 +3317,7 @@ window.reviewProblem = function() {
   state[modalPid].reviewsAt = (state[modalPid].reviewsAt || []).concat([nowTs]);
   state[modalPid].reviewResults = (state[modalPid].reviewResults || []).concat([pendingResult]);
   // 時間帯ログ記録
-  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log_v2')||'{}'); if(!log[h])log[h]={}; log[h][currentBook]=(log[h][currentBook]||0)+1; localStorage.setItem('fg_hour_log_v2',JSON.stringify(log)); })();
+  (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log')||'{}'); log[h]=(log[h]||0)+1; localStorage.setItem('fg_hour_log',JSON.stringify(log)); })();
   state[modalPid].result = pendingResult;
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
@@ -3593,8 +3394,7 @@ window.showTab = function(t) {
   if (t === 'progress') {
     renderProgress();
     var exTab = document.getElementById('stab-example');
-    var noExBooks = ['seminar','excel-chem','chem-jyuyo'];
-    if (exTab) exTab.style.display = noExBooks.indexOf(currentBook) !== -1 ? 'none' : '';
+    if (exTab) exTab.style.display = currentBook === 'seminar' ? 'none' : '';
   }
   if (t === 'memo') { renderMemoSearch(); renderMemoTags(); renderProjects(); renderFreeNotes(); }
 };
@@ -3606,13 +3406,12 @@ window.switchProgressTab = function(tab) {
     var st = document.getElementById('stab-' + id);
     if (st) st.classList.toggle('active', id === tab);
   });
-  // セミナー物理・エクセル化学・化学重要問題集では example タブを非表示
+  // セミナー物理では example タブを非表示
   var exTab = document.getElementById('stab-example');
-  var noExBooks = ['seminar','excel-chem','chem-jyuyo'];
-  if (exTab) exTab.style.display = noExBooks.indexOf(currentBook) !== -1 ? 'none' : '';
+  if (exTab) exTab.style.display = currentBook === 'seminar' ? 'none' : '';
   if (tab === 'heatmap') renderHeatmap();
   if (tab === 'badges') renderBadges();
-  if (tab === 'example' && noExBooks.indexOf(currentBook) === -1) renderProgressEx();
+  if (tab === 'example' && currentBook !== 'seminar') renderProgressEx();
   if (tab === 'practice') renderProgress();
   if (tab === 'trends') { renderBestTime(); renderSparklines(); }
 };
@@ -3722,22 +3521,16 @@ function saveStateEx() {
 var timerInterval = null;
 var timerSeconds = 0;
 function initTimerBar() {
-  // モーダル表示時にタイマーを自動スタート
+  // モーダル表示時はタイマーバーを停止状態で表示
   stopTimer();
   timerSeconds = 0;
   var bar = document.getElementById('timer-bar');
   var disp = document.getElementById('timer-display');
   if (bar) bar.style.display = '';
   if (disp) disp.textContent = '0:00';
+  // 開始ボタンを表示
   var stopBtn = document.querySelector('#timer-bar .timer-stop-btn');
-  if (stopBtn) stopBtn.textContent = '⏸ 停止';
-  // 自動開始
-  timerInterval = setInterval(function() {
-    timerSeconds++;
-    var m = Math.floor(timerSeconds / 60);
-    var s = timerSeconds % 60;
-    if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-  }, 1000);
+  if (stopBtn) stopBtn.textContent = '▶ 開始';
 }
 window.toggleTimer = function() {
   if (timerInterval) {
@@ -3764,8 +3557,6 @@ window.stopTimer = function() {
     // 累計学習時間に加算
     var prev = parseInt(localStorage.getItem('fg_total_time') || '0');
     localStorage.setItem('fg_total_time', String(prev + timerSeconds));
-    // セッション履歴記録
-    recordStudySession(timerSeconds);
   }
   var bar = document.getElementById('timer-bar');
   if (bar) bar.style.display = 'none';
@@ -3774,21 +3565,7 @@ window.stopTimer = function() {
 
 // ===== SOUND =====
 var soundEnabled = localStorage.getItem('fg_sound') !== 'off';
-var soundVolume = parseFloat(localStorage.getItem('fg_sound_volume') || '0.5');
-window.setSoundVolume = function(val) {
-  soundVolume = parseFloat(val) / 100;
-  localStorage.setItem('fg_sound_volume', String(soundVolume));
-  var lbl = document.getElementById('sound-volume-label');
-  if (lbl) lbl.textContent = val + '%';
-};
-// 初期化
-setTimeout(function() {
-  var slider = document.getElementById('sound-volume-slider');
-  var lbl = document.getElementById('sound-volume-label');
-  var pct = Math.round(soundVolume * 100);
-  if (slider) slider.value = pct;
-  if (lbl) lbl.textContent = pct + '%';
-}, 400);
+var _audioCtx = null;
 function getAudioCtx() {
   if (!_audioCtx) { try { _audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
   return _audioCtx;
@@ -3802,8 +3579,7 @@ function playTone(freqs, duration, vol) {
       var osc = actx.createOscillator(); var g = actx.createGain();
       osc.connect(g); g.connect(actx.destination);
       osc.frequency.value = f;
-      var v = (vol || 0.25) * soundVolume * 2;
-      g.gain.setValueAtTime(v, actx.currentTime + off);
+      g.gain.setValueAtTime(vol || 0.25, actx.currentTime + off);
       g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + off + duration);
       osc.start(actx.currentTime + off); osc.stop(actx.currentTime + off + duration);
     });
@@ -3864,15 +3640,15 @@ var COLOR_THEMES = [
   {cat:'☀️ ライト',name:'さくら',      bg:'#fdf2f8',bg2:null,          accent:'#db2777',accent2:'#ec4899'},
   {cat:'☀️ ライト',name:'レモン',      bg:'#fefce8',bg2:null,          accent:'#ca8a04',accent2:'#eab308'},
   {cat:'☀️ ライト',name:'アイスブルー',bg:'#f0f9ff',bg2:null,          accent:'#0284c7',accent2:'#0ea5e9'},
-  // ── グラデーション（豊か） ──
-  {cat:'🌈 グラデ',name:'オーロラ',    bg:'#0d0221',bg2:'#0a1628',     accent:'#a855f7',accent2:'#38bdf8', grad:'linear-gradient(160deg,#0d0221 0%,#1a0a2e 40%,#0a1628 100%)'},
-  {cat:'🌈 グラデ',name:'サンセット',  bg:'#1a0505',bg2:'#1a1200',     accent:'#f97316',accent2:'#eab308', grad:'linear-gradient(160deg,#1a0505 0%,#2d1000 45%,#1a1200 100%)'},
-  {cat:'🌈 グラデ',name:'ディープオーシャン',bg:'#001a33',bg2:'#002d2d',accent:'#0ea5e9',accent2:'#14b8a6', grad:'linear-gradient(160deg,#001a33 0%,#003355 45%,#002d2d 100%)'},
-  {cat:'🌈 グラデ',name:'フォレスト',  bg:'#0d1f0d',bg2:'#1a1400',     accent:'#4ade80',accent2:'#facc15', grad:'linear-gradient(160deg,#0d1f0d 0%,#0a2d0a 50%,#1a1400 100%)'},
-  {cat:'🌈 グラデ',name:'チェリー炎',  bg:'#1a0a14',bg2:'#1a0800',     accent:'#f43f5e',accent2:'#f97316', grad:'linear-gradient(160deg,#1a0a14 0%,#2d0010 45%,#1a0800 100%)'},
-  {cat:'🌈 グラデ',name:'コスモス',    bg:'#0d0221',bg2:'#0a1628',     accent:'#818cf8',accent2:'#38bdf8', grad:'linear-gradient(135deg,#0d0221,#10052e,#0a1628)'},
-  {cat:'🌈 グラデ',name:'桜グラデ',    bg:'#fff5f7',bg2:'#fdf2f8',     accent:'#ec4899',accent2:'#f9a8d4', grad:'linear-gradient(160deg,#fff5f7,#fdeeff,#fdf2f8)'},
-  {cat:'🌈 グラデ',name:'夕焼け空',    bg:'#fff7ed',bg2:'#fff1f2',     accent:'#f97316',accent2:'#f43f5e', grad:'linear-gradient(160deg,#fff7ed,#ffe4d0,#fff1f2)'},
+  // ── グラデーション ──
+  {cat:'🌈 グラデ',name:'オーロラ',    bg:'#0d0221',bg2:'#1a0a2e',     accent:'#a855f7',accent2:'#38bdf8'},
+  {cat:'🌈 グラデ',name:'サンセット',  bg:'#1a0a0a',bg2:'#1a1200',     accent:'#f97316',accent2:'#eab308'},
+  {cat:'🌈 グラデ',name:'オーシャン',  bg:'#001a33',bg2:'#002d2d',     accent:'#0ea5e9',accent2:'#14b8a6'},
+  {cat:'🌈 グラデ',name:'フォレスト',  bg:'#0d1f0d',bg2:'#1a1400',     accent:'#4ade80',accent2:'#facc15'},
+  {cat:'🌈 グラデ',name:'チェリー炎',  bg:'#1a0a14',bg2:'#1a0800',     accent:'#f43f5e',accent2:'#f97316'},
+  {cat:'🌈 グラデ',name:'コスモス',    bg:'#0d0221',bg2:'#0a1628',     accent:'#818cf8',accent2:'#38bdf8'},
+  {cat:'🌈 グラデ',name:'桜グラデ',    bg:'#fff5f7',bg2:'#fdf2f8',     accent:'#ec4899',accent2:'#f9a8d4'},
+  {cat:'🌈 グラデ',name:'夕焼け空',    bg:'#fff7ed',bg2:'#fff1f2',     accent:'#f97316',accent2:'#f43f5e'},
   // ── ネオン ──
   {cat:'⚡ ネオン',name:'ネオンパープル',bg:'#0a0010',bg2:null,        accent:'#d946ef',accent2:'#e879f9'},
   {cat:'⚡ ネオン',name:'ネオングリーン',bg:'#001a00',bg2:null,        accent:'#22c55e',accent2:'#4ade80'},
@@ -3883,32 +3659,17 @@ var COLOR_THEMES = [
   {cat:'⚡ ネオン',name:'サイバーイエロー',bg:'#0a0a00',bg2:null,      accent:'#eab308',accent2:'#facc15'},
   {cat:'⚡ ネオン',name:'ネオンレッド', bg:'#0f0000',bg2:null,         accent:'#dc2626',accent2:'#f87171'},
   // ── サイバーパンク ──
-  {cat:'🤖 サイバー',name:'サイバーパンク',bg:'#0a0010',bg2:'#001a00', accent:'#d946ef',accent2:'#4ade80', grad:'linear-gradient(135deg,#0a0010,#001a00)'},
-  {cat:'🤖 サイバー',name:'ブレードランナー',bg:'#0a0505',bg2:'#001a33',accent:'#f43f5e',accent2:'#38bdf8', grad:'linear-gradient(135deg,#0a0505,#001a33)'},
+  {cat:'🤖 サイバー',name:'サイバーパンク',bg:'#0a0010',bg2:'#001a00', accent:'#d946ef',accent2:'#4ade80'},
+  {cat:'🤖 サイバー',name:'ブレードランナー',bg:'#0a0505',bg2:'#001a33',accent:'#f43f5e',accent2:'#38bdf8'},
   {cat:'🤖 サイバー',name:'マトリックス',bg:'#000a00',bg2:null,        accent:'#22c55e',accent2:'#4ade80'},
   {cat:'🤖 サイバー',name:'ゴーストシェル',bg:'#020617',bg2:null,      accent:'#818cf8',accent2:'#c084fc'},
   {cat:'🤖 サイバー',name:'トロン',     bg:'#000820',bg2:null,         accent:'#38bdf8',accent2:'#7dd3fc'},
-  {cat:'🤖 サイバー',name:'アトム',     bg:'#00001a',bg2:'#001a00',    accent:'#38bdf8',accent2:'#4ade80', grad:'linear-gradient(135deg,#00001a,#001a00)'},
+  {cat:'🤖 サイバー',name:'アトム',     bg:'#00001a',bg2:'#001a00',    accent:'#38bdf8',accent2:'#4ade80'},
   // ── モノ ──
   {cat:'⬛ モノ',name:'ピュアブラック',bg:'#000000',bg2:null,          accent:'#ffffff',accent2:'#d1d5db'},
   {cat:'⬛ モノ',name:'チャコール',    bg:'#1f2937',bg2:null,          accent:'#9ca3af',accent2:'#d1d5db'},
   {cat:'⬛ モノ',name:'スレート',      bg:'#0f172a',bg2:null,          accent:'#64748b',accent2:'#94a3b8'},
   {cat:'⬛ モノ',name:'ホワイト',      bg:'#f9fafb',bg2:null,          accent:'#374151',accent2:'#6b7280'},
-  // ── 和風 ──
-  {cat:'🎋 和風',name:'夜桜',         bg:'#1a0d15',bg2:'#2d0a1f',     accent:'#f9a8d4',accent2:'#fbcfe8', grad:'linear-gradient(160deg,#1a0d15,#2d0a1f,#0d0a1a)'},
-  {cat:'🎋 和風',name:'抹茶',         bg:'#0d1a0d',bg2:'#1a2d10',     accent:'#86efac',accent2:'#bbf7d0', grad:'linear-gradient(160deg,#0d1a0d,#1a2d10,#0d1205)'},
-  {cat:'🎋 和風',name:'藍染め',       bg:'#0a1220',bg2:'#0d1a30',     accent:'#93c5fd',accent2:'#bfdbfe', grad:'linear-gradient(160deg,#0a1220,#0d1a30,#060e1c)'},
-  {cat:'🎋 和風',name:'朱赤',         bg:'#1a0800',bg2:'#2d1000',     accent:'#fca5a5',accent2:'#fecaca', grad:'linear-gradient(160deg,#1a0800,#2d1000,#0d0400)'},
-  // ── パステル ──
-  {cat:'🍬 パステル',name:'Cotton Candy',bg:'#fdf0ff',bg2:'#f0f4ff',  accent:'#c084fc',accent2:'#a78bfa', grad:'linear-gradient(160deg,#fdf0ff,#f5f0ff,#f0f4ff)'},
-  {cat:'🍬 パステル',name:'ミルクティー',bg:'#faf5eb',bg2:'#f5ebe0',  accent:'#d97706',accent2:'#f59e0b', grad:'linear-gradient(160deg,#faf5eb,#f5ebe0,#ede0d0)'},
-  {cat:'🍬 パステル',name:'ソーダ',    bg:'#edfcff',bg2:'#f0fff4',    accent:'#0ea5e9',accent2:'#22d3ee', grad:'linear-gradient(160deg,#edfcff,#e8faff,#f0fff4)'},
-  {cat:'🍬 パステル',name:'いちご',    bg:'#fff0f3',bg2:'#fff5f0',    accent:'#f43f5e',accent2:'#fb7185', grad:'linear-gradient(160deg,#fff0f3,#ffe8e8,#fff5f0)'},
-  // ── 宇宙 ──
-  {cat:'🌌 宇宙',name:'ディープスペース',bg:'#020008',bg2:'#08001a',  accent:'#a78bfa',accent2:'#c4b5fd', grad:'linear-gradient(160deg,#020008,#08001a,#000510)'},
-  {cat:'🌌 宇宙',name:'ネビュラ',      bg:'#050020',bg2:'#200510',    accent:'#e879f9',accent2:'#f0abfc', grad:'linear-gradient(160deg,#050020,#200510,#001020)'},
-  {cat:'🌌 宇宙',name:'ギャラクシー',  bg:'#020515',bg2:'#150215',    accent:'#818cf8',accent2:'#e879f9', grad:'linear-gradient(135deg,#020515 0%,#0a0230 30%,#150215 60%,#020515 100%)'},
-  {cat:'🌌 宇宙',name:'オーロラ極光',  bg:'#011208',bg2:'#010d20',    accent:'#34d399',accent2:'#67e8f9', grad:'linear-gradient(160deg,#011208,#021a10,#010d20)'},
 ];
 var currentColorTheme = parseInt(localStorage.getItem('fg_color_theme') || '0');
 function applyColorTheme(idx) {
@@ -3918,11 +3679,8 @@ function applyColorTheme(idx) {
   var r = document.documentElement.style;
   r.setProperty('--bg', t.bg);
   // グラデーション背景
-  if (t.grad) {
-    document.body.style.background = t.grad;
-    document.body.style.backgroundAttachment = 'fixed';
-  } else if (t.bg2) {
-    document.body.style.background = 'linear-gradient(160deg, ' + t.bg + ' 0%, ' + t.bg2 + ' 100%)';
+  if (t.bg2) {
+    document.body.style.background = 'linear-gradient(135deg, ' + t.bg + ' 0%, ' + t.bg2 + ' 100%)';
     document.body.style.backgroundAttachment = 'fixed';
   } else {
     document.body.style.background = '';
@@ -4215,38 +3973,18 @@ function showBadgeFlash(b) {
 }
 
 window.shareAchievement = function(text) {
-  try {
-    var canvas = document.createElement('canvas');
-    canvas.width = 600; canvas.height = 400;
-    var ctx = canvas.getContext('2d');
-    var gr = ctx.createLinearGradient(0,0,600,400);
-    gr.addColorStop(0,'#0d0221'); gr.addColorStop(1,'#0a1628');
-    ctx.fillStyle=gr; ctx.fillRect(0,0,600,400);
-    ctx.strokeStyle='#8b84ff'; ctx.lineWidth=3;
-    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(12,12,576,376,16) : ctx.strokeRect(12,12,576,376); ctx.stroke();
-    ctx.textAlign='center';
-    ctx.fillStyle='#8b84ff'; ctx.font='bold 20px sans-serif';
-    ctx.fillText('🏅 FocusGold 学習記録', 300, 75);
-    ctx.fillStyle='#e8e8f0'; ctx.font='bold 26px sans-serif';
-    var lines = text.split('\n');
-    ctx.fillText(lines[0]||'', 300, 155);
-    ctx.fillStyle='#9090a8'; ctx.font='18px sans-serif';
-    ctx.fillText(lines[1]||'', 300, 200);
-    ctx.fillStyle='#5a5a72'; ctx.font='13px sans-serif';
-    ctx.fillText(new Date().toLocaleDateString('ja-JP'), 300, 360);
-    canvas.toBlob(function(blob) {
-      var file = new File([blob], 'focusgold_badge.png', {type:'image/png'});
-      if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-        navigator.share({files:[file], text:text}).catch(function(){
-          var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download='focusgold_badge.png'; a.click(); showToast('📥 達成画像を保存しました！');
-        });
-      } else {
-        var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download='focusgold_badge.png'; a.click(); showToast('📥 達成画像を保存しました！');
-      }
+  if (navigator.share) {
+    navigator.share({ text: text }).catch(function(){});
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('📋 クリップボードにコピーしました！');
+    }).catch(function() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('📋 コピーしました！');
     });
-  } catch(e) {
-    if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){showToast('📋 クリップボードにコピーしました！');}); }
-    else { showToast('📤 ' + text.slice(0,40)); }
   }
 };
 // ===== XP SYSTEM =====
@@ -4292,36 +4030,6 @@ window.showBadgeDetail = function(bid, idx) {
   var xp = getBadgeXP(b, idx);
   var badgeDates = JSON.parse(localStorage.getItem('fg_badge_dates') || '{}');
   var dateStr = earned && badgeDates[bid] ? new Date(badgeDates[bid]).toLocaleString('ja-JP') : '';
-  // 進捗計算
-  var progressHTML = '';
-  if (!earned) {
-    var total = Object.keys(state).length;
-    var totalAll = CHAPTERS.reduce(function(a,ch){return a+(ch.prefix?ch.count:(ch.end-ch.start+1));},0);
-    var streak = getStreakCount();
-    var reviews = Object.keys(state).filter(function(p){return (state[p].reviews||[]).length>0;}).length;
-    var batsu = Object.keys(state).filter(function(p){return state[p]&&state[p].result==='batu';}).length;
-    var progressMap = {
-      'first_learn':'初めての問題を学習してみよう！',
-      'learn_10': '残り' + Math.max(0,10-total) + '問で達成',
-      'learn_50': '残り' + Math.max(0,50-total) + '問で達成',
-      'learn_100': '残り' + Math.max(0,100-total) + '問で達成',
-      'learn_200': '残り' + Math.max(0,200-total) + '問で達成',
-      'learn_300': '残り' + Math.max(0,300-total) + '問で達成',
-      'learn_500': '残り' + Math.max(0,500-total) + '問で達成',
-      'half_way': '残り' + Math.max(0,Math.ceil(totalAll/2)-total) + '問で達成',
-      'all_done': '残り' + Math.max(0,totalAll-total) + '問で達成',
-      'review_10': '残り' + Math.max(0,10-reviews) + '問の復習で達成',
-      'review_50': '残り' + Math.max(0,50-reviews) + '問の復習で達成',
-      'review_100': '残り' + Math.max(0,100-reviews) + '問の復習で達成',
-      'week1': '残り' + Math.max(0,7-streak) + '日連続で達成',
-      'week2': '残り' + Math.max(0,14-streak) + '日連続で達成',
-      'month1': '残り' + Math.max(0,30-streak) + '日連続で達成',
-      'batu_zero': '現在の×問題: ' + batsu + '問（全て克服で達成）',
-      'project_1': 'プロジェクトを1つ作成すると達成',
-    };
-    var hint = progressMap[bid];
-    if (hint) progressHTML = '<div style="background:var(--accent-bg);border:1px solid rgba(108,99,255,0.25);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--accent2);margin-bottom:12px">🎯 ' + hint + '</div>';
-  }
   var old = document.getElementById('badge-detail-modal');
   if (old) old.remove();
   var el = document.createElement('div');
@@ -4334,9 +4042,8 @@ window.showBadgeDetail = function(bid, idx) {
     '<div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">' +
     '<span style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--amber);font-weight:700">⚡ ' + xp + ' XP</span>' +
     '<span style="background:' + (earned?'var(--green-bg)':'var(--bg3)') + ';border:1px solid ' + (earned?'rgba(74,222,128,0.3)':'var(--border2)') + ';border-radius:20px;padding:4px 12px;font-size:12px;color:' + (earned?'var(--green)':'var(--text3)') + '">' + (earned ? '✅ 獲得済み' : '🔒 未獲得') + '</span></div>' +
-    (dateStr ? '<div style="font-size:11px;color:var(--text3);margin-bottom:12px">達成日: ' + dateStr + '</div>' : '') +
-    progressHTML +
-    '<button onclick="document.getElementById(\'badge-detail-modal\').remove()" style="margin-top:4px;width:100%;padding:10px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">閉じる</button></div>';
+    (dateStr ? '<div style="font-size:11px;color:var(--text3)">達成日: ' + dateStr + '</div>' : '') +
+    '<button onclick="document.getElementById(\'badge-detail-modal\').remove()" style="margin-top:16px;width:100%;padding:10px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">閉じる</button></div>';
   el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
   document.body.appendChild(el);
 };
@@ -4396,96 +4103,28 @@ window.deleteTag = function(tg) {
 // ===== PROJECTS =====
 function getProjects() { return JSON.parse(localStorage.getItem('fg_projects')||'[]'); }
 function saveProjects(p) { localStorage.setItem('fg_projects', JSON.stringify(p)); }
-var SUBJECT_PRESETS = ['数学','英語','物理','化学','生物','地理','日本史','世界史','現代文','古文・漢文','情報','公民・倫理'];
 window.renderProjects = function() {
   var list = document.getElementById('projects-list'); if (!list) return;
   var projects = getProjects();
   if (projects.length===0) { list.innerHTML='<div class="empty-state"><div class="empty-icon">📁</div>プロジェクトがありません<br><span style="font-size:12px">目標期間を設定して学習を管理しよう</span></div>'; return; }
   list.innerHTML = projects.map(function(p,i) {
-    var end=new Date(p.end||Date.now());
-    var now=new Date(); var daysLeft=Math.ceil((end-now)/86400000);
-    var tasks=p.tasks||[]; var done=tasks.filter(function(t){return t.done;}).length;
-    var usedSec=parseInt(p.usedSec||0); var usedMin=Math.round(usedSec/60);
-    var pct=tasks.length>0?Math.round(done/tasks.length*100):0;
-    var statusColor=p.completed?'var(--green)':daysLeft<0?'var(--red)':'var(--accent2)';
-    var statusLabel=p.completed?'✅ 完了':daysLeft<0?'期限切れ':daysLeft+'日後';
-    return '<div class="project-card" onclick="openProjectDetail('+i+')" style="cursor:pointer">' +
-      '<div class="project-header"><div class="project-name">'+p.name+'</div>' +
-      '<span style="font-size:11px;color:'+statusColor+';font-weight:700">'+statusLabel+'</span></div>' +
-      (p.subject?'<div style="font-size:11px;color:var(--text3);margin-bottom:4px">📚 '+p.subject+(p.goalScore?' ／ 目標: '+p.goalScore+'点':'')+'</div>':'') +
-      '<div class="project-progress-bar" style="margin-bottom:4px"><div class="project-progress-fill" style="width:'+pct+'%"></div></div>' +
-      '<div class="project-meta" style="display:flex;gap:12px"><span>タスク: '+done+'/'+tasks.length+'</span><span>⏱ '+(usedMin<60?usedMin+'分':Math.floor(usedMin/60)+'時間'+usedMin%60+'分')+'</span><span>終了: '+(p.end||'未設定')+'</span></div></div>';
+    var start=new Date(p.start); var end=new Date(p.end);
+    var total=Math.max(1,Math.ceil((end-start)/86400000));
+    var elapsed=Math.ceil((new Date()-start)/86400000);
+    var pct=Math.min(100,Math.max(0,Math.round(elapsed/total*100)));
+    return '<div class="project-card"><div class="project-header"><div class="project-name">'+p.name+'</div>' +
+      '<button onclick="deleteProject('+i+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">×</button></div>' +
+      '<div class="project-progress-bar"><div class="project-progress-fill" style="width:'+pct+'%"></div></div>' +
+      '<div class="project-meta">'+p.start+' 〜 '+p.end+'（'+pct+'%経過）</div></div>';
   }).join('');
 };
-window.openProjectDetail = function(idx) {
-  var projects=getProjects(); var p=projects[idx]; if(!p) return;
-  var old=document.getElementById('project-detail-modal'); if(old) old.remove();
-  var tasks=p.tasks||[]; var usedSec=parseInt(p.usedSec||0); var usedMin=Math.round(usedSec/60);
-  var tasksHTML=tasks.map(function(t,ti){
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">' +
-      '<input type="checkbox"'+(t.done?' checked':'')+' onchange="toggleProjectTask('+idx+','+ti+',this.checked)" style="width:16px;height:16px;cursor:pointer">' +
-      '<span style="flex:1;font-size:13px;'+(t.done?'text-decoration:line-through;color:var(--text3)':'color:var(--text)')+'">'+t.name+'</span>' +
-      '<button onclick="deleteProjectTask('+idx+','+ti+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px">×</button></div>';
-  }).join('')||'<div style="color:var(--text3);font-size:12px;padding:10px 0">タスクがありません</div>';
-  var subjectOpts=SUBJECT_PRESETS.map(function(s){return '<option value="'+s+'"'+(p.subject===s?' selected':'')+'>'+s+'</option>';}).join('');
-  var el=document.createElement('div'); el.id='project-detail-modal';
-  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:450;display:flex;align-items:flex-end;justify-content:center';
-  el.innerHTML='<div style="background:var(--bg2);border-radius:var(--radius-lg) var(--radius-lg) 0 0;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:20px 18px 32px">' +
-    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
-      '<div style="font-size:15px;font-weight:800">📁 '+p.name+'</div>' +
-      '<button onclick="document.getElementById(\'project-detail-modal\').remove()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer">×</button></div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">' +
-      '<div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">教科</div>' +
-        '<select onchange="updateProjectField('+idx+',\'subject\',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit"><option value="">選択...</option>'+subjectOpts+'</select></div>' +
-      '<div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">目標点</div>' +
-        '<input type="number" placeholder="例: 80" value="'+(p.goalScore||'')+'" onchange="updateProjectField('+idx+',\'goalScore\',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit;outline:none"></div>' +
-      '<div><div style="font-size:11px;color:var(--text3);margin-bottom:3px">終了日</div>' +
-        '<input type="date" value="'+(p.end||'')+'" onchange="updateProjectField('+idx+',\'end\',this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:6px;font-family:inherit"></div>' +
-      '<div style="background:var(--bg3);border-radius:var(--radius);padding:8px 10px"><div style="font-size:10px;color:var(--text3)">利用済み時間</div>' +
-        '<div style="font-size:14px;font-weight:700;color:var(--accent2)">⏱ '+(usedMin<60?usedMin+'分':Math.floor(usedMin/60)+'時間'+usedMin%60+'分')+'</div></div></div>' +
-    '<div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">✅ タスク</div>' +
-    '<div id="pj-tasks-'+idx+'">'+tasksHTML+'</div>' +
-    '<div style="display:flex;gap:6px;margin-top:8px">' +
-      '<input id="pj-new-task-'+idx+'" type="text" placeholder="新しいタスクを入力..." onkeydown="if(event.key===\'Enter\')addProjectTask('+idx+')" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:12px;padding:7px 10px;font-family:inherit;outline:none">' +
-      '<button onclick="addProjectTask('+idx+')" style="background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;padding:7px 14px;cursor:pointer;font-family:inherit">追加</button></div>' +
-    '<div style="display:flex;gap:8px;margin-top:16px">' +
-      '<button onclick="completeProject('+idx+')" style="flex:1;padding:11px;background:var(--green-bg);border:1px solid rgba(74,222,128,0.4);border-radius:var(--radius);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🎉 完了</button>' +
-      '<button onclick="deleteProject('+idx+')" style="flex:1;padding:11px;background:var(--red-bg);border:1px solid rgba(248,113,113,0.3);border-radius:var(--radius);color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🗑 削除</button></div>' +
-  '</div>';
-  el.addEventListener('click',function(e){if(e.target===el)el.remove();}); document.body.appendChild(el);
-};
-window.updateProjectField=function(idx,field,val){var p=getProjects();p[idx][field]=val;saveProjects(p);};
-window.addProjectTask=function(idx){var inp=document.getElementById('pj-new-task-'+idx);if(!inp)return;var name=inp.value.trim();if(!name)return;var p=getProjects();if(!p[idx].tasks)p[idx].tasks=[];p[idx].tasks.push({name:name,done:false});saveProjects(p);inp.value='';renderProjects();openProjectDetail(idx);};
-window.toggleProjectTask=function(idx,ti,checked){var p=getProjects();p[idx].tasks[ti].done=checked;saveProjects(p);renderProjects();};
-window.deleteProjectTask=function(idx,ti){var p=getProjects();p[idx].tasks.splice(ti,1);saveProjects(p);renderProjects();openProjectDetail(idx);};
-window.completeProject=function(idx){var p=getProjects();p[idx].completed=true;saveProjects(p);var el=document.getElementById('project-detail-modal');if(el)el.remove();renderProjects();showToast('🎉 プロジェクト完了！おめでとうございます！');launchConfetti();};
 window.openNewProject = function() {
-  var old=document.getElementById('new-project-modal');if(old)old.remove();
-  var el=document.createElement('div');el.id='new-project-modal';
-  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:450;display:flex;align-items:center;justify-content:center;padding:20px';
-  var subjectOpts=SUBJECT_PRESETS.map(function(s){return '<option value="'+s+'">'+s+'</option>';}).join('');
-  el.innerHTML='<div style="background:var(--bg2);border-radius:var(--radius-lg);padding:22px;width:100%;max-width:360px">' +
-    '<div style="font-size:15px;font-weight:800;margin-bottom:14px">📁 新規プロジェクト</div>' +
-    '<input id="np-name" type="text" placeholder="プロジェクト名" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;font-family:inherit;outline:none;margin-bottom:8px">' +
-    '<select id="np-subject" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px;font-family:inherit;margin-bottom:8px"><option value="">教科を選択（任意）</option>'+subjectOpts+'</select>' +
-    '<input id="np-goal" type="number" placeholder="目標点（任意）" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;font-family:inherit;outline:none;margin-bottom:8px">' +
-    '<div style="font-size:11px;color:var(--text3);margin-bottom:4px">終了日</div>' +
-    '<input id="np-end" type="date" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px;font-family:inherit;margin-bottom:14px">' +
-    '<div style="display:flex;gap:8px">' +
-      '<button onclick="saveNewProject()" style="flex:1;padding:11px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">作成</button>' +
-      '<button onclick="document.getElementById(\'new-project-modal\').remove()" style="padding:11px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit">キャンセル</button>' +
-    '</div></div>';
-  el.addEventListener('click',function(e){if(e.target===el)el.remove();}); document.body.appendChild(el);
+  var name = prompt('プロジェクト名（例：共通テスト3週間対策）'); if (!name) return;
+  var start = prompt('開始日（YYYY-MM-DD）', new Date().toISOString().slice(0,10)); if (!start) return;
+  var end = prompt('終了日（YYYY-MM-DD）'); if (!end) return;
+  var projects = getProjects(); projects.push({name:name,start:start,end:end}); saveProjects(projects); renderProjects();
 };
-window.saveNewProject=function(){
-  var name=(document.getElementById('np-name')||{}).value||'';if(!name.trim()){showToast('名前を入力してください');return;}
-  var end=(document.getElementById('np-end')||{}).value||new Date().toISOString().slice(0,10);
-  var subject=(document.getElementById('np-subject')||{}).value||'';
-  var goalScore=(document.getElementById('np-goal')||{}).value||'';
-  var projects=getProjects();projects.push({name:name.trim(),end:end,subject:subject,goalScore:goalScore,tasks:[],usedSec:0,completed:false});
-  saveProjects(projects);var el=document.getElementById('new-project-modal');if(el)el.remove();renderProjects();showToast('📁 プロジェクトを作成しました');
-};
-window.deleteProject=function(i){if(!confirm('このプロジェクトを削除しますか？'))return;var p=getProjects();p.splice(i,1);saveProjects(p);var el=document.getElementById('project-detail-modal');if(el)el.remove();renderProjects();};
+window.deleteProject = function(i) { var p=getProjects(); p.splice(i,1); saveProjects(p); renderProjects(); };
 
 function checkChapterComplete(pid) {
   var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(pid) !== -1; });
@@ -4887,31 +4526,45 @@ window._loadStart = Date.now();
 })();
 
 // ===== PWA: Service Worker をインラインで登録 =====
+// ビルドのたびにこの値を変える → キャッシュが必ず更新される
+var APP_BUILD_ID = '20250519-001';
+
 if ('serviceWorker' in navigator) {
   var swCode = `
-const CACHE_NAME = 'focusgold-v1';
-const STATIC_ASSETS = ['./'];
+const BUILD_ID = '` + APP_BUILD_ID + `';
+const CACHE_NAME = 'focusgold-' + BUILD_ID;
 
+// インストール: 古いSWをすぐ置き換え
 self.addEventListener('install', function(e) {
-  e.waitUntil(caches.open(CACHE_NAME).then(function(c) { return c.addAll(STATIC_ASSETS); }));
-  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(function(c) { return c.addAll(['./']); })
+      .then(function() { return self.skipWaiting(); })
+  );
 });
 
+// アクティベート: 旧キャッシュを全削除してから制御を奪う
 self.addEventListener('activate', function(e) {
-  e.waitUntil(caches.keys().then(function(keys) {
-    return Promise.all(keys.filter(function(k){return k!==CACHE_NAME;}).map(function(k){return caches.delete(k);}));
-  }));
-  self.clients.claim();
+  e.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(
+        keys.filter(function(k) { return k !== CACHE_NAME; })
+            .map(function(k) { return caches.delete(k); })
+      );
+    }).then(function() { return self.clients.claim(); })
+  );
 });
 
+// フェッチ: ネットワーク優先（オフライン時のみキャッシュ）
 self.addEventListener('fetch', function(e) {
   var url = e.request.url;
-  if (url.includes('firestore')||url.includes('firebase')||url.includes('gstatic')) return;
+  // Firebase/外部APIはSWをスルー
+  if (url.includes('firestore') || url.includes('firebase') ||
+      url.includes('googleapis') || url.includes('gstatic')) { return; }
   e.respondWith(
     fetch(e.request).then(function(res) {
-      if (res && res.status===200 && res.type==='basic') {
+      if (res && res.status === 200 && res.type === 'basic') {
         var clone = res.clone();
-        caches.open(CACHE_NAME).then(function(c){ c.put(e.request, clone); });
+        caches.open(CACHE_NAME).then(function(c) { c.put(e.request, clone); });
       }
       return res;
     }).catch(function() {
@@ -4923,8 +4576,8 @@ self.addEventListener('fetch', function(e) {
 self.addEventListener('push', function(e) {
   var data = e.data ? e.data.json() : {};
   var n = data.notification || {};
-  e.waitUntil(self.registration.showNotification(n.title||'FocusGold', {
-    body: n.body||'今日の学習をしよう！', tag: 'focusgold-reminder'
+  e.waitUntil(self.registration.showNotification(n.title || 'FocusGold', {
+    body: n.body || '今日の学習をしよう！', tag: 'focusgold-reminder'
   }));
 });
 
@@ -4935,7 +4588,41 @@ self.addEventListener('notificationclick', function(e) {
 `;
   var swBlob = new Blob([swCode], { type: 'text/javascript' });
   var swUrl = URL.createObjectURL(swBlob);
-  navigator.serviceWorker.register(swUrl).catch(function() {});
+
+  navigator.serviceWorker.register(swUrl).then(function(reg) {
+    // 新しいSWが待機中なら即座に適用してリロード
+    reg.addEventListener('updatefound', function() {
+      var newWorker = reg.installing;
+      newWorker.addEventListener('statechange', function() {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          // 新バージョン検知 → 旧キャッシュ全消去してリロード
+          caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+          }).then(function() {
+            window.location.reload(true);
+          });
+        }
+      });
+    });
+  }).catch(function() {});
+
+  // 起動時: ローカルに保存されたBUILD_IDと現在のものを比較
+  var savedBuild = localStorage.getItem('fg_build_id');
+  if (savedBuild && savedBuild !== APP_BUILD_ID) {
+    // 新バージョン検知: キャッシュを全消去してリロード
+    localStorage.setItem('fg_build_id', APP_BUILD_ID);
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+      }).then(function() {
+        window.location.reload(true);
+      });
+    } else {
+      window.location.reload(true);
+    }
+  } else {
+    localStorage.setItem('fg_build_id', APP_BUILD_ID);
+  }
 }
 
 // ===== RIPPLE TRANSITION ENGINE =====
