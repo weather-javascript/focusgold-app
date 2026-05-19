@@ -878,6 +878,10 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <div class="chart-title">⏱ 累計学習時間</div>
         <div id="total-time-display" style="font-size:28px;font-weight:800;color:var(--accent2)">0分</div>
         <div style="font-size:11px;color:var(--text3);margin-top:4px">モーダルタイマー計測分の合計</div>
+        <div style="margin-top:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">📋 過去の学習記録</div>
+          <div id="session-history-list" style="font-size:12px;color:var(--text2);max-height:240px;overflow-y:auto"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1119,6 +1123,10 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     </div>
     <div class="settings-card">
       <div class="settings-title">データ</div>
+      <div class="settings-row">
+        <div><div class="settings-label">時間帯ログをリセット</div><div class="settings-sub">「最適学習時間帯」のデータをクリア</div></div>
+        <button class="danger-btn" onclick="if(confirm('時間帯データをリセットしますか？')){localStorage.removeItem('fg_hour_log');showToast('時間帯データをリセットしました');}">リセット</button>
+      </div>
       <div class="settings-row">
         <div><div class="settings-label">データをリセット</div><div class="settings-sub">現在の教材の記録のみ削除（他の教材は影響なし）</div></div>
         <button class="danger-btn" onclick="resetData()">リセット</button>
@@ -1838,12 +1846,40 @@ async function loadFromFirestore(uid) {
       if (data.freeNotes && Array.isArray(data.freeNotes)) {
         localStorage.setItem('fg_free_notes', JSON.stringify(data.freeNotes));
       }
-      // fg_hour_log をFirestoreから復元（デバイス間同期）
-      if (data.hourLog && typeof data.hourLog === 'object') {
-        var localLog = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
-        var merged = Object.assign({}, data.hourLog);
-        Object.keys(localLog).forEach(function(h) { merged[h] = (merged[h] || 0) + localLog[h]; });
-        localStorage.setItem('fg_hour_log', JSON.stringify(merged));
+      // fg_hour_log: Firestoreには保存せず、localStorageのみで管理
+      // （Firestore経由での二重計上を防ぐため）
+      // 異常値チェック: 合計が10万超なら壊れているのでリセット
+      (function() {
+        var logRaw = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
+        var total = 0;
+        for (var hh = 0; hh < 24; hh++) {
+          var v = logRaw[String(hh)];
+          if (typeof v === 'number') total += v;
+          else if (typeof v === 'object' && v) { Object.keys(v).forEach(function(k){ total += (typeof v[k]==='number'?v[k]:0); }); }
+        }
+        if (total > 100000) {
+          localStorage.removeItem('fg_hour_log');
+          console.warn('fg_hour_log が異常値(' + total + ')のためリセットしました');
+        }
+      })();
+      // 累計学習時間をFirestoreから復元
+      if (typeof data.totalTime === 'number' && data.totalTime > 0) {
+        var localTime = parseInt(localStorage.getItem('fg_total_time') || '0');
+        // Firestoreの値が大きければ優先（デバイス間同期）
+        if (data.totalTime > localTime) {
+          localStorage.setItem('fg_total_time', String(data.totalTime));
+        }
+      }
+      // セッション履歴をFirestoreから復元
+      if (data.sessionHistory && Array.isArray(data.sessionHistory)) {
+        var localHist = JSON.parse(localStorage.getItem('fg_session_history') || '[]');
+        // tsでマージ・重複除去
+        var merged2 = data.sessionHistory.concat(localHist);
+        var seen = {};
+        merged2 = merged2.filter(function(s){ if(seen[s.ts]) return false; seen[s.ts]=true; return true; });
+        merged2.sort(function(a,b){ return b.ts - a.ts; });
+        if (merged2.length > 200) merged2 = merged2.slice(0, 200);
+        localStorage.setItem('fg_session_history', JSON.stringify(merged2));
       }
     } else {
       stateFocusGold = JSON.parse(localStorage.getItem('fg_state') || '{}');
@@ -1922,7 +1958,8 @@ async function saveToFirestore(uid) {
       stateFg3: stateFg3, stateFg3Ex: stateFg3Ex,
       stateFg1: stateFg1, stateFg1Ex: stateFg1Ex,
       badgesFG: earnedBadgesFG, badgesSeminar: earnedBadgesSeminar,
-      hourLog: JSON.parse(localStorage.getItem('fg_hour_log') || '{}'),
+      totalTime: parseInt(localStorage.getItem('fg_total_time') || '0'),
+      sessionHistory: (function(){ var h=JSON.parse(localStorage.getItem('fg_session_history')||'[]'); return h.slice(0,200); })(),
       updatedAt: Date.now()
     });
     localStorage.setItem('fg_state', JSON.stringify(stateFocusGold));
@@ -2446,11 +2483,23 @@ function renderWeeklyReport() {
 }
 
 // ===== 最適学習時間帯 =====
+// fg_hour_log の値は数値（新形式）またはオブジェクト {bookKey:count}（旧形式）の両方に対応
+function _hourSlotToCount(val) {
+  if (!val) return 0;
+  if (typeof val === 'number') return val;
+  if (typeof val === 'object') {
+    var sum = 0;
+    Object.keys(val).forEach(function(k) { sum += (typeof val[k] === 'number' ? val[k] : 0); });
+    return sum;
+  }
+  var n = parseInt(val);
+  return isNaN(n) ? 0 : n;
+}
 function renderBestTime() {
-  // fg_hour_log: 問題を記録した時刻の時間帯カウント（キー: 0-23の文字列）
+  // fg_hour_log: キー 0-23、値は数値または旧形式オブジェクト両対応
   var logRaw = JSON.parse(localStorage.getItem('fg_hour_log') || '{}');
   var hourCounts = new Array(24).fill(0);
-  for (var h = 0; h < 24; h++) { hourCounts[h] = logRaw[String(h)] || 0; }
+  for (var h = 0; h < 24; h++) { hourCounts[h] = _hourSlotToCount(logRaw[String(h)]); }
   var maxH = Math.max.apply(null, hourCounts) || 1;
   var chart = document.getElementById('hourly-chart');
   if (chart) {
@@ -2466,13 +2515,15 @@ function renderBestTime() {
   var el = document.getElementById('best-time-display');
   if (el) {
     if (maxVal <= 0) { el.textContent = 'まだデータがありません'; return; }
-    el.innerHTML = 'あなたは <strong style="color:var(--accent2)">' + bestH + '時〜' + (bestH+1) + '時</strong> に最もよく学習しています（' + hourCounts[bestH] + '問）';
+    el.innerHTML = 'あなたは <strong style="color:var(--accent2)">' + bestH + '時〜' + (bestH+1) + '時</strong> に最もよく学習しています（累計 ' + maxVal + ' 回）';
   }
   // 累計時間
   var totalSec = parseInt(localStorage.getItem('fg_total_time') || '0');
   var totalMin = Math.round(totalSec / 60);
   var te = document.getElementById('total-time-display');
   if (te) te.textContent = totalMin < 60 ? totalMin + '分' : Math.floor(totalMin/60) + '時間' + (totalMin%60) + '分';
+  // 過去セッション履歴
+  renderSessionHistory();
 }
 
 // ===== スパークライン =====
@@ -3586,16 +3637,22 @@ function saveStateEx() {
 var timerInterval = null;
 var timerSeconds = 0;
 function initTimerBar() {
-  // モーダル表示時はタイマーバーを停止状態で表示
+  // モーダル表示時にタイマーを自動スタート
   stopTimer();
   timerSeconds = 0;
   var bar = document.getElementById('timer-bar');
   var disp = document.getElementById('timer-display');
   if (bar) bar.style.display = '';
   if (disp) disp.textContent = '0:00';
-  // 開始ボタンを表示
   var stopBtn = document.querySelector('#timer-bar .timer-stop-btn');
-  if (stopBtn) stopBtn.textContent = '▶ 開始';
+  if (stopBtn) stopBtn.textContent = '⏸ 停止';
+  // 自動開始
+  timerInterval = setInterval(function() {
+    timerSeconds++;
+    var m = Math.floor(timerSeconds / 60);
+    var s = timerSeconds % 60;
+    if (disp) disp.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
 }
 window.toggleTimer = function() {
   if (timerInterval) {
@@ -3622,11 +3679,41 @@ window.stopTimer = function() {
     // 累計学習時間に加算
     var prev = parseInt(localStorage.getItem('fg_total_time') || '0');
     localStorage.setItem('fg_total_time', String(prev + timerSeconds));
+    // セッション履歴記録
+    recordStudySession(timerSeconds);
   }
   var bar = document.getElementById('timer-bar');
   if (bar) bar.style.display = 'none';
   timerSeconds = 0;
 };
+
+// ===== セッション履歴 =====
+function recordStudySession(seconds) {
+  if (seconds < 10) return;
+  var history = JSON.parse(localStorage.getItem('fg_session_history') || '[]');
+  history.unshift({ ts: Date.now(), sec: seconds, book: currentBook });
+  if (history.length > 200) history = history.slice(0, 200);
+  localStorage.setItem('fg_session_history', JSON.stringify(history));
+  // Firestoreにも保存（遅延同期）
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(function() { saveToFirestore(); }, 800);
+}
+function renderSessionHistory() {
+  var el = document.getElementById('session-history-list'); if (!el) return;
+  var history = JSON.parse(localStorage.getItem('fg_session_history') || '[]');
+  if (history.length === 0) { el.innerHTML = '<div style="color:var(--text3);padding:10px 0;font-size:12px">まだ記録がありません</div>'; return; }
+  el.innerHTML = history.slice(0, 50).map(function(s) {
+    var d = new Date(s.ts);
+    var dateStr = (d.getMonth()+1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + ('0'+d.getMinutes()).slice(-2);
+    var m = Math.floor(s.sec/60), sec2 = s.sec % 60;
+    var durStr = m > 0 ? m + '分' + (sec2>0?sec2+'秒':'') : sec2 + '秒';
+    var bookLabel = { focusgold:'FG数2BC', seminar:'セミナー物理', 'excel-chem':'エクセル化学', 'chem-jyuyo':'化学重要', fg3:'FG数Ⅲ', fg1:'FG数Ⅰ' }[s.book] || (s.book || '');
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)">' +
+      '<span style="color:var(--text3);font-size:11px">' + dateStr + '</span>' +
+      '<span style="font-size:11px;color:var(--text2)">' + bookLabel + '</span>' +
+      '<span style="color:var(--accent2);font-weight:700">' + durStr + '</span></div>';
+  }).join('');
+}
 
 // ===== SOUND =====
 var soundEnabled = localStorage.getItem('fg_sound') !== 'off';
