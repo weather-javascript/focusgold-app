@@ -383,6 +383,12 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 
 /* PROJECT */
 .project-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 13px 15px; margin-bottom: 10px; }
+.np-subj-chip { padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.np-subj-chip.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent2); font-weight: 600; }
+.book-sel-chip { padding: 5px 10px; border-radius: 16px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); font-size: 11px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.book-sel-chip.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent2); font-weight: 600; }
+.project-subjects { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.project-subj-tag { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--accent-bg); color: var(--accent2); }
 .project-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .project-name { font-size: 14px; font-weight: 700; }
 .project-progress-bar { height: 6px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
@@ -724,13 +730,24 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
         <button class="sort-chip" onclick="startBatuDrill()" title="×問題特訓">💢</button>
       </div>
     </div>
-    <!-- 問題番号ジャンプ -->
-    <div style="display:flex;gap:6px;margin-bottom:10px">
-      <div style="position:relative;flex:1">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px">🔍</span>
-        <input id="pid-jump-input" style="width:100%;padding:8px 10px 8px 32px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none" placeholder="問題番号で直接ジャンプ（例: 42, B1.5）" onkeydown="if(event.key==='Enter')jumpToProblem()" />
+    <!-- 参考書選択＆問題番号ジャンプ -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:11px 13px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">📚 参考書から問題を開く</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px" id="book-select-chips">
+        <button class="book-sel-chip active" data-book="focusgold" onclick="selectBookChip(this)">📘 FG数2BC</button>
+        <button class="book-sel-chip" data-book="seminar" onclick="selectBookChip(this)">📗 セミナー物理</button>
+        <button class="book-sel-chip" data-book="excel-chem" onclick="selectBookChip(this)">🧪 エクセル化学</button>
+        <button class="book-sel-chip" data-book="chem-jyuyo" onclick="selectBookChip(this)">⚗️ 化学重要問題集</button>
+        <button class="book-sel-chip" data-book="fg3" onclick="selectBookChip(this)">📕 FG数Ⅲ</button>
+        <button class="book-sel-chip" data-book="fg1" onclick="selectBookChip(this)">📙 FG数Ⅰ</button>
       </div>
-      <button class="sort-chip" onclick="jumpToProblem()" style="flex-shrink:0">ジャンプ</button>
+      <div style="display:flex;gap:6px">
+        <div style="position:relative;flex:1">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px">🔍</span>
+          <input id="pid-jump-input" style="width:100%;padding:8px 10px 8px 32px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:inherit;outline:none" placeholder="問題番号（例: 42, B1.5）" onkeydown="if(event.key==='Enter')jumpToProblem()" />
+        </div>
+        <button class="sort-chip" onclick="jumpToProblem()" style="flex-shrink:0">ジャンプ</button>
+      </div>
     </div>
     <div class="section-title">📋 今日の復習タスク</div>
     <div class="task-list" id="task-list"></div>
@@ -1169,6 +1186,50 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
 <div id="warp-overlay">
   <canvas id="warp-canvas"></canvas>
   <div class="warp-label" id="warp-label"></div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="modal-overlay" id="new-project-modal" onclick="closeNewProjectModalBg(event)" style="align-items:center">
+  <div class="modal" style="border-radius:var(--radius-lg);max-height:88vh">
+    <div class="modal-handle"></div>
+    <div class="modal-close-row"><button class="modal-x" onclick="closeNewProjectModal()">×</button></div>
+    <div class="modal-title">📁 新規プロジェクト</div>
+    <div class="modal-sub">目標期間と教科を設定しよう</div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">プロジェクト名</div>
+      <input id="np-name" class="auth-input" style="margin-bottom:0" placeholder="例：共通テスト3週間対策" />
+    </div>
+    <div style="margin-bottom:10px;display:flex;gap:8px">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">開始日</div>
+        <input type="date" id="np-start" class="auth-input" style="margin-bottom:0" />
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:600">終了日</div>
+        <input type="date" id="np-end" class="auth-input" style="margin-bottom:0" />
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:7px;font-weight:600">教科（複数選択可）</div>
+      <div id="np-subject-chips" style="display:flex;flex-wrap:wrap;gap:6px">
+        <button class="np-subj-chip" data-subj="数学" onclick="toggleSubjChip(this)">📐 数学</button>
+        <button class="np-subj-chip" data-subj="物理" onclick="toggleSubjChip(this)">⚡ 物理</button>
+        <button class="np-subj-chip" data-subj="化学" onclick="toggleSubjChip(this)">🧪 化学</button>
+        <button class="np-subj-chip" data-subj="生物" onclick="toggleSubjChip(this)">🌿 生物</button>
+        <button class="np-subj-chip" data-subj="英語" onclick="toggleSubjChip(this)">🔤 英語</button>
+        <button class="np-subj-chip" data-subj="国語" onclick="toggleSubjChip(this)">📖 国語</button>
+        <button class="np-subj-chip" data-subj="地理" onclick="toggleSubjChip(this)">🌍 地理</button>
+        <button class="np-subj-chip" data-subj="歴史" onclick="toggleSubjChip(this)">🏛 歴史</button>
+        <button class="np-subj-chip" data-subj="公民" onclick="toggleSubjChip(this)">⚖️ 公民</button>
+        <button class="np-subj-chip np-subj-other" data-subj="__other__" onclick="toggleSubjChip(this)">✏️ その他</button>
+      </div>
+      <div id="np-other-wrap" style="display:none;margin-top:8px">
+        <input id="np-other-input" class="auth-input" style="margin-bottom:0" placeholder="教科名を入力（例：情報、地学、現代文...）" />
+      </div>
+    </div>
+    <div id="np-err" style="color:var(--red);font-size:12px;min-height:16px;margin-bottom:6px"></div>
+    <button class="modal-btn primary" onclick="saveNewProject()">作成する</button>
+  </div>
 </div>
 
 <!-- Firebase Compat SDK -->
@@ -2565,23 +2626,27 @@ function pomoNextPhase() {
 function playPomoSound(type) {
   if (!soundEnabled) return;
   try {
-    var actx = new (window.AudioContext||window.webkitAudioContext)();
-    if (type === 'tick') {
-      var osc = actx.createOscillator(); var g = actx.createGain();
-      osc.connect(g); g.connect(actx.destination);
-      osc.frequency.value = 800; g.gain.setValueAtTime(0.05, actx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.08);
-      osc.start(); osc.stop(actx.currentTime+0.08);
-    } else {
-      var freqs = [523,659,784,1047];
-      freqs.forEach(function(f, i) {
+    var actx = getAudioCtx(); if (!actx) return;
+    var doPlay = function() {
+      if (type === 'tick') {
         var osc = actx.createOscillator(); var g = actx.createGain();
         osc.connect(g); g.connect(actx.destination);
-        osc.frequency.value = f; g.gain.setValueAtTime(0.25, actx.currentTime+i*0.12);
-        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+i*0.12+0.4);
-        osc.start(actx.currentTime+i*0.12); osc.stop(actx.currentTime+i*0.12+0.4);
-      });
-    }
+        osc.frequency.value = 800; g.gain.setValueAtTime(0.05, actx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.08);
+        osc.start(); osc.stop(actx.currentTime+0.08);
+      } else {
+        var freqs = [523,659,784,1047];
+        freqs.forEach(function(f, i) {
+          var osc = actx.createOscillator(); var g = actx.createGain();
+          osc.connect(g); g.connect(actx.destination);
+          osc.frequency.value = f; g.gain.setValueAtTime(0.25, actx.currentTime+i*0.12);
+          g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+i*0.12+0.4);
+          osc.start(actx.currentTime+i*0.12); osc.stop(actx.currentTime+i*0.12+0.4);
+        });
+      }
+    };
+    if (actx.state === 'suspended') { actx.resume().then(doPlay).catch(function(){}); }
+    else { doPlay(); }
   } catch(e) {}
 }
 window.togglePomodoro = function() {
@@ -3574,15 +3639,19 @@ function playTone(freqs, duration, vol) {
   if (!soundEnabled) return;
   try {
     var actx = getAudioCtx(); if (!actx) return;
-    (Array.isArray(freqs) ? freqs : [freqs]).forEach(function(f, i) {
-      var off = Array.isArray(freqs) ? i * (duration / freqs.length * 0.8) : 0;
-      var osc = actx.createOscillator(); var g = actx.createGain();
-      osc.connect(g); g.connect(actx.destination);
-      osc.frequency.value = f;
-      g.gain.setValueAtTime(vol || 0.25, actx.currentTime + off);
-      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + off + duration);
-      osc.start(actx.currentTime + off); osc.stop(actx.currentTime + off + duration);
-    });
+    var doPlay = function() {
+      (Array.isArray(freqs) ? freqs : [freqs]).forEach(function(f, i) {
+        var off = Array.isArray(freqs) ? i * (duration / freqs.length * 0.8) : 0;
+        var osc = actx.createOscillator(); var g = actx.createGain();
+        osc.connect(g); g.connect(actx.destination);
+        osc.frequency.value = f;
+        g.gain.setValueAtTime(vol || 0.25, actx.currentTime + off);
+        g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + off + duration);
+        osc.start(actx.currentTime + off); osc.stop(actx.currentTime + off + duration);
+      });
+    };
+    if (actx.state === 'suspended') { actx.resume().then(doPlay).catch(function(){}); }
+    else { doPlay(); }
   } catch(e) {}
 }
 function playSound() { playTone([523,659,784], 0.18, 0.25); }
@@ -4112,17 +4181,63 @@ window.renderProjects = function() {
     var total=Math.max(1,Math.ceil((end-start)/86400000));
     var elapsed=Math.ceil((new Date()-start)/86400000);
     var pct=Math.min(100,Math.max(0,Math.round(elapsed/total*100)));
+    var subjects = (p.subjects||[]);
+    var subjHTML = subjects.length ? '<div class="project-subjects">'+subjects.map(function(s){return '<span class="project-subj-tag">'+s+'</span>';}).join('')+'</div>' : '';
     return '<div class="project-card"><div class="project-header"><div class="project-name">'+p.name+'</div>' +
       '<button onclick="deleteProject('+i+')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px">×</button></div>' +
-      '<div class="project-progress-bar"><div class="project-progress-fill" style="width:'+pct+'%"></div></div>' +
+      subjHTML +
+      '<div class="project-progress-bar" style="margin-top:8px"><div class="project-progress-fill" style="width:'+pct+'%"></div></div>' +
       '<div class="project-meta">'+p.start+' 〜 '+p.end+'（'+pct+'%経過）</div></div>';
   }).join('');
 };
 window.openNewProject = function() {
-  var name = prompt('プロジェクト名（例：共通テスト3週間対策）'); if (!name) return;
-  var start = prompt('開始日（YYYY-MM-DD）', new Date().toISOString().slice(0,10)); if (!start) return;
-  var end = prompt('終了日（YYYY-MM-DD）'); if (!end) return;
-  var projects = getProjects(); projects.push({name:name,start:start,end:end}); saveProjects(projects); renderProjects();
+  var modal = document.getElementById('new-project-modal'); if (!modal) return;
+  // reset
+  var nameEl = document.getElementById('np-name'); if (nameEl) nameEl.value = '';
+  var startEl = document.getElementById('np-start'); if (startEl) startEl.value = new Date().toISOString().slice(0,10);
+  var endEl = document.getElementById('np-end'); if (endEl) endEl.value = '';
+  var otherWrap = document.getElementById('np-other-wrap'); if (otherWrap) otherWrap.style.display = 'none';
+  var otherInput = document.getElementById('np-other-input'); if (otherInput) otherInput.value = '';
+  var errEl = document.getElementById('np-err'); if (errEl) errEl.textContent = '';
+  document.querySelectorAll('.np-subj-chip').forEach(function(c){ c.classList.remove('active'); });
+  modal.classList.add('open');
+};
+window.closeNewProjectModal = function() {
+  var modal = document.getElementById('new-project-modal'); if (modal) modal.classList.remove('open');
+};
+window.closeNewProjectModalBg = function(e) {
+  if (e.target === document.getElementById('new-project-modal')) closeNewProjectModal();
+};
+window.toggleSubjChip = function(btn) {
+  btn.classList.toggle('active');
+  var otherWrap = document.getElementById('np-other-wrap');
+  var otherActive = document.querySelector('.np-subj-other.active');
+  if (otherWrap) otherWrap.style.display = otherActive ? 'block' : 'none';
+};
+window.saveNewProject = function() {
+  var name = (document.getElementById('np-name')||{}).value.trim();
+  var start = (document.getElementById('np-start')||{}).value;
+  var end = (document.getElementById('np-end')||{}).value;
+  var errEl = document.getElementById('np-err');
+  if (!name) { if (errEl) errEl.textContent = 'プロジェクト名を入力してください'; return; }
+  if (!start) { if (errEl) errEl.textContent = '開始日を入力してください'; return; }
+  if (!end) { if (errEl) errEl.textContent = '終了日を入力してください'; return; }
+  if (end < start) { if (errEl) errEl.textContent = '終了日は開始日以降にしてください'; return; }
+  var subjects = [];
+  document.querySelectorAll('.np-subj-chip.active').forEach(function(c) {
+    if (c.dataset.subj === '__other__') {
+      var otherVal = (document.getElementById('np-other-input')||{}).value.trim();
+      if (otherVal) subjects.push(otherVal);
+    } else {
+      subjects.push(c.dataset.subj);
+    }
+  });
+  var projects = getProjects();
+  projects.push({name:name, start:start, end:end, subjects:subjects});
+  saveProjects(projects);
+  renderProjects();
+  closeNewProjectModal();
+  showToast('📁 プロジェクトを作成しました');
 };
 window.deleteProject = function(i) { var p=getProjects(); p.splice(i,1); saveProjects(p); renderProjects(); };
 
@@ -4151,18 +4266,41 @@ function checkChapterComplete(pid) {
     }
   }
 }
+var _jumpBook = null; // null means use currentBook
+window.selectBookChip = function(btn) {
+  document.querySelectorAll('.book-sel-chip').forEach(function(c){ c.classList.remove('active'); });
+  btn.classList.add('active');
+  _jumpBook = btn.dataset.book;
+};
+// init chip to match currentBook on page load
+setTimeout(function() {
+  var chip = document.querySelector('.book-sel-chip[data-book="'+currentBook+'"]');
+  if (chip) { document.querySelectorAll('.book-sel-chip').forEach(function(c){c.classList.remove('active');}); chip.classList.add('active'); _jumpBook = currentBook; }
+}, 500);
 window.jumpToProblem = function() {
   var input = document.getElementById('pid-jump-input');
   if (!input) return;
   var query = input.value.trim();
   if (!query) return;
-  // Find the problem across all chapters
+  // Get chapters for selected book
+  var bookMap = { focusgold: CHAPTERS_FOCUSGOLD, seminar: CHAPTERS_SEMINAR, 'excel-chem': CHAPTERS_EXCEL_CHEM, 'chem-jyuyo': CHAPTERS_CHEM_JYUYO, fg3: CHAPTERS_FG3, fg1: CHAPTERS_FG1 };
+  var targetBook = _jumpBook || currentBook;
+  var targetChapters = bookMap[targetBook] || CHAPTERS;
   var allPids = [];
-  CHAPTERS.forEach(function(ch) { getProblems(ch).forEach(function(p) { allPids.push(p); }); });
+  targetChapters.forEach(function(ch) { getProblems(ch).forEach(function(p) { allPids.push(p); }); });
   var found = allPids.find(function(p) { return p.toLowerCase() === query.toLowerCase(); });
   if (found) {
-    var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(found) !== -1; });
-    openModal(found, ch ? ch.name : '');
+    // If different book, switch book first
+    if (targetBook !== currentBook) {
+      switchBook(targetBook);
+      setTimeout(function() {
+        var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(found) !== -1; });
+        openModal(found, ch ? ch.name : '');
+      }, 600);
+    } else {
+      var ch = CHAPTERS.find(function(c) { return getProblems(c).indexOf(found) !== -1; });
+      openModal(found, ch ? ch.name : '');
+    }
     input.value = '';
   } else {
     showToast('❌ 問題「' + query + '」が見つかりません');
