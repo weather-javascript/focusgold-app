@@ -451,6 +451,84 @@ nav.top-nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,19,
 .sparkline-wrap { display: inline-flex; align-items: flex-end; gap: 1px; height: 20px; margin-left: 6px; vertical-align: middle; }
 .sparkline-bar { width: 4px; border-radius: 1px; }
 
+/* FILTER BAR */
+.filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; padding: 6px 0; }
+.filter-label { font-size: 11px; color: var(--text3); font-weight: 600; flex-shrink: 0; }
+.filter-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; border: 1px solid var(--border2); background: var(--bg3); color: var(--text2); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+.filter-chip:hover { border-color: var(--accent); color: var(--accent2); }
+.filter-chip.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent2); font-weight: 600; }
+
+/* TIME VIZ RANKING */
+.time-viz-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.time-viz-row:last-child { border-bottom: none; }
+.time-viz-pid { font-size: 12px; font-weight: 700; color: var(--text); min-width: 64px; flex-shrink: 0; }
+.time-viz-bar-wrap { flex: 1; height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+.time-viz-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; min-width: 3px; }
+.time-viz-sec { font-size: 12px; font-weight: 600; color: var(--text2); min-width: 60px; text-align: right; flex-shrink: 0; }
+
+
+/* ===== 曜日×時間帯ヒートマップ ===== */
+.dow-heatmap-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.dow-heatmap-table { border-collapse: separate; border-spacing: 3px; min-width: 100%; }
+.dow-heatmap-table th { font-size: 9px; color: var(--text3); font-weight: 600; text-align: center; padding: 2px 4px; white-space: nowrap; }
+.dow-heatmap-table td { width: 28px; height: 22px; border-radius: 4px; text-align: center; font-size: 9px; font-weight: 600; cursor: default; transition: transform 0.1s; }
+.dow-heatmap-table td:hover { transform: scale(1.2); z-index: 1; position: relative; }
+.dow-heatmap-legend { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10px; color: var(--text3); justify-content: flex-end; }
+.dow-heatmap-legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+/* ===== 解答時間推移グラフ ===== */
+.time-history-select { width: 100%; padding: 8px 10px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-size: 13px; font-family: inherit; outline: none; margin-bottom: 12px; }
+.time-history-select:focus { border-color: var(--accent); }
+.time-history-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 6px; }
+.time-history-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; }
+.time-history-bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--accent-bg); min-height: 3px; transition: height 0.3s; }
+.time-history-bar.first { background: var(--amber); }
+.time-history-label { font-size: 8px; color: var(--text3); }
+.time-history-val { font-size: 8px; color: var(--text3); }
+.time-history-empty { font-size: 12px; color: var(--text3); text-align: center; padding: 20px 0; }
+/* ===== 目標達成率リング ===== */
+.goal-ring-wrap { display: flex; align-items: center; gap: 16px; padding: 4px 0 10px; }
+.goal-ring-svg { flex-shrink: 0; }
+.goal-ring-track { fill: none; stroke: var(--bg4); stroke-width: 8; }
+.goal-ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1); }
+.goal-ring-info { flex: 1; }
+.goal-ring-pct { font-size: 26px; font-weight: 800; line-height: 1; }
+.goal-ring-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.goal-ring-breakdown { display: flex; gap: 10px; margin-top: 8px; font-size: 12px; font-weight: 700; }
+/* ===== 章別弱点スコア ===== */
+.weakness-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.weakness-row:last-child { border-bottom: none; }
+.weakness-ch { font-size: 11px; color: var(--text2); min-width: 130px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.weakness-bar-wrap { flex: 1; height: 10px; background: var(--bg4); border-radius: 5px; overflow: hidden; position: relative; }
+.weakness-bar-batu { height: 100%; border-radius: 5px 0 0 5px; background: var(--red); min-width: 0; transition: width 0.4s; }
+.weakness-bar-sanka { position: absolute; top: 0; height: 100%; background: var(--amber); transition: width 0.4s; }
+.weakness-pct { font-size: 10px; font-weight: 700; color: var(--red); min-width: 34px; text-align: right; flex-shrink: 0; }
+.weakness-empty { font-size: 12px; color: var(--text3); text-align: center; padding: 14px 0; }
+/* ===== 未着手バッジ ===== */
+.unlearned-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 18px; border-radius: 9px; background: var(--bg4); color: var(--text3); font-size: 9px; font-weight: 700; padding: 0 5px; margin-left: 6px; vertical-align: middle; }
+.unlearned-badge.has-unlearned { background: rgba(108,99,255,0.2); color: var(--accent2); }
+/* ===== セッション終了サマリー ===== */
+.session-summary-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 600; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeInBg 0.25s ease; }
+@keyframes fadeInBg { from{opacity:0} to{opacity:1} }
+.session-summary-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 28px 22px 22px; width: 100%; max-width: 340px; text-align: center; animation: badgePop 0.35s ease; }
+.session-summary-emoji { font-size: 36px; margin-bottom: 8px; }
+.session-summary-title { font-size: 20px; font-weight: 800; margin-bottom: 3px; }
+.session-summary-sub { font-size: 12px; color: var(--text3); margin-bottom: 18px; }
+.session-summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+.session-summary-cell { border-radius: var(--radius); padding: 12px 6px; }
+.session-summary-val { font-size: 26px; font-weight: 800; line-height: 1; }
+.session-summary-lbl { font-size: 11px; color: var(--text2); margin-top: 3px; }
+.session-summary-avg { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+.session-summary-btn { width: 100%; padding: 13px; background: var(--accent); border: none; border-radius: var(--radius); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+/* SHARE REPORT BUTTON */
+.share-report-btn { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; width: 100%; padding: 11px 16px; border-radius: var(--radius); border: 1px solid rgba(108,99,255,0.35); background: var(--accent-bg); color: var(--accent2); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.share-report-btn:hover { background: rgba(108,99,255,0.2); border-color: var(--accent); }
+
+/* SHARE CANVAS OVERLAY */
+#share-canvas-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; }
+#share-canvas { max-width: 100%; border-radius: var(--radius); border: 1px solid var(--border2); box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+.share-canvas-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.share-canvas-btn { padding: 10px 20px; border-radius: var(--radius); border: none; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
+
 /* BOOK SWITCHER */
 .nav-logo { cursor: pointer; user-select: none; }
 .nav-logo:active { opacity: 0.75; }
@@ -555,6 +633,79 @@ body.fg1-mode .project-progress-fill { background: linear-gradient(90deg,#b45309
 body.fg1-mode .loading-bar-fill { background: linear-gradient(90deg,#b45309,#fbbf24,#fde68a); }
 body.fg1-mode .badge-flash-card { border-color: #d97706; box-shadow: 0 0 60px rgba(217,119,6,0.5); }
 body.fg1-mode .ring-circle-el { stroke: #d97706; }
+</style>
+<!-- ===== IMAGE PREVIEW STYLES (Supabase Storage) ===== -->
+<style>
+/* 学習記録モーダル: 画像エリア */
+.img-upload-area { margin: 8px 0 10px; }
+.img-upload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 13px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius); color: var(--text2); font-size: 12px;
+  cursor: pointer; font-family: inherit; transition: border-color 0.15s;
+}
+.img-upload-btn:hover { border-color: var(--accent); color: var(--accent2); }
+.img-upload-input { display: none; }
+.img-uploading { font-size: 11px; color: var(--accent2); margin-top: 5px; display: none; }
+.img-uploading.active { display: flex; align-items: center; gap: 6px; }
+.img-uploading-spinner {
+  width: 12px; height: 12px; border: 2px solid var(--border2);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+/* サムネイルグリッド (共通) */
+.img-thumb-list {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;
+}
+.img-thumb-item {
+  position: relative; width: 76px; height: 76px; border-radius: 8px;
+  overflow: hidden; border: 1px solid var(--border2); background: var(--bg3);
+  cursor: pointer;
+}
+.img-thumb-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-thumb-del {
+  position: absolute; top: 2px; right: 2px;
+  width: 18px; height: 18px; background: rgba(0,0,0,0.65);
+  border: none; border-radius: 50%; color: #fff; font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+/* フリーメモ: 横スクロール画像列 */
+.fne-img-bar {
+  display: flex; gap: 8px; overflow-x: auto; padding: 10px 16px;
+  border-bottom: 1px solid var(--border); background: var(--bg2);
+  -webkit-overflow-scrolling: touch;
+}
+.fne-img-bar:empty { display: none; }
+.fne-img-item {
+  position: relative; flex-shrink: 0; width: 72px; height: 72px;
+  border-radius: 8px; overflow: hidden; border: 1px solid var(--border2);
+  background: var(--bg3); cursor: pointer;
+}
+.fne-img-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fne-img-del {
+  position: absolute; top: 2px; right: 2px;
+  width: 18px; height: 18px; background: rgba(0,0,0,0.65);
+  border: none; border-radius: 50%; color: #fff; font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.fne-img-add-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius); color: var(--text2); font-size: 12px;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+/* 拡大ライトボックス */
+#img-lightbox {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 9999; display: flex; align-items: center; justify-content: center;
+}
+#img-lightbox img { max-width: 94vw; max-height: 88vh; border-radius: 8px; }
+#img-lightbox-close {
+  position: absolute; top: 16px; right: 20px;
+  background: none; border: none; color: #fff; font-size: 28px; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -670,7 +821,10 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     <div id="streak-alert" class="streak-alert" style="display:none">🔥 今日まだ0問！ストリークが途切れる前に1問やろう！</div>
     <!-- 今日のひとこと -->
     <div class="daily-word-card" id="daily-word-card">
-      <div class="daily-word-label">💬 今日のひとこと</div>
+      <div class="daily-word-header">
+        <div class="daily-word-label">💬 今日のひとこと</div>
+        <button class="daily-word-edit-btn" onclick="openDailyWordEditor()" title="メッセージをカスタマイズ">✏️</button>
+      </div>
       <div class="daily-word-text" id="daily-word-text">読み込み中...</div>
     </div>
     <div id="countdown-banner" style="display:none" class="countdown-banner">
@@ -700,8 +854,27 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     <div class="goal-card" id="goal-card">
       <span style="font-size:16px">🎯</span>
       <div id="goal-declared" style="display:none;flex:1">
-        <div class="goal-progress-text" id="goal-progress-text">0 / 0 問完了</div>
-        <div class="level-bar-wrap"><div class="level-bar-fill" id="goal-bar" style="width:0%"></div></div>
+        <div class="goal-ring-wrap">
+          <svg class="goal-ring-svg" width="72" height="72" viewBox="0 0 72 72">
+            <circle class="goal-ring-track" cx="36" cy="36" r="28"/>
+            <circle class="goal-ring-fill" id="goal-ring-fill" cx="36" cy="36" r="28"
+              stroke="var(--accent2)"
+              stroke-dasharray="175.9"
+              stroke-dashoffset="175.9"
+              transform="rotate(-90 36 36)"/>
+            <text x="36" y="40" text-anchor="middle" font-size="13" font-weight="800" fill="var(--text)" id="goal-ring-text">0%</text>
+          </svg>
+          <div class="goal-ring-info">
+            <div class="goal-ring-pct" id="goal-ring-pct" style="color:var(--accent2)">0%</div>
+            <div class="goal-ring-sub" id="goal-progress-text">0 / 0 問完了</div>
+            <div class="goal-ring-breakdown">
+              <span style="color:var(--green)" id="goal-ring-maru">○ 0</span>
+              <span style="color:var(--amber)" id="goal-ring-sanka">△ 0</span>
+              <span style="color:var(--red)" id="goal-ring-batu">× 0</span>
+            </div>
+          </div>
+        </div>
+        <div class="level-bar-wrap" style="display:none"><div class="level-bar-fill" id="goal-bar" style="width:0%"></div></div>
       </div>
       <div id="goal-set-ui" style="flex:1;display:flex;align-items:center;gap:8px">
         <span style="font-size:12px;color:var(--text3)">今日の目標:</span>
@@ -728,6 +901,16 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div style="display:flex;gap:4px">
         <button class="sort-chip" onclick="startRandomMode()" title="ランダム出題">🎲</button>
         <button class="sort-chip" onclick="startBatuDrill()" title="×問題特訓">💢</button>
+      </div>
+      <div class="filter-bar" id="task-filter-bar">
+        <span class="filter-label">絞込:</span>
+        <button class="filter-chip active" id="ff-all" onclick="setTaskFilter('all')">すべて</button>
+        <button class="filter-chip" id="ff-imp3" onclick="setTaskFilter('imp3')">★★★</button>
+        <button class="filter-chip" id="ff-imp2" onclick="setTaskFilter('imp2')">★★</button>
+        <button class="filter-chip" id="ff-diff-hard" onclick="setTaskFilter('diff-hard')">難問</button>
+        <button class="filter-chip" id="ff-diff-std" onclick="setTaskFilter('diff-std')">標準</button>
+        <button class="filter-chip" id="ff-no-memo" onclick="setTaskFilter('no-memo')">メモなし</button>
+        <button class="filter-chip" id="ff-timed" onclick="setTaskFilter('timed')">時間記録あり</button>
       </div>
     </div>
     <!-- 参考書選択＆問題番号ジャンプ -->
@@ -769,6 +952,7 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
     <div class="weekly-report-card" id="weekly-report-card">
       <div class="weekly-report-title">📊 今週のまとめ</div>
       <div class="weekly-report-grid" id="weekly-report-grid"></div>
+      <button class="share-report-btn" onclick="shareWeeklyReport()">📤 今週の成績を画像でシェア</button>
     </div>
     <!-- 30日ストリークグラフ -->
     <div class="chart-card">
@@ -792,6 +976,27 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div class="chart-title">📈 正答率トレンド（過去8週・折れ線）</div>
       <svg id="rate-line-chart" width="100%" height="100" viewBox="0 0 320 100" preserveAspectRatio="none" style="display:block;overflow:visible"></svg>
       <div class="bar-chart" id="rate-chart" style="margin-top:8px"></div>
+    </div>
+    <!-- 曜日×時間帯ヒートマップ -->
+    <div class="chart-card">
+      <div class="chart-title">🗓 曜日×時間帯ヒートマップ</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">どの時間帯に一番集中できているか</div>
+      <div class="dow-heatmap-wrap"><div id="dow-heatmap-inner"></div></div>
+    </div>
+    <!-- 解答時間推移グラフ -->
+    <div class="chart-card">
+      <div class="chart-title">📉 解答時間の推移</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">同じ問題を繰り返すごとにタイムが縮んでいるか</div>
+      <select class="time-history-select" id="time-history-select" onchange="renderTimeHistory()">
+        <option value="">問題を選択...</option>
+      </select>
+      <div id="time-history-chart-wrap"></div>
+    </div>
+    <!-- 問題別解答時間ランキング -->
+    <div class="chart-card">
+      <div class="chart-title">⏱ 問題別解答時間ランキング</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">記録のある問題（上位10件）</div>
+      <div id="time-viz-list"></div>
     </div>
     <!-- 週次ランキング -->
     <div class="ranking-card">
@@ -864,6 +1069,11 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       </div>
     </div>
     <div id="progress-trends" style="display:none">
+      <div class="chart-card">
+        <div class="chart-title">💔 章別弱点スコア</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px">各章の△・×の割合（多いほど要注意）</div>
+        <div id="weakness-score-list"></div>
+      </div>
       <div class="chart-card">
         <div class="chart-title">📈 最適学習時間帯</div>
         <div id="best-time-display" style="font-size:13px;color:var(--text2);padding:6px 0"></div>
@@ -1122,6 +1332,23 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
       <div id="study-plan-result" style="font-size:12px;color:var(--text2);margin-top:8px;display:none;background:var(--bg3);border-radius:8px;padding:8px"></div>
     </div>
     <div class="settings-card">
+      <div class="settings-title">👥 フレンドコード</div>
+      <div id="friend-code-section">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px">コードを共有して友達と進捗を比較しよう</div>
+        <div class="friend-code-display" id="my-friend-code">------</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="small-btn" onclick="copyFriendCode()" style="flex:1">📋 コピー</button>
+          <button class="small-btn" onclick="shareFriendCode()" style="flex:1">📤 シェア</button>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">友達のコードを入力</div>
+        <div style="display:flex;gap:6px">
+          <input id="friend-code-input" class="auth-input" placeholder="例: AB1C2D" maxlength="6" style="flex:1;margin-bottom:0;text-transform:uppercase;letter-spacing:2px;font-weight:700" oninput="this.value=this.value.toUpperCase()" />
+          <button class="small-btn" onclick="addFriend()">追加</button>
+        </div>
+        <div id="friend-list" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <div class="settings-card">
       <div class="settings-title">データ</div>
       <div class="settings-row">
         <div><div class="settings-label">時間帯ログをリセット</div><div class="settings-sub">「最適学習時間帯」のデータをクリア</div></div>
@@ -1245,7 +1472,63 @@ body.fg1-mode .ring-circle-el { stroke: #d97706; }
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
-  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+// ===== SUPABASE 初期化 =====
+// ⚠️ GitHub公開リポジトリにそのまま置かず、GitHub Secretsや環境変数で管理してください
+// APKビルド/GitHub Actions利用の場合は下記を直書きせず
+// build時に置換する方式を推奨（後述のセキュリティ手順を参照）
+var SUPABASE_URL  = 'https://pjdbzgkucvbjzyrizwvs.supabase.co';
+var SUPABASE_ANON = 'sb_publishable_EtKgMslX0uvLwWpkxqALCw_JNva_-55';
+var sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ===== Storage ヘルパー =====
+var SB_BUCKET = 'study-images';
+
+function sbUserId() {
+  return (typeof currentUid !== 'undefined' && currentUid) ? currentUid : 'guest';
+}
+
+function sbGenFilename(ext) {
+  return Date.now() + '_' + Math.random().toString(36).substring(2, 9) + (ext || '.jpg');
+}
+
+// 画像をSupabaseにアップロードしてPublic URLを返す (Promise)
+async function sbUploadImage(file, folder) {
+  var uid = sbUserId();
+  var mimeToExt = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif', 'image/webp': '.webp', 'image/heic': '.jpg', 'image/heif': '.jpg' };
+  var ext = mimeToExt[file.type] || '.jpg';
+  var path = folder + '/' + uid + '/' + sbGenFilename(ext);
+  var { data, error } = await sbClient.storage.from(SB_BUCKET).upload(path, file, {
+    cacheControl: '3600', upsert: false, contentType: 'image/jpeg'
+  });
+  if (error) {
+    console.error('[Supabase Storage] Upload error:', JSON.stringify(error));
+    throw new Error(error.message || error.error || JSON.stringify(error));
+  }
+  var { data: urlData } = sbClient.storage.from(SB_BUCKET).getPublicUrl(path);
+  return { url: urlData.publicUrl, path: path };
+}
+
+// Storageから削除
+async function sbDeleteImage(path) {
+  if (!path) return;
+  await sbClient.storage.from(SB_BUCKET).remove([path]);
+}
+
+// ===== ライトボックス =====
+function showLightbox(src) {
+  var old = document.getElementById('img-lightbox'); if (old) old.remove();
+  var el = document.createElement('div'); el.id = 'img-lightbox';
+  el.innerHTML = '<button id="img-lightbox-close" onclick="document.getElementById(\'img-lightbox\').remove()">✕</button>' +
+    '<img src="' + src + '" />';
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+  document.body.appendChild(el);
+}
+window.showLightbox = showLightbox;
+</script>
+
 <script>
 var firebaseConfig = {
   apiKey: "AIzaSyCrZL-70u3uYUApW5vfSmktSDHHIDBcl7k",
@@ -1806,6 +2089,22 @@ auth.onAuthStateChanged(function(user) {
       if (sub) sub.textContent = nl.sub;
     })();
     loadFromFirestore(user.uid).then(function() {
+      // リアルタイム同期 (onSnapshot)
+      if (window._unsubscribeSnapshot) window._unsubscribeSnapshot();
+      window._unsubscribeSnapshot = db.collection('users').doc(user.uid).onSnapshot(function(doc) {
+        if (!doc.exists) return;
+        var data = doc.data();
+        if (data.updatedAt && Date.now() - data.updatedAt < 3000) return;
+        var remoteTs = data.updatedAt || 0;
+        var localTs = parseInt(localStorage.getItem('fg_local_updatedAt') || '0');
+        if (remoteTs > localTs + 5000) {
+          showToast('🔄 他のデバイスから同期しました', 2500);
+          loadFromFirestore(user.uid).then(function() {
+            localStorage.setItem('fg_local_updatedAt', String(remoteTs));
+            renderToday(); renderProgress(); renderCountdown();
+          });
+        }
+      }, function(err) { console.warn('onSnapshot error:', err); });
       setStatus('online');
       loadTodayGoalFirestore().then(function() {
         renderToday();
@@ -1975,6 +2274,7 @@ async function saveToFirestore(uid) {
     localStorage.setItem('fg1_state', JSON.stringify(stateFg1));
     localStorage.setItem('fg1_stateEx', JSON.stringify(stateFg1Ex));
     setStatus('online');
+    localStorage.setItem('fg_local_updatedAt', String(Date.now()));
     var el = document.getElementById('sync-status');
     if (el) el.textContent = '同期済み ' + new Date().toLocaleTimeString('ja-JP');
   } catch(e) {
@@ -2235,12 +2535,19 @@ function renderToday() {
   var chipCols = {maru:'var(--green)',sanka:'var(--amber)',batu:'var(--red)'};
   var chipLbls = {maru:'○',sanka:'△',batu:'×'};
 
+  // フィルター適用
+  var displayTasks = applyTaskFilter(tasks.map(function(t){ return t.pid; })).map(function(pid){
+    return tasks.find(function(t){ return t.pid === pid; });
+  }).filter(Boolean);
+
   var listEl = document.getElementById('task-list');
   if (!listEl) return;
   if (tasks.length === 0) {
     listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div>今日の復習タスクはありません！</div>';
+  } else if (displayTasks.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>フィルター条件に一致するタスクがありません</div>';
   } else {
-    listEl.innerHTML = tasks.map(function(t) {
+    listEl.innerHTML = displayTasks.map(function(t) {
       var done = sessionStorage.getItem('done_' + t.pid);
       var lr = (state[t.pid] && state[t.pid].result) || 'maru';
       // 優先度スコア: 期限超過日数
@@ -2406,6 +2713,30 @@ function renderGoalProgress() {
 }
 
 // ===== SORT =====
+var taskFilterMode = 'all';
+window.setTaskFilter = function(f) {
+  taskFilterMode = f;
+  ['all','imp3','imp2','diff-hard','diff-std','no-memo','timed'].forEach(function(id) {
+    var el = document.getElementById('ff-' + id);
+    if (el) el.classList.toggle('active', id === f);
+  });
+  renderToday();
+};
+
+function applyTaskFilter(tasks) {
+  if (taskFilterMode === 'all') return tasks;
+  return tasks.filter(function(pid) {
+    var s = state[pid]; if (!s) return taskFilterMode === 'all';
+    if (taskFilterMode === 'imp3') return (s.importance || 0) >= 3;
+    if (taskFilterMode === 'imp2') return (s.importance || 0) >= 2;
+    if (taskFilterMode === 'diff-hard') return s.difficulty === '難';
+    if (taskFilterMode === 'diff-std') return s.difficulty === '標準';
+    if (taskFilterMode === 'no-memo') return !s.memo || s.memo.trim() === '';
+    if (taskFilterMode === 'timed') return s.lastTime && s.lastTime > 0;
+    return true;
+  });
+}
+
 window.setSort = function(mode) {
   taskSortMode = mode;
   ['default','weak','chapter','count'].forEach(function(m) {
@@ -2854,7 +3185,7 @@ function getWeekData(offsetWeeks) {
   var now = new Date(); now.setHours(0,0,0,0);
   var weekStart = new Date(now);
   weekStart.setDate(weekStart.getDate() - now.getDay() - offsetWeeks * 7);
-  var total = 0, maru = 0;
+  var total = 0, maru = 0, sanka = 0, batu = 0;
   for (var d = 0; d < 7; d++) {
     var day = new Date(weekStart); day.setDate(day.getDate() + d);
     var dayTs = day.getTime();
@@ -2863,13 +3194,18 @@ function getWeekData(offsetWeeks) {
       if (!s) return;
       function checkDay(ts) {
         var rd = new Date(ts); rd.setHours(0,0,0,0);
-        if (rd.getTime() === dayTs) { total++; if (s.result === 'maru') maru++; }
+        if (rd.getTime() === dayTs) {
+          total++;
+          if (s.result === 'maru') maru++;
+          else if (s.result === 'sanka') sanka++;
+          else if (s.result === 'batu') batu++;
+        }
       }
       checkDay(s.learnedAt);
       (s.reviews||[]).forEach(checkDay);
     });
   }
-  return { total: total, maru: maru };
+  return { total: total, maru: maru, sanka: sanka, batu: batu };
 }
 
 function renderWeeklyChart() {
@@ -3177,6 +3513,16 @@ function memoHTML(pid) {
   return '<div class="memo-label">📝 メモ</div>' +
     (memo ? '<div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:6px;white-space:pre-wrap">📌 前回のメモ: ' + memo.replace(/</g,'&lt;') + '</div>' : '') +
     '<textarea class="memo-input" id="prob-memo" placeholder="ここにメモを入力...">' + memo + '</textarea>' +
+    // ===== 画像アップロードUI =====
+    '<div class="img-upload-area" id="modal-img-area">' +
+      '<label class="img-upload-btn">' +
+        '<input class="img-upload-input" type="file" accept="image/*" id="modal-img-input" onchange="handleModalImageUpload(event)">' +
+        '📸 カメラで撮影 / 写真を選択' +
+      '</label>' +
+      '<div class="img-uploading" id="modal-img-loading"><div class="img-uploading-spinner"></div>アップロード中...</div>' +
+      '<div class="img-thumb-list" id="modal-img-thumbs"></div>' +
+    '</div>' +
+    // ===== ここまで =====
     missHtml +
     '<div class="tag-area"><div class="tag-label">🎯 難易度</div>' + diffHtml +
     starsHtml +
@@ -3252,6 +3598,8 @@ window.openModal = function(pid, chName) {
 
   document.getElementById('modal-actions').innerHTML = actions;
   document.getElementById('modal').classList.add('open');
+  // 既存画像プレビューを描画
+  setTimeout(function() { renderModalImageThumbs(pid); }, 0);
 };
 
 window.closeModalBg = function(e) { if (e.target === document.getElementById('modal')) { stopTimer(); closeModalDirect(); } };
@@ -3408,7 +3756,8 @@ window.learnProblem = function() {
   var sm2 = sm2NextInterval({reviews:[], ef: SM2_DEFAULT_EF}, pendingResult);
   state[modalPid] = { learnedAt: todayTs(), actualLearnedAt: nowTs, reviews: [], reviewsAt: [], reviewResults: [], result: pendingResult, firstResult: pendingResult, memo: getMemo(), tags: getModalTags(), missReasons: getMissReasons(),
     ef: sm2.ef, lastInterval: sm2.interval, lastReviewAt: todayTs(), sm2Active: true,
-    difficulty: getModalDifficulty(), importance: getModalImportance() };
+    difficulty: getModalDifficulty(), importance: getModalImportance(),
+    imageUrls: getModalImageUrls(), imagePaths: getModalImagePaths() };
   if (timerSeconds > 0) { state[modalPid].lastTime = timerSeconds; }
   // 時間帯ログ記録（actualLearnedAt の時を記録）
   (function(){ var h=new Date(nowTs).getHours(); var log=JSON.parse(localStorage.getItem('fg_hour_log')||'{}'); log[h]=(log[h]||0)+1; localStorage.setItem('fg_hour_log',JSON.stringify(log)); })();
@@ -3438,6 +3787,8 @@ window.reviewProblem = function() {
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
   state[modalPid].missReasons = getMissReasons();
+  state[modalPid].imageUrls = getModalImageUrls();
+  state[modalPid].imagePaths = getModalImagePaths();
   state[modalPid].ef = sm2.ef;
   state[modalPid].lastInterval = interval;
   state[modalPid].lastReviewAt = todayTs();
@@ -3466,6 +3817,8 @@ window.updateResult = function() {
   state[modalPid].result = pendingResult;
   state[modalPid].memo = getMemo();
   state[modalPid].tags = getModalTags();
+  state[modalPid].imageUrls = getModalImageUrls();
+  state[modalPid].imagePaths = getModalImagePaths();
   saveState(); closeModalDirect();
   showToast('問題' + modalPid + ' 更新しました');
   renderToday(); renderProgress();
@@ -3505,7 +3858,8 @@ window.showTab = function(t) {
     if (bn) bn.classList.toggle('active', id === t);
   });
   if (t === 'today') { renderToday(); renderCountdown(); }
-  if (t === 'calendar') { initCal(); renderCalendar(); render30DayStreak(); renderWeeklyReport(); renderRanking(); }
+  if (t === 'calendar') { initCal(); renderCalendar(); render30DayStreak(); renderWeeklyReport(); renderRanking(); renderTimeViz(); }
+  if (t === 'settings') { renderMyFriendCode(); renderFriendList(); }
   if (t === 'settings') { setTimeout(applySM2Inputs, 50); setTimeout(renderThemePalette, 60); }
   if (t === 'progress') {
     renderProgress();
@@ -3927,6 +4281,24 @@ function renderCountdown() {
   document.getElementById('countdown-days').textContent = diff > 0 ? diff : 0;
   document.getElementById('countdown-title').textContent = (data.name || '試験') + 'まで';
   document.getElementById('countdown-sub').textContent = diff > 0 ? '残り' + diff + '日！毎日コツコツ頑張ろう 💪' : (diff === 0 ? '🎯 今日が試験日！' : '試験終了');
+  // 学習計画を計算してバナーに表示
+  var planEl = document.getElementById('countdown-plan');
+  var progBar = document.getElementById('countdown-prog-bar');
+  var progFill = document.getElementById('countdown-prog-fill');
+  if (planEl && diff > 0) {
+    var totalProbs = CHAPTERS.reduce(function(a,ch){return a+(ch.prefix?ch.count:ch.end-ch.start+1);},0);
+    var learnedCount = Object.keys(state).length;
+    var remaining = totalProbs - learnedCount;
+    var perDay = Math.ceil(remaining / diff);
+    var pct = totalProbs > 0 ? Math.round(learnedCount / totalProbs * 100) : 0;
+    planEl.textContent = remaining > 0
+      ? '未学習 ' + remaining + '問 → 1日 ' + perDay + '問ペースで完了'
+      : '✅ 全問学習済み！復習を続けよう';
+    if (progBar && progFill) {
+      progBar.style.display = '';
+      progFill.style.width = pct + '%';
+    }
+  } else if (planEl) { planEl.textContent = ''; }
   var ne = document.getElementById('exam-name-input'); if (ne) ne.value = data.name || '';
   var de = document.getElementById('exam-date-input'); if (de) de.value = data.date || '';
 }
@@ -5077,6 +5449,9 @@ function renderDailyWord() {
   else if (batuCnt === 0 && totalLearned > 10) msgs.push('✨ 苦手問題ゼロ！完璧な状態で進んでいる。');
   var FIXED = ['勉強は「理解」ではなく「再現できる」まで。','間違えた問題が、一番の教科書だ。','今日の1問が、未来の自分を支える。','できないことができるようになる、それが成長だ。','焦らなくていい。でも、止まらないで。'];
   msgs.push(FIXED[Math.floor(Date.now()/86400000) % FIXED.length]);
+  // カスタムメッセージを追加
+  var customs = JSON.parse(localStorage.getItem('fg_custom_quotes') || '[]');
+  customs.forEach(function(q){ if(q) msgs.push(q); });
   el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
 }
 
@@ -5173,7 +5548,7 @@ window.renderFreeNotes = function() {
 };
 window.openFreeNote = function(idx) {
   var notes = getFreeNotes();
-  var note = idx!==null ? notes[idx] : {title:'',body:'',createdAt:Date.now(),updatedAt:Date.now()};
+  var note = idx!==null ? notes[idx] : {title:'',body:'',imageUrls:[],imagePaths:[],createdAt:Date.now(),updatedAt:Date.now()};
   var old = document.getElementById('free-note-editor'); if (old) old.remove();
   var el = document.createElement('div');
   el.id = 'free-note-editor';
@@ -5182,19 +5557,29 @@ window.openFreeNote = function(idx) {
     '<div class="free-memo-editor-nav">' +
     '<button onclick="closeFreeNote()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:4px 10px 4px 0">‹</button>' +
     '<input class="free-memo-editor-title" id="fne-title" placeholder="タイトル" value="'+(note.title||'').replace(/"/g,'&quot;')+'" />' +
-    '<button onclick="saveFreeNote('+(idx!==null?idx:-1)+')" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;font-family:inherit">保存</button>' +
+    '<label class="fne-img-add-btn" title="写真を追加">' +
+      '<input type="file" accept="image/*" id="fne-img-input" onchange="handleFneImageUpload(event,'+(idx!==null?idx:-1)+')" style="display:none">' +
+      '📸 写真を追加' +
+    '</label>' +
+    '<button onclick="saveFreeNote('+(idx!==null?idx:-1)+')" style="background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;font-family:inherit;margin-left:4px">保存</button>' +
     (idx!==null ? '<button onclick="deleteFreeNote('+idx+')" style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.3);border-radius:8px;color:var(--red);font-size:12px;font-weight:700;padding:7px 10px;cursor:pointer;font-family:inherit;margin-left:4px">削除</button>' : '') +
     '</div>' +
+    '<div class="img-uploading" id="fne-img-loading" style="padding:6px 16px;"><div class="img-uploading-spinner"></div>アップロード中...</div>' +
+    '<div class="fne-img-bar" id="fne-img-bar"></div>' +
     '<textarea class="free-memo-editor-body" id="fne-body" placeholder="ここに自由にメモを書こう...">'+(note.body||'')+'</textarea>';
   document.body.appendChild(el);
+  // 既存画像を描画
+  renderFneImages(note.imageUrls||[], note.imagePaths||[]);
 };
 window.closeFreeNote = function() { var el=document.getElementById('free-note-editor'); if(el) el.remove(); };
 window.saveFreeNote = function(idx) {
   var title = (document.getElementById('fne-title')||{}).value||'';
   var body = (document.getElementById('fne-body')||{}).value||'';
   var notes = getFreeNotes(); var now3=Date.now();
-  if (idx===-1) notes.unshift({title:title,body:body,createdAt:now3,updatedAt:now3});
-  else notes[idx]=Object.assign({},notes[idx],{title:title,body:body,updatedAt:now3});
+  // 現在エディタに表示されている画像を収集
+  var imgs = collectFneImages();
+  if (idx===-1) notes.unshift({title:title,body:body,imageUrls:imgs.urls,imagePaths:imgs.paths,createdAt:now3,updatedAt:now3});
+  else notes[idx]=Object.assign({},notes[idx],{title:title,body:body,imageUrls:imgs.urls,imagePaths:imgs.paths,updatedAt:now3});
   saveFreeNotes(notes); closeFreeNote(); renderFreeNotes();
   showToast('📓 ノートを保存しました');
 };
@@ -5206,6 +5591,765 @@ window.deleteFreeNote = function(idx) {
 };
 // Firestore から freeNotes 読み込みをフック
 var _firestoreLoadOrig = loadFromFirestore;
+
+
+// ===== 週次レポート画像共有 =====
+window.shareWeeklyReport = function() {
+  var w = getWeekData(0);
+  var streak = getStreakCount();
+  var totalProbs = CHAPTERS.reduce(function(a,ch){return a+(ch.prefix?ch.count:ch.end-ch.start+1);},0);
+  var learnedCount = Object.keys(state).length;
+  var pct = totalProbs > 0 ? Math.round(learnedCount/totalProbs*100) : 0;
+  var rate = w.total > 0 ? Math.round(w.maru/w.total*100) : 0;
+  var examData = JSON.parse(localStorage.getItem('fg_exam') || 'null');
+  var daysLeft = null;
+  if (examData && examData.date) {
+    var today2 = new Date(); today2.setHours(0,0,0,0);
+    var exam2 = new Date(examData.date); exam2.setHours(0,0,0,0);
+    daysLeft = Math.ceil((exam2 - today2) / 86400000);
+  }
+
+  var canvas = document.createElement('canvas');
+  canvas.width = 640; canvas.height = 360;
+  var ctx = canvas.getContext('2d');
+
+  // 背景
+  var grad = ctx.createLinearGradient(0,0,640,360);
+  grad.addColorStop(0, '#0f0f13'); grad.addColorStop(1, '#1e1e28');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,640,360);
+
+  // アクセントライン
+  ctx.strokeStyle = 'rgba(108,99,255,0.6)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,80); ctx.lineTo(640,80); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,280); ctx.lineTo(640,280); ctx.stroke();
+
+  // タイトル
+  ctx.fillStyle = '#8b84ff'; ctx.font = 'bold 26px sans-serif';
+  ctx.fillText('FocusGold 📊 今週のまとめ', 32, 52);
+  var dateStr = new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric'}) + '週';
+  ctx.fillStyle = '#5a5a72'; ctx.font = '14px sans-serif';
+  ctx.fillText(dateStr, 490, 52);
+
+  // メイン3つの数値
+  var cols = [
+    { label: '学習数', value: w.total + '問', color: '#8b84ff', x: 90 },
+    { label: '正答率', value: rate + '%', color: '#4ade80', x: 260 },
+    { label: 'ストリーク', value: streak + '日', color: '#fbbf24', x: 430 },
+  ];
+  cols.forEach(function(c) {
+    ctx.fillStyle = c.color; ctx.font = 'bold 52px sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText(c.value, c.x + 60, 180);
+    ctx.fillStyle = '#9090a8'; ctx.font = '13px sans-serif';
+    ctx.fillText(c.label, c.x + 60, 210);
+  });
+  ctx.textAlign = 'left';
+
+  // ○△× 内訳
+  ctx.fillStyle = '#4ade80'; ctx.font = 'bold 18px sans-serif'; ctx.fillText('○ ' + w.maru, 100, 250);
+  ctx.fillStyle = '#fbbf24'; ctx.fillText('△ ' + w.sanka, 240, 250);
+  ctx.fillStyle = '#f87171'; ctx.fillText('× ' + w.batu, 380, 250);
+
+  // 達成率バー
+  var barY = 295; var barW = 576;
+  ctx.fillStyle = '#252533'; ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(32, barY, barW, 14, 7) : ctx.rect(32, barY, barW, 14);
+  ctx.fill();
+  ctx.fillStyle = '#6c63ff';
+  var fillW = Math.round(barW * pct / 100);
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(32, barY, fillW, 14, 7) : ctx.rect(32, barY, fillW, 14);
+  ctx.fill();
+  ctx.fillStyle = '#e8e8f0'; ctx.font = '12px sans-serif';
+  ctx.fillText('進捗 ' + pct + '%  (' + learnedCount + '/' + totalProbs + '問)', 32, 328);
+  if (daysLeft !== null && daysLeft >= 0) {
+    ctx.fillStyle = '#9090a8'; ctx.font = '12px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText((examData.name || '試験') + 'まで ' + daysLeft + '日', 608, 328);
+    ctx.textAlign = 'left';
+  }
+
+  // 表示
+  var dataURL = canvas.toDataURL('image/png');
+  var wrap = document.createElement('div'); wrap.id = 'share-canvas-wrap';
+  wrap.innerHTML = '<canvas id="share-canvas"></canvas>' +
+    '<div class="share-canvas-btns">' +
+    '<button class="share-canvas-btn" style="background:var(--accent);color:#fff" onclick="downloadShareImage()">💾 保存</button>' +
+    '<button class="share-canvas-btn" style="background:var(--bg3);color:var(--text)" onclick="nativeShareImage()">📤 シェア</button>' +
+    '<button class="share-canvas-btn" style="background:var(--bg3);color:var(--text3)" onclick="document.getElementById(&quot;share-canvas-wrap&quot;).remove()">✕ 閉じる</button>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  var c = document.getElementById('share-canvas');
+  c.width = 640; c.height = 360;
+  c.getContext('2d').drawImage(canvas, 0, 0);
+  window._shareDataURL = dataURL;
+  wrap.addEventListener('click', function(e){ if(e.target===wrap) wrap.remove(); });
+};
+
+window.downloadShareImage = function() {
+  var a = document.createElement('a'); a.href = window._shareDataURL || '';
+  a.download = 'focusgold_weekly_' + new Date().toISOString().slice(0,10) + '.png';
+  a.click();
+};
+
+window.nativeShareImage = async function() {
+  if (!navigator.share) { downloadShareImage(); return; }
+  try {
+    var res = await fetch(window._shareDataURL);
+    var blob = await res.blob();
+    var file = new File([blob], 'focusgold_weekly.png', { type: 'image/png' });
+    await navigator.share({ files: [file], title: 'FocusGold 今週のまとめ' });
+  } catch(e) { downloadShareImage(); }
+};
+
+// ===== 今日のひとことカスタマイズ =====
+window.openDailyWordEditor = function() {
+  var customs = JSON.parse(localStorage.getItem('fg_custom_quotes') || '[]');
+  var old = document.getElementById('daily-word-editor-modal'); if (old) old.remove();
+  var el = document.createElement('div');
+  el.id = 'daily-word-editor-modal';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;display:flex;align-items:center;justify-content:center';
+  el.innerHTML =
+    '<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:20px;width:90%;max-width:380px">' +
+    '<div style="font-size:15px;font-weight:700;margin-bottom:12px">💬 ひとことをカスタマイズ</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:8px">自分だけのメッセージを追加できます（ランダムで表示）</div>' +
+    '<div id="custom-quote-list" style="margin-bottom:10px;max-height:180px;overflow-y:auto"></div>' +
+    '<div style="display:flex;gap:6px;margin-bottom:12px">' +
+    '<input id="custom-quote-input" class="auth-input" placeholder="新しいメッセージを入力..." style="flex:1;margin-bottom:0" />' +
+    '<button class="small-btn" onclick="addCustomQuote()">追加</button></div>' +
+    '<button onclick="document.getElementById(&quot;daily-word-editor-modal&quot;).remove();renderDailyWord();" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:13px;font-weight:700;padding:9px 24px;cursor:pointer;font-family:inherit;width:100%">保存して閉じる</button>' +
+    '</div>';
+  el.addEventListener('click', function(e){ if(e.target===el){ el.remove(); renderDailyWord(); } });
+  document.body.appendChild(el);
+  renderCustomQuoteList();
+};
+
+function renderCustomQuoteList() {
+  var customs = JSON.parse(localStorage.getItem('fg_custom_quotes') || '[]');
+  var el = document.getElementById('custom-quote-list'); if (!el) return;
+  if (customs.length === 0) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">まだカスタムメッセージはありません</div>'; return; }
+  el.innerHTML = customs.map(function(q, i) {
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">' +
+      '<span style="flex:1;font-size:12px;color:var(--text2)">' + q.replace(/</g,'&lt;') + '</span>' +
+      '<button onclick="deleteCustomQuote(' + i + ')" style="background:none;border:none;color:var(--red);font-size:14px;cursor:pointer;padding:2px 6px">×</button></div>';
+  }).join('');
+}
+
+window.addCustomQuote = function() {
+  var inp = document.getElementById('custom-quote-input'); if (!inp) return;
+  var val = inp.value.trim(); if (!val) return;
+  var customs = JSON.parse(localStorage.getItem('fg_custom_quotes') || '[]');
+  customs.push(val);
+  localStorage.setItem('fg_custom_quotes', JSON.stringify(customs));
+  inp.value = ''; renderCustomQuoteList();
+};
+
+window.deleteCustomQuote = function(i) {
+  var customs = JSON.parse(localStorage.getItem('fg_custom_quotes') || '[]');
+  customs.splice(i, 1);
+  localStorage.setItem('fg_custom_quotes', JSON.stringify(customs));
+  renderCustomQuoteList();
+};
+
+// ===== 解答時間可視化 =====
+window.renderTimeViz = function() {
+  var el = document.getElementById('time-viz-list'); if (!el) return;
+  var timed = Object.keys(state).filter(function(p){ return state[p] && state[p].lastTime > 0; });
+  if (timed.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">タイマーを使って問題を解くとデータが蓄積されます</div>';
+    return;
+  }
+  timed.sort(function(a,b){ return (state[b].lastTime||0)-(state[a].lastTime||0); });
+  var top = timed.slice(0,10);
+  var maxT = state[top[0]].lastTime;
+  el.innerHTML = top.map(function(pid) {
+    var t = state[pid].lastTime;
+    var m = Math.floor(t/60), s = t%60;
+    var pct = Math.round(t/maxT*100);
+    var col = t > 300 ? 'var(--red)' : t > 120 ? 'var(--amber)' : 'var(--accent)';
+    return '<div class="time-viz-row">' +
+      '<div class="time-viz-pid">問' + pid + '</div>' +
+      '<div class="time-viz-bar-wrap"><div class="time-viz-bar" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+      '<div class="time-viz-sec">' + (m>0?m+'分':'')+s+'秒</div></div>';
+  }).join('');
+};
+
+// ===== フレンドコード =====
+function uidToFriendCode(uid) {
+  if (!uid) return '------';
+  // UIDから6文字の英数字コードを生成（決定論的）
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var h = 0;
+  for (var i = 0; i < uid.length; i++) h = (Math.imul(31, h) + uid.charCodeAt(i)) | 0;
+  var code = '';
+  var n = Math.abs(h);
+  for (var j = 0; j < 6; j++) { code += chars[n % chars.length]; n = Math.floor(n / chars.length) || (n + 7919); }
+  return code;
+}
+
+function renderMyFriendCode() {
+  var el = document.getElementById('my-friend-code'); if (!el) return;
+  el.textContent = uidToFriendCode(currentUid);
+}
+
+window.copyFriendCode = function() {
+  var code = uidToFriendCode(currentUid);
+  if (navigator.clipboard) navigator.clipboard.writeText(code).then(function(){ showToast('コードをコピーしました: ' + code); });
+  else { showToast('コード: ' + code); }
+};
+
+window.shareFriendCode = function() {
+  var code = uidToFriendCode(currentUid);
+  var text = 'FocusGoldで一緒に勉強しよう！私のフレンドコード: ' + code;
+  if (navigator.share) navigator.share({ text: text }).catch(function(){});
+  else if (navigator.clipboard) navigator.clipboard.writeText(text).then(function(){ showToast('シェアテキストをコピーしました'); });
+};
+
+window.addFriend = async function() {
+  if (!currentUid) { showToast('ログインが必要です'); return; }
+  var inp = document.getElementById('friend-code-input'); if (!inp) return;
+  var code = inp.value.trim().toUpperCase(); if (code.length !== 6) { showToast('6文字のコードを入力してください'); return; }
+  showToast('⏳ フレンドを検索中...');
+  try {
+    // rankingコレクションから逆引き（uidToFriendCodeが同じUIDを持つユーザーを探す）
+    var snap = await db.collection('ranking').limit(200).get();
+    var found = null;
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      if (d.uid && uidToFriendCode(d.uid) === code && d.uid !== currentUid) found = d;
+    });
+    if (!found) { showToast('フレンドが見つかりませんでした（ランキングに参加しているユーザーのみ検索可能）'); return; }
+    var friends = JSON.parse(localStorage.getItem('fg_friends') || '[]');
+    if (friends.find(function(f){ return f.uid === found.uid; })) { showToast('すでに追加済みです'); return; }
+    friends.push({ uid: found.uid, code: code, name: found.name || generateAnonName(found.uid), addedAt: Date.now() });
+    localStorage.setItem('fg_friends', JSON.stringify(friends));
+    inp.value = '';
+    renderFriendList();
+    showToast('✅ ' + (found.name || generateAnonName(found.uid)) + ' を追加しました');
+  } catch(e) { showToast('エラー: ' + (e.message||e)); }
+};
+
+async function renderFriendList() {
+  var el = document.getElementById('friend-list'); if (!el) return;
+  var friends = JSON.parse(localStorage.getItem('fg_friends') || '[]');
+  if (friends.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">まだフレンドはいません</div>';
+    return;
+  }
+  el.innerHTML = '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">フレンドの今週スコア</div>' +
+    friends.map(function(f, i) {
+      return '<div class="friend-row" id="friend-row-' + i + '">' +
+        '<div style="flex:1"><div style="font-size:13px;font-weight:700">' + f.name + '</div>' +
+        '<div style="font-size:10px;color:var(--text3)">' + f.code + '</div></div>' +
+        '<div id="friend-score-' + i + '" style="font-size:12px;color:var(--text2)">読込中...</div>' +
+        '<button onclick="removeFriend(' + i + ')" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;padding:2px 6px;margin-left:4px">×</button></div>';
+    }).join('');
+  // 各フレンドのスコアをFirestoreから取得
+  var periodKey = 'week_' + getWeekKey();
+  friends.forEach(function(f, i) {
+    db.collection('ranking').where('uid','==',f.uid).where('period','==',periodKey).limit(1).get()
+      .then(function(snap) {
+        var scoreEl = document.getElementById('friend-score-' + i);
+        if (!scoreEl) return;
+        if (snap.empty) { scoreEl.textContent = '今週 0問'; return; }
+        var d = snap.docs[0].data();
+        scoreEl.innerHTML = '<span style="color:var(--accent2);font-weight:700">' + (d.score||0) + '問</span>';
+      }).catch(function(){ });
+  });
+}
+
+window.removeFriend = function(i) {
+  var friends = JSON.parse(localStorage.getItem('fg_friends') || '[]');
+  friends.splice(i, 1);
+  localStorage.setItem('fg_friends', JSON.stringify(friends));
+  renderFriendList();
+};
+
+// ===== 画像アップロード機能 (Supabase Storage) =====
+
+// ---- 学習記録モーダル ----
+var _modalImages = []; // [{url, path}]
+
+function getModalImageUrls() { return _modalImages.map(function(i){return i.url;}); }
+function getModalImagePaths() { return _modalImages.map(function(i){return i.path;}); }
+
+function renderModalImageThumbs(pid) {
+  _modalImages = [];
+  var s = state[pid];
+  var urls = (s && s.imageUrls) || [];
+  var paths = (s && s.imagePaths) || [];
+  urls.forEach(function(url, i) { _modalImages.push({ url: url, path: paths[i] || '' }); });
+  _redrawModalThumbs();
+}
+
+function _redrawModalThumbs() {
+  var container = document.getElementById('modal-img-thumbs');
+  if (!container) return;
+  container.innerHTML = '';
+  _modalImages.forEach(function(img, i) {
+    var item = document.createElement('div'); item.className = 'img-thumb-item';
+    item.innerHTML = '<img src="' + img.url + '" onclick="showLightbox(\'' + img.url + '\')" />' +
+      '<button class="img-thumb-del" onclick="deleteModalImage(' + i + ')">✕</button>';
+    container.appendChild(item);
+  });
+}
+
+window.handleModalImageUpload = async function(e) {
+  var file = e.target.files && e.target.files[0]; if (!file) return;
+  var loading = document.getElementById('modal-img-loading');
+  if (loading) loading.classList.add('active');
+  try {
+    var result = await sbUploadImage(file, 'records');
+    _modalImages.push({ url: result.url, path: result.path });
+    _redrawModalThumbs();
+  } catch(err) { showToast('画像アップロード失敗: ' + (err.message||err)); }
+  finally { if (loading) loading.classList.remove('active'); if (e.target) e.target.value = ''; }
+};
+
+window.deleteModalImage = async function(i) {
+  var img = _modalImages[i]; if (!img) return;
+  if (img.path) { try { await sbDeleteImage(img.path); } catch(err) { console.warn('Storage削除失敗:', err); } }
+  _modalImages.splice(i, 1); _redrawModalThumbs();
+};
+
+// ---- フリーメモエディタ ----
+var _fneImages = []; // [{url, path}]
+
+function renderFneImages(urls, paths) {
+  _fneImages = [];
+  (urls||[]).forEach(function(url, i) { _fneImages.push({ url: url, path: (paths||[])[i] || '' }); });
+  _redrawFneBar();
+}
+
+function _redrawFneBar() {
+  var bar = document.getElementById('fne-img-bar'); if (!bar) return;
+  bar.innerHTML = '';
+  _fneImages.forEach(function(img, i) {
+    var item = document.createElement('div'); item.className = 'fne-img-item';
+    item.innerHTML = '<img src="' + img.url + '" onclick="showLightbox(\'' + img.url + '\')" />' +
+      '<button class="fne-img-del" onclick="deleteFneImage(' + i + ')">✕</button>';
+    bar.appendChild(item);
+  });
+}
+
+function collectFneImages() {
+  return { urls: _fneImages.map(function(i){return i.url;}), paths: _fneImages.map(function(i){return i.path;}) };
+}
+
+window.handleFneImageUpload = async function(e) {
+  var file = e.target.files && e.target.files[0]; if (!file) return;
+  var loading = document.getElementById('fne-img-loading');
+  if (loading) loading.classList.add('active');
+  try {
+    var result = await sbUploadImage(file, 'memos');
+    _fneImages.push({ url: result.url, path: result.path });
+    _redrawFneBar();
+  } catch(err) { showToast('画像アップロード失敗: ' + (err.message||err)); }
+  finally { if (loading) loading.classList.remove('active'); if (e.target) e.target.value = ''; }
+};
+
+window.deleteFneImage = async function(i) {
+  var img = _fneImages[i]; if (!img) return;
+  if (img.path) { try { await sbDeleteImage(img.path); } catch(err) { console.warn('Storage削除失敗:', err); } }
+  _fneImages.splice(i, 1); _redrawFneBar();
+};
+// ===== 画像機能ここまで =====
+
+
+// ===== 1. 曜日×時間帯ヒートマップ =====
+function renderDowHeatmap() {
+  var inner = document.getElementById('dow-heatmap-inner');
+  if (!inner) return;
+
+  // grid[dow 0=日..6=土][hour 0-23]
+  var grid = [];
+  for (var d = 0; d < 7; d++) { grid[d] = []; for (var h = 0; h < 24; h++) grid[d][h] = 0; }
+
+  // ユニーク学習日を集計（日数カウント用）
+  var daySet = {};
+  Object.keys(state).forEach(function(pid) {
+    var s = state[pid]; if (!s) return;
+    function tally(ts) {
+      if (!ts) return;
+      var dt = new Date(ts);
+      grid[dt.getDay()][dt.getHours()]++;
+      var dk = dt.getFullYear()+'-'+(dt.getMonth()+1)+'-'+dt.getDate();
+      daySet[dk] = true;
+    }
+    tally(s.actualLearnedAt || s.learnedAt);
+    (s.reviewsAt || []).forEach(tally);
+  });
+  var totalDays = Object.keys(daySet).length;
+
+  // 2時間単位にまとめる grid2[dow][slot 0-11]
+  var grid2 = [];
+  for (var d2 = 0; d2 < 7; d2++) {
+    grid2[d2] = [];
+    for (var s2 = 0; s2 < 12; s2++) grid2[d2][s2] = (grid[d2][s2*2]||0) + (grid[d2][s2*2+1]||0);
+  }
+
+  var maxVal = 0;
+  for (var dd = 0; dd < 7; dd++) for (var ss = 0; ss < 12; ss++) if (grid2[dd][ss] > maxVal) maxVal = grid2[dd][ss];
+
+  if (maxVal === 0) {
+    inner.innerHTML = '<div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">問題を解くとデータが蓄積されます</div>';
+    return;
+  }
+
+  var DOWS  = ['日','月','火','水','木','金','土'];
+  var SLOTS = ['0','2','4','6','8','10','12','14','16','18','20','22'];
+
+  // コンパクトなセルサイズ
+  var CW = 26, CH = 20, PAD_LEFT = 26, PAD_TOP = 22, GAP = 2;
+  var W = PAD_LEFT + 7*(CW+GAP);
+  var H = PAD_TOP  + 12*(CH+GAP) + 26;
+
+  function cellColor(v) {
+    if (!v || maxVal === 0) return null;
+    var t = v / maxVal;
+    var r = Math.round(40  + (139-40)*t);
+    var g = Math.round(36  + (132-36)*t);
+    var b = Math.round(80  + (255-80)*t);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+  function textColor(v) {
+    return (v / maxVal) > 0.5 ? '#fff' : 'rgba(180,176,255,0.95)';
+  }
+
+  // ピーク検出
+  var peakSlot = 0, peakDow = 0, peakV = 0;
+  for (var pd = 0; pd < 7; pd++) for (var ps = 0; ps < 12; ps++) {
+    if (grid2[pd][ps] > peakV) { peakV = grid2[pd][ps]; peakSlot = ps; peakDow = pd; }
+  }
+
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 '+W+' '+H+'" style="display:block;font-family:inherit">';
+
+  // 曜日ヘッダー
+  DOWS.forEach(function(day, di) {
+    var x = PAD_LEFT + di*(CW+GAP) + CW/2;
+    var isWeekend = (di===0||di===6);
+    svg += '<text x="'+x+'" y="'+(PAD_TOP-6)+'" text-anchor="middle" font-size="10" font-weight="700" fill="'+(isWeekend?'var(--amber)':'var(--text3)')+'">'+day+'</text>';
+  });
+
+  // 時間ラベル + セル
+  SLOTS.forEach(function(lbl, si) {
+    var y = PAD_TOP + si*(CH+GAP);
+    svg += '<text x="'+(PAD_LEFT-3)+'" y="'+(y+CH/2+3.5)+'" text-anchor="end" font-size="9" fill="var(--text3)">'+lbl+'</text>';
+    DOWS.forEach(function(_, di) {
+      var x = PAD_LEFT + di*(CW+GAP);
+      var v = grid2[di][si];
+      var col = cellColor(v);
+      var isPeak = (di===peakDow && si===peakSlot);
+      if (col) {
+        svg += '<rect x="'+x+'" y="'+y+'" width="'+CW+'" height="'+CH+'" rx="4" fill="'+col+'"'+(isPeak?' stroke="var(--amber)" stroke-width="1.5"':'')+'/>';
+        if (v >= 2) {
+          svg += '<text x="'+(x+CW/2)+'" y="'+(y+CH/2+3.5)+'" text-anchor="middle" font-size="9" font-weight="700" fill="'+textColor(v)+'">'+v+'</text>';
+        }
+      } else {
+        svg += '<rect x="'+x+'" y="'+y+'" width="'+CW+'" height="'+CH+'" rx="4" fill="var(--bg4)" opacity="0.5"/>';
+      }
+    });
+  });
+
+  // 凡例行
+  var legY = H - 18;
+  svg += '<text x="0" y="'+(legY+10)+'" font-size="9" fill="var(--text3)">少</text>';
+  [0.15,0.35,0.55,0.75,0.95].forEach(function(t, i) {
+    var r=Math.round(40+(139-40)*t), g=Math.round(36+(132-36)*t), b=Math.round(80+(255-80)*t);
+    svg += '<rect x="'+(14+i*16)+'" y="'+legY+'" width="12" height="12" rx="2" fill="rgb('+r+','+g+','+b+')"/>';
+  });
+  svg += '<text x="96" y="'+(legY+10)+'" font-size="9" fill="var(--text3)">多</text>';
+  svg += '<rect x="112" y="'+legY+'" width="12" height="12" rx="2" fill="none" stroke="var(--amber)" stroke-width="1.5"/>';
+  svg += '<text x="126" y="'+(legY+10)+'" font-size="9" fill="var(--amber)">ピーク</text>';
+
+  svg += '</svg>';
+  inner.innerHTML = svg;
+
+  // データ日数サマリーをSVGの下に追記
+  var totalSessions = 0;
+  for (var td=0;td<7;td++) for (var ts2=0;ts2<12;ts2++) totalSessions += grid2[td][ts2];
+  var peakDowName = DOWS[peakDow];
+  var peakHour = peakSlot*2;
+  inner.insertAdjacentHTML('beforeend',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+    '<span style="font-size:11px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px">📅 '+totalDays+'日分のデータ</span>' +
+    '<span style="font-size:11px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 10px">📝 計'+totalSessions+'件</span>' +
+    '<span style="font-size:11px;color:var(--amber);background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3);border-radius:20px;padding:3px 10px">⚡ ピーク: '+peakDowName+'曜 '+peakHour+'〜'+(peakHour+2)+'時</span>' +
+    '</div>'
+  );
+}
+
+
+// ===== 2. 解答時間推移グラフ =====
+function renderTimeHistorySelect() {
+  var sel = document.getElementById('time-history-select');
+  if (!sel) return;
+  // 複数回タイム記録があるor最低1回タイム記録ある問題を列挙
+  var timed = Object.keys(state).filter(function(p){ return state[p] && state[p].lastTime > 0; });
+  timed.sort(function(a,b){ return (state[b].lastTime||0)-(state[a].lastTime||0); });
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">問題を選択...</option>' +
+    timed.map(function(pid){
+      var t = state[pid].lastTime;
+      var m = Math.floor(t/60), s = t%60;
+      return '<option value="'+pid+'"'+(pid===cur?' selected':'')+'>'+'問'+pid+' ('+( m>0?m+'分':'')+s+'秒)'+'</option>';
+    }).join('');
+  if (cur && timed.indexOf(cur) >= 0) renderTimeHistory();
+}
+
+window.renderTimeHistory = function() {
+  var sel = document.getElementById('time-history-select');
+  var wrap = document.getElementById('time-history-chart-wrap');
+  if (!sel || !wrap) return;
+  var pid = sel.value;
+  if (!pid || !state[pid]) { wrap.innerHTML = '<div class="time-history-empty">問題を選択してください</div>'; return; }
+  var s = state[pid];
+
+  // タイムの履歴を構成: 最初の学習 + 各復習 (reviewsAt があれば使う)
+  var entries = [];
+  if (s.learnedAt) entries.push({ label: '初回', ts: s.actualLearnedAt || s.learnedAt, time: s.lastTime || 0 });
+
+  // reviewsAt は複数あるが、lastTimeは最後の1回しかない。
+  // 時系列順に並べるため: 初回 + 復習n回。タイムは現在のlastTimeのみ確定できる。
+  // → 現在取れるデータで「回数 vs lastTime」を1点、概念表示する
+  var reviewCount = (s.reviews || []).length;
+  if (reviewCount > 0) {
+    (s.reviewsAt || s.reviews || []).forEach(function(ts, i) {
+      entries.push({ label: '復習'+(i+1), ts: ts, time: i === reviewCount-1 ? (s.lastTime||0) : null });
+    });
+  }
+
+  if (entries.length === 0 || !entries[0].time) {
+    wrap.innerHTML = '<div class="time-history-empty">タイム記録がありません</div>';
+    return;
+  }
+
+  // タイムが記録されているエントリのみ表示
+  var valid = entries.filter(function(e){ return e.time > 0; });
+  if (valid.length === 0) { wrap.innerHTML = '<div class="time-history-empty">タイム記録がありません</div>'; return; }
+
+  var maxT = Math.max.apply(null, valid.map(function(e){ return e.time; }));
+  var html = '<div class="time-history-chart">';
+  valid.forEach(function(e, i) {
+    var pct = Math.round(e.time / maxT * 100);
+    var m = Math.floor(e.time/60), sv = e.time%60;
+    html += '<div class="time-history-bar-wrap">' +
+      '<div class="time-history-val">'+(m>0?m+'分':'')+sv+'秒</div>' +
+      '<div class="time-history-bar'+(i===0?' first':'')+'" style="height:'+pct+'%"></div>' +
+      '<div class="time-history-label">'+e.label+'</div></div>';
+  });
+  html += '</div>';
+  html += '<div style="font-size:10px;color:var(--text3)">問'+pid+' 全'+valid.length+'記録</div>';
+  wrap.innerHTML = html;
+};
+
+// ===== 3. 目標達成率リング =====
+// renderGoalProgress を拡張
+var _origRenderGoalProgress = typeof renderGoalProgress === 'function' ? renderGoalProgress : null;
+function renderGoalProgress() {
+  var declared = document.getElementById('goal-declared');
+  var setUi = document.getElementById('goal-set-ui');
+  if (!todayGoal) { if (declared) declared.style.display = 'none'; if (setUi) setUi.style.display = ''; return; }
+  if (declared) declared.style.display = '';
+  if (setUi) setUi.style.display = 'none';
+  var done = countTodayDone();
+  todayDoneCount = done;
+  var pct = Math.min(100, Math.round(done / todayGoal * 100));
+
+  // テキスト更新
+  var pt = document.getElementById('goal-progress-text');
+  if (pt) pt.textContent = done + ' / ' + todayGoal + ' 問完了';
+
+  // リング更新
+  var ringFill = document.getElementById('goal-ring-fill');
+  var ringText = document.getElementById('goal-ring-text');
+  var ringPct  = document.getElementById('goal-ring-pct');
+  if (ringFill) {
+    var circ = 2 * Math.PI * 28; // r=28
+    var offset = circ * (1 - pct/100);
+    ringFill.style.strokeDashoffset = offset;
+    var col = pct >= 100 ? 'var(--green)' : pct >= 50 ? 'var(--accent2)' : 'var(--amber)';
+    ringFill.style.stroke = col;
+  }
+  if (ringText) { ringText.textContent = pct+'%'; }
+  if (ringPct)  { ringPct.textContent = pct+'%'; ringPct.style.color = pct>=100?'var(--green)':pct>=50?'var(--accent2)':'var(--amber)'; }
+
+  // ○△× 内訳
+  var tts = todayTs();
+  var todayPids = Object.keys(state).filter(function(pid) {
+    var s = state[pid]; if (!s) return false;
+    var d = new Date(s.learnedAt); d.setHours(0,0,0,0); if (d.getTime()===tts) return true;
+    return (s.reviews||[]).some(function(r){ var rd=new Date(r);rd.setHours(0,0,0,0);return rd.getTime()===tts; });
+  });
+  var mEl = document.getElementById('goal-ring-maru');
+  var sEl = document.getElementById('goal-ring-sanka');
+  var bEl = document.getElementById('goal-ring-batu');
+  var mr = todayPids.filter(function(p){return state[p].result==='maru';}).length;
+  var sr = todayPids.filter(function(p){return state[p].result==='sanka';}).length;
+  var br = todayPids.filter(function(p){return state[p].result==='batu';}).length;
+  if (mEl) mEl.textContent = '○ '+mr;
+  if (sEl) sEl.textContent = '△ '+sr;
+  if (bEl) bEl.textContent = '× '+br;
+
+  var bar = document.getElementById('goal-bar');
+  if (bar) bar.style.width = pct+'%';
+
+  if (done >= todayGoal && pct === 100) {
+    showToast('🎉 今日の目標達成！');
+    launchConfetti();
+    checkBadges();
+  }
+}
+
+// ===== 4. 章別弱点スコア =====
+function renderWeaknessScore() {
+  var el = document.getElementById('weakness-score-list');
+  if (!el) return;
+  var rows = CHAPTERS.map(function(ch) {
+    var pids = getProblems(ch);
+    var learned = pids.filter(function(p){ return !!state[p]; });
+    if (learned.length === 0) return null;
+    var batu  = learned.filter(function(p){ return state[p].result==='batu'; }).length;
+    var sanka = learned.filter(function(p){ return state[p].result==='sanka'; }).length;
+    var weak = batu + sanka * 0.5;
+    var weakPct = Math.round(weak / learned.length * 100);
+    var batuPct = Math.round(batu / learned.length * 100);
+    var sankaPct = Math.round(sanka / learned.length * 100);
+    return { name: ch.name.replace(/第.章 /,''), learned: learned.length, batu: batu, sanka: sanka, weakPct: weakPct, batuPct: batuPct, sankaPct: sankaPct };
+  }).filter(Boolean);
+
+  if (rows.length === 0) { el.innerHTML = '<div class="weakness-empty">学習データがありません</div>'; return; }
+  rows.sort(function(a,b){ return b.weakPct - a.weakPct; });
+
+  el.innerHTML = rows.map(function(r) {
+    return '<div class="weakness-row">' +
+      '<div class="weakness-ch" title="'+r.name+'">'+r.name+'</div>' +
+      '<div class="weakness-bar-wrap">' +
+        '<div class="weakness-bar-batu" style="width:'+r.batuPct+'%"></div>' +
+        '<div class="weakness-bar-sanka" style="left:'+r.batuPct+'%;width:'+r.sankaPct+'%"></div>' +
+      '</div>' +
+      '<div class="weakness-pct">'+r.weakPct+'%</div>' +
+    '</div>';
+  }).join('') +
+  '<div style="display:flex;gap:12px;margin-top:8px;font-size:10px"><span style="color:var(--red)">■ ×</span><span style="color:var(--amber)">■ △</span></div>';
+}
+
+// ===== 5. 未着手問題数バッジ (chapter-header に注入) =====
+function renderUnlearnedBadges() {
+  CHAPTERS.forEach(function(ch) {
+    var safeId = (ch.name||'').replace(/[^a-zA-Z0-9]/g,'');
+    var badgeEl = document.getElementById('unlearned-badge-'+safeId);
+    if (!badgeEl) return;
+    var pids = getProblems(ch);
+    var unlearned = pids.filter(function(p){ return !state[p]; }).length;
+    badgeEl.textContent = unlearned;
+    badgeEl.className = 'unlearned-badge' + (unlearned > 0 ? ' has-unlearned' : '');
+  });
+}
+
+// chapter-header の章名にバッジ要素を埋め込む (renderProgress の後に呼ぶ)
+function injectUnlearnedBadges() {
+  CHAPTERS.forEach(function(ch) {
+    var safeId = (ch.name||'').replace(/[^a-zA-Z0-9]/g,'');
+    if (document.getElementById('unlearned-badge-'+safeId)) return; // 既に注入済み
+    // chapter-name 要素を探す（章名で検索）
+    var nameEls = document.querySelectorAll('.chapter-name');
+    nameEls.forEach(function(el) {
+      if (el.textContent.trim() === ch.name && !el.querySelector('.unlearned-badge')) {
+        var badge = document.createElement('span');
+        badge.id = 'unlearned-badge-'+safeId;
+        badge.className = 'unlearned-badge';
+        el.appendChild(badge);
+      }
+    });
+  });
+  renderUnlearnedBadges();
+}
+
+// ===== 6. セッション終了サマリー（拡張版）=====
+// セッション中のタイム計測も追加
+var _sessionTimes = [];
+var _origLearnProblem = window.learnProblem;
+var _origReviewProblem = window.reviewProblem;
+
+// learnProblem / reviewProblem をラップしてタイムを記録
+(function() {
+  var origLearn = window.learnProblem;
+  window.learnProblem = function() {
+    if (sessionMode && timerSeconds > 0) _sessionTimes.push(timerSeconds);
+    origLearn.apply(this, arguments);
+  };
+  var origReview = window.reviewProblem;
+  window.reviewProblem = function() {
+    if (sessionMode && timerSeconds > 0) _sessionTimes.push(timerSeconds);
+    origReview.apply(this, arguments);
+  };
+})();
+
+// startSession にリセット追加
+var _origStartSession = window.startSession;
+window.startSession = function() {
+  _sessionTimes = [];
+  _origStartSession.apply(this, arguments);
+};
+
+// showSessionSummary を拡張版に置き換え
+function showSessionSummary() {
+  var avgTime = 0;
+  if (_sessionTimes.length > 0) {
+    avgTime = Math.round(_sessionTimes.reduce(function(a,b){return a+b;},0) / _sessionTimes.length);
+  }
+  var avgM = Math.floor(avgTime/60), avgS = avgTime%60;
+  var avgStr = avgTime > 0 ? (avgM>0?avgM+'分':'')+avgS+'秒' : '—';
+
+  var el = document.createElement('div');
+  el.className = 'session-summary-overlay';
+  el.innerHTML =
+    '<div class="session-summary-card">' +
+      '<div class="session-summary-emoji">🎉</div>' +
+      '<div class="session-summary-title">セッション完了！</div>' +
+      '<div class="session-summary-sub">' + new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric'}) + ' &nbsp;'+ sessionDone +'問 終了</div>' +
+      '<div class="session-summary-grid">' +
+        '<div class="session-summary-cell" style="background:var(--green-bg);border:1px solid rgba(74,222,128,0.3)">' +
+          '<div class="session-summary-val" style="color:var(--green)">'+ sessionResults.maru +'</div>' +
+          '<div class="session-summary-lbl">○ できた</div></div>' +
+        '<div class="session-summary-cell" style="background:var(--amber-bg);border:1px solid rgba(251,191,36,0.3)">' +
+          '<div class="session-summary-val" style="color:var(--amber)">'+ sessionResults.sanka +'</div>' +
+          '<div class="session-summary-lbl">△ もう少し</div></div>' +
+        '<div class="session-summary-cell" style="background:var(--red-bg);border:1px solid rgba(248,113,113,0.3)">' +
+          '<div class="session-summary-val" style="color:var(--red)">'+ sessionResults.batu +'</div>' +
+          '<div class="session-summary-lbl">× 要復習</div></div>' +
+      '</div>' +
+      '<div class="session-summary-avg">⏱ 平均解答時間: <strong>' + avgStr + '</strong></div>' +
+      (sessionResults.batu > 0 ?
+        '<div style="font-size:11px;color:var(--text3);margin-bottom:14px">×問題が'+sessionResults.batu+'問あります。今週中に復習しましょう。</div>' : '') +
+      '<button class="session-summary-btn" onclick="this.closest(\'.session-summary-overlay\').remove()">OK！続ける</button>' +
+    '</div>';
+  el.addEventListener('click', function(e){ if(e.target===el) el.remove(); });
+  document.body.appendChild(el);
+  launchConfetti();
+}
+
+// ===== 7. カレンダータブ切り替え時に全部呼ぶ =====
+// (既存のshowTab内の calendar ブランチを上書き)
+var _origShowTab = window.showTab;
+window.showTab = function(t) {
+  _origShowTab.apply(this, arguments);
+  if (t === 'calendar') {
+    renderDowHeatmap();
+    renderTimeHistorySelect();
+  }
+  if (t === 'progress') {
+    setTimeout(injectUnlearnedBadges, 120);
+  }
+};
+
+// progress-trends タブ切り替え時
+var _origSwitchProgressTab = window.switchProgressTab;
+window.switchProgressTab = function(tab) {
+  _origSwitchProgressTab.apply(this, arguments);
+  if (tab === 'trends') renderWeaknessScore();
+};
+
 
 initCal();
 </script>
